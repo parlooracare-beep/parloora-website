@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin"
 import { revalidatePath } from "next/cache"
 
 export async function getNotifications() {
@@ -29,7 +30,7 @@ export async function createNotification(data: {
   type: "booking" | "system" | "offer" | "order"
   link?: string
 }) {
-  const supabase = await createClient()
+  const supabase = hasServiceRoleKey() ? createAdminClient() : await createClient()
 
   const { error } = await supabase
     .from("notifications")

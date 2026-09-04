@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 
 /**
  * bKash Payment Callback Handler
@@ -62,7 +62,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const supabase = await createClient()
+    const supabase = createAdminClient()
     const token = await getBkashToken()
 
     // Execute the payment

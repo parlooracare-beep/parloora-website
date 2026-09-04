@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin"
 import { Database } from "@/types/supabase"
 import { revalidatePath } from "next/cache"
 import { createNotification } from "./notifications"
@@ -8,7 +9,8 @@ import { createNotification } from "./notifications"
 type OrderInsert = Database["public"]["Tables"]["orders"]["Insert"]
 
 export async function createOrder(orderData: OrderInsert) {
-  const supabase = await createClient()
+  // Use service role client if configured to bypass RLS, otherwise fallback to server client
+  const supabase = hasServiceRoleKey() ? createAdminClient() : await createClient()
 
   const { data, error } = await supabase
     .from("orders")
@@ -77,7 +79,7 @@ export async function getSellerOrders(sellerId: string) {
 }
 
 export async function updateOrderStatus(orderId: string, status: string) {
-  const supabase = await createClient()
+  const supabase = hasServiceRoleKey() ? createAdminClient() : await createClient()
 
   const { data, error } = await supabase
     .from("orders")

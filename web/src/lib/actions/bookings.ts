@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin"
 import { Database } from "@/types/supabase"
 import { createNotification } from "./notifications"
 import { sendBookingConfirmation, sendBookingStatusUpdate } from "@/lib/email"
@@ -36,7 +37,7 @@ function parseTimeToHours(timeStr: string | null): number | null {
 // ─── createBooking ────────────────────────────────────────────────────────────
 
 export async function createBooking(bookingData: BookingInsert) {
-  const supabase = await createClient()
+  const supabase = hasServiceRoleKey() ? createAdminClient() : await createClient()
 
   const { data, error } = await supabase
     .from("bookings")
@@ -433,7 +434,7 @@ export async function cancelBooking(bookingId: string) {
 // ─── confirmBookingPayment ────────────────────────────────────────────────────
 
 export async function confirmBookingPayment(bookingId: string, paymentIntentId: string, paymentMethod: string = "stripe") {
-  const supabase = await createClient()
+  const supabase = hasServiceRoleKey() ? createAdminClient() : await createClient()
   
   console.log(`confirmBookingPayment: confirming booking ${bookingId} with payment intent ${paymentIntentId}...`)
 

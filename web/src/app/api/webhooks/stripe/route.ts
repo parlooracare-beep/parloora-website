@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import Stripe from "stripe"
-import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { sendBookingStatusUpdate, sendOrderConfirmation } from "@/lib/email"
 import { sendBookingStatusSMS } from "@/lib/sms"
 
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 })
   }
 
-  const supabase = await createClient()
+  const supabase = createAdminClient()
 
   // ─── Handle events ──────────────────────────────────────────────────────────
   switch (event.type) {

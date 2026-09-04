@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin"
 import { revalidatePath } from "next/cache"
 
 export async function getParlourReviews(parlourId: string) {
@@ -65,7 +66,8 @@ export async function submitReview(data: {
 
   if (allReviews && allReviews.length > 0) {
     const avgRating = allReviews.reduce((sum, r) => sum + (r.rating || 0), 0) / allReviews.length
-    await supabase
+    const updateClient = hasServiceRoleKey() ? createAdminClient() : supabase
+    await updateClient
       .from("parlours")
       .update({ rating: parseFloat(avgRating.toFixed(1)) })
       .eq("id", data.parlourId)
