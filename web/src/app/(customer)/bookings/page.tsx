@@ -113,6 +113,15 @@ export default function MyBookingsPage() {
                             <StatusIcon className="w-3.5 h-3.5" />
                             {status.label}
                           </Badge>
+                          {booking.payment_method === "cash" ? (
+                            <Badge className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] px-2.5 py-0.5 font-bold">
+                              💵 Cash on Service
+                            </Badge>
+                          ) : booking.payment_method ? (
+                            <Badge className="bg-blue-50 text-blue-700 border border-blue-200 text-[10px] px-2.5 py-0.5 font-bold uppercase">
+                              💳 {booking.payment_method}
+                            </Badge>
+                          ) : null}
                           {booking.payment_status === 'refund_pending' && (
                             <Badge className="bg-amber-100 text-amber-800 border-0 text-[10px] px-2 py-0.5 font-semibold">
                               Refund Pending
@@ -143,7 +152,9 @@ export default function MyBookingsPage() {
                               </div>
                             </div>
                             <div className="space-y-1">
-                              <p className="text-[10px] text-brand-gray-400 uppercase font-bold tracking-widest">Amount</p>
+                              <p className="text-[10px] text-brand-gray-400 uppercase font-bold tracking-widest">
+                                {booking.payment_method === "cash" ? "Pay at Parlour" : "Amount"}
+                              </p>
                               <p className="text-lg font-black text-primary">৳{booking.amount?.toLocaleString()}</p>
                             </div>
                           </div>

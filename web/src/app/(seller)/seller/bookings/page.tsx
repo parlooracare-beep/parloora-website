@@ -130,8 +130,19 @@ export default function BookingsPage() {
                             <p className="flex items-center gap-1 mt-0.5"><Clock className="w-3 h-3 text-brand-gray-400" /> {booking.time}</p>
                           </div>
                         </td>
-                        <td className="px-4 py-4 text-right text-sm font-bold text-brand-gray-900">
-                          ৳{(booking.amount || 0).toLocaleString()}
+                        <td className="px-4 py-4 text-right">
+                          <p className="text-sm font-bold text-brand-gray-900">৳{(booking.amount || 0).toLocaleString()}</p>
+                          <div className="mt-0.5">
+                            {booking.payment_method === "cash" ? (
+                              <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
+                                Cash on Service
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-1.5 py-0.5 rounded uppercase">
+                                {booking.payment_method || "Online"}
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="px-6 py-4 text-center">
                           <div className="flex flex-col items-center gap-2">

@@ -244,13 +244,20 @@ export default function CustomerDashboard() {
                       <div className="flex flex-col md:flex-row">
                         <div className="p-6 flex-1">
                           <div className="flex items-center justify-between mb-4">
-                            <Badge className={cn(
-                              "px-3 py-1 rounded-lg font-bold text-[10px] uppercase tracking-widest",
-                              booking.status === "confirmed" ? "bg-emerald-100 text-emerald-600" : 
-                              booking.status === "pending" ? "bg-amber-100 text-amber-600" : "bg-brand-gray-100 text-brand-gray-600"
-                            )}>
-                              {booking.status}
-                            </Badge>
+                            <div className="flex items-center gap-2">
+                              <Badge className={cn(
+                                "px-3 py-1 rounded-lg font-bold text-[10px] uppercase tracking-widest",
+                                booking.status === "confirmed" ? "bg-emerald-100 text-emerald-600" : 
+                                booking.status === "pending" ? "bg-amber-100 text-amber-600" : "bg-brand-gray-100 text-brand-gray-600"
+                              )}>
+                                {booking.status}
+                              </Badge>
+                              {booking.payment_method === "cash" && (
+                                <Badge className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-lg font-bold text-[10px]">
+                                  💵 Cash on Service
+                                </Badge>
+                              )}
+                            </div>
                             <span className="text-xs text-brand-gray-400 font-bold">#{booking.id.slice(0, 8)}</span>
                           </div>
                           
@@ -307,9 +314,16 @@ export default function CustomerDashboard() {
                       <div className="flex flex-col md:flex-row">
                         <div className="p-6 flex-1">
                           <div className="flex items-center justify-between mb-4">
-                            <Badge className="bg-blue-100 text-blue-600 px-3 py-1 rounded-lg font-bold text-[10px] uppercase tracking-widest">
-                              {order.status}
-                            </Badge>
+                            <div className="flex items-center gap-2">
+                              <Badge className="bg-blue-100 text-blue-600 px-3 py-1 rounded-lg font-bold text-[10px] uppercase tracking-widest">
+                                {order.status}
+                              </Badge>
+                              {order.payment_method === "Cash on Delivery" && (
+                                <Badge className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-lg font-bold text-[10px]">
+                                  📦 Cash on Delivery
+                                </Badge>
+                              )}
+                            </div>
                             <span className="text-xs text-brand-gray-400 font-bold">Order #{order.id.slice(0, 8)}</span>
                           </div>
                           

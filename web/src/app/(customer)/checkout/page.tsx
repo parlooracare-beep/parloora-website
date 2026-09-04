@@ -83,7 +83,7 @@ export default function CheckoutPage() {
     address: "",
     city: "",
     postalCode: "",
-    paymentMethod: "Card"
+    paymentMethod: "Cash on Delivery"
   })
 
   React.useEffect(() => {
@@ -425,21 +425,26 @@ export default function CheckoutPage() {
                   <h3 className="text-xl font-bold text-brand-gray-900">Payment Method</h3>
                 </div>
 
-                {/* Payment method grid — 4 options */}
+                {/* Payment method grid — Cash on Delivery prioritized, digital options available */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {([
                     {
-                      id: "Card",
-                      label: "Card (Stripe)",
-                      sub: "Visa, Mastercard, AMEX",
+                      id: "Cash on Delivery",
+                      label: "Cash on Delivery (COD)",
+                      sub: "Pay in cash at your doorstep upon delivery",
                       badge: (
-                        <div className="flex gap-1">
-                          <div className="w-7 h-4 bg-blue-700 rounded-sm flex items-center justify-center">
-                            <span className="text-[7px] font-black text-white">VISA</span>
-                          </div>
-                          <div className="w-7 h-4 rounded-sm overflow-hidden flex">
-                            <div className="w-1/2 bg-red-500" /><div className="w-1/2 bg-amber-400" />
-                          </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                          Recommended
+                        </span>
+                      ),
+                    },
+                    {
+                      id: "bKash",
+                      label: "bKash",
+                      sub: "Bangladesh's #1 MFS wallet",
+                      badge: (
+                        <div className="w-12 h-5 bg-[#E2136E] rounded flex items-center justify-center">
+                          <span className="text-[7px] font-black text-white">bKash</span>
                         </div>
                       ),
                     },
@@ -454,20 +459,19 @@ export default function CheckoutPage() {
                       ),
                     },
                     {
-                      id: "bKash",
-                      label: "bKash",
-                      sub: "Bangladesh's #1 MFS",
+                      id: "Card",
+                      label: "Card (Stripe)",
+                      sub: "International Visa, Mastercard, AMEX",
                       badge: (
-                        <div className="w-12 h-5 bg-[#E2136E] rounded flex items-center justify-center">
-                          <span className="text-[7px] font-black text-white">bKash</span>
+                        <div className="flex gap-1">
+                          <div className="w-7 h-4 bg-blue-700 rounded-sm flex items-center justify-center">
+                            <span className="text-[7px] font-black text-white">VISA</span>
+                          </div>
+                          <div className="w-7 h-4 rounded-sm overflow-hidden flex">
+                            <div className="w-1/2 bg-red-500" /><div className="w-1/2 bg-amber-400" />
+                          </div>
                         </div>
                       ),
-                    },
-                    {
-                      id: "Cash on Delivery",
-                      label: "Cash on Delivery",
-                      sub: "Pay when your order arrives",
-                      badge: null,
                     },
                   ] as const).map((method) => (
                     <button
@@ -499,6 +503,20 @@ export default function CheckoutPage() {
                     </button>
                   ))}
                 </div>
+
+                {/* Cash on Delivery Explanatory Notice */}
+                {formData.paymentMethod === "Cash on Delivery" && (
+                  <div className="mt-5 p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 flex items-start gap-3 text-emerald-900">
+                    <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                    <div className="text-xs space-y-0.5">
+                      <p className="font-bold text-emerald-950">Zero Advance Payment Required</p>
+                      <p className="text-emerald-800/90 leading-relaxed">
+                        Pay in cash at your doorstep when your package arrives. Please keep exact cash of{" "}
+                        <span className="font-bold text-emerald-950">৳{finalTotal.toLocaleString()}</span> ready for the courier.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </section>
             </div>
 
@@ -615,8 +633,10 @@ export default function CheckoutPage() {
                       >
                         {isSubmitting ? (
                           <><Loader2 className="w-6 h-6 mr-3 animate-spin" /> Processing...</>
+                        ) : formData.paymentMethod === "Cash on Delivery" ? (
+                          <>Confirm Order (Cash on Delivery) <ArrowRight className="w-5 h-5 ml-2" /></>
                         ) : (
-                          <>Complete Order <ArrowRight className="w-5 h-5 ml-2" /></>
+                          <>Pay & Complete Order <ArrowRight className="w-5 h-5 ml-2" /></>
                         )}
                       </Button>
 

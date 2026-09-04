@@ -1038,7 +1038,9 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                   <h4 className="text-2xl font-bold text-brand-gray-900 mb-2">You&apos;re all set!</h4>
                   <p className="text-brand-gray-500 text-sm mb-8 leading-relaxed">
                     Great choice! Your appointment at <span className="text-brand-gray-900 font-bold">{parlour?.name ? formatParlourName(parlour.name) : ""}</span> is secured. 
-                    We&apos;ve sent the details to your email.
+                    {bookingPaymentMethod === "cash" 
+                      ? " Zero advance payment needed — pay in cash directly at the parlour after your service."
+                      : " We've sent the booking and payment receipt to your email."}
                   </p>
                   
                   <div className="relative bg-white border-2 border-brand-gray-100 rounded-2xl overflow-hidden shadow-sm mb-8">
@@ -1076,7 +1078,15 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                         </div>
                         <div className="text-right">
                           <p className="text-[10px] uppercase font-bold text-brand-gray-400 tracking-widest">Payment Method</p>
-                          <span className="text-xs text-brand-gray-600 font-bold uppercase">{bookingPaymentMethod}</span>
+                          {bookingPaymentMethod === "cash" ? (
+                            <span className="text-xs text-emerald-800 bg-emerald-100/90 border border-emerald-300 font-bold px-2 py-0.5 rounded-full inline-block">
+                              💵 Cash on Service
+                            </span>
+                          ) : (
+                            <span className="text-xs text-brand-gray-700 bg-brand-gray-100 font-bold uppercase px-2 py-0.5 rounded-full inline-block">
+                              💳 {bookingPaymentMethod}
+                            </span>
+                          )}
                         </div>
                       </div>
 
@@ -1399,10 +1409,17 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                     <p className="text-sm font-bold text-brand-gray-800">Select how you want to pay:</p>
                     <div className="grid grid-cols-1 gap-3">
                       {[
-                        { id: "cash", label: "Pay at Salon", sub: "Pay cash/card after service completion", icon: Store },
-                        { id: "stripe", label: "Pay Online (Stripe)", sub: "Secure checkout with credit card", icon: CreditCard },
-                        { id: "bkash", label: "bKash", sub: "Bangladesh's leading mobile financial service", badge: "MFS" },
-                        { id: "sslcommerz", label: "SSLCommerz", sub: "Pay via local banks, cards or mobile wallets", badge: "Local Pay" }
+                        { 
+                          id: "cash", 
+                          label: "Cash on Service (Pay at Parlour)", 
+                          sub: "No advance payment needed. Pay in cash after treatment.", 
+                          badge: "Recommended", 
+                          badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-200", 
+                          icon: Store 
+                        },
+                        { id: "bkash", label: "bKash", sub: "Pay in advance with Bangladesh's #1 MFS", badge: "MFS", badgeClass: "bg-primary/10 text-primary border-0", icon: null },
+                        { id: "sslcommerz", label: "SSLCommerz", sub: "Pay via local banks, cards or mobile wallets", badge: "Local Pay", badgeClass: "bg-primary/10 text-primary border-0", icon: null },
+                        { id: "stripe", label: "Pay Online (Stripe)", sub: "Secure checkout with credit or debit card", badge: "Card", badgeClass: "bg-primary/10 text-primary border-0", icon: CreditCard },
                       ].map((method) => {
                         const Icon = method.icon;
                         return (
@@ -1433,15 +1450,28 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                                 <p className="text-[10px] text-brand-gray-400 mt-0.5">{method.sub}</p>
                               </div>
                             </div>
-                            {Icon ? (
-                              <Icon className="w-5 h-5 text-brand-gray-400" />
-                            ) : method.badge ? (
-                              <Badge className="bg-primary/10 text-primary border-0 text-[9px] uppercase tracking-wider">{method.badge}</Badge>
-                            ) : null}
+                            <div className="flex items-center gap-2">
+                              {method.badge && (
+                                <Badge className={cn("text-[9px] uppercase tracking-wider font-bold border", method.badgeClass)}>
+                                  {method.badge}
+                                </Badge>
+                              )}
+                              {Icon && <Icon className="w-4 h-4 text-brand-gray-400" />}
+                            </div>
                           </button>
                         );
                       })}
                     </div>
+
+                    {/* Cash on Service Informational Callout */}
+                    {bookingPaymentMethod === "cash" && (
+                      <div className="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200/80 flex items-start gap-2.5 text-emerald-900 mt-3">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                        <p className="text-xs leading-relaxed text-emerald-800">
+                          <strong className="text-emerald-950">Zero Advance Payment:</strong> Your appointment slot is guaranteed immediately. You will pay ৳{finalBookingTotal.toLocaleString()} directly at the parlour counter after receiving your service.
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Pricing summary & Promo code */}
@@ -1576,7 +1606,7 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                         {isBooking ? (
                           <><Loader2 className="w-5 h-5 mr-3 animate-spin" /> Processing...</>
                         ) : bookingPaymentMethod === "cash" ? (
-                          "Confirm Reservation"
+                          "Book with Cash on Service (Pay at Parlour)"
                         ) : (
                           "Proceed to Payment"
                         )}

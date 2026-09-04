@@ -162,7 +162,15 @@ export default function SellerOrdersPage() {
                       </td>
                       <td className="px-4 py-6 text-right">
                         <p className="text-sm font-black text-brand-gray-900">{formatCurrency(order.total_amount)}</p>
-                        <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest">Paid</p>
+                        {order.payment_method === "Cash on Delivery" ? (
+                          <p className="text-[10px] text-amber-700 font-bold uppercase tracking-wider bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 inline-block mt-0.5">
+                            COD (Collect Cash)
+                          </p>
+                        ) : (
+                          <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest mt-0.5">
+                            Paid Online
+                          </p>
+                        )}
                       </td>
                       <td className="px-4 py-6 text-center">
                         <Badge className={cn(

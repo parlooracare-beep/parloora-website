@@ -66,9 +66,20 @@ export default function MyOrdersPage() {
                   <div className="flex flex-col md:flex-row">
                     <div className="p-6 flex-1">
                       <div className="flex items-center justify-between mb-4">
-                        <Badge className="bg-blue-50 text-blue-700 border-blue-200 px-3 py-1 rounded-lg font-bold text-[10px] uppercase tracking-widest">
-                          {order.status}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge className="bg-blue-50 text-blue-700 border-blue-200 px-3 py-1 rounded-lg font-bold text-[10px] uppercase tracking-widest">
+                            {order.status}
+                          </Badge>
+                          {order.payment_method === "Cash on Delivery" ? (
+                            <Badge className="bg-emerald-50 text-emerald-800 border-emerald-200 px-2.5 py-1 rounded-lg font-bold text-[10px]">
+                              📦 Cash on Delivery
+                            </Badge>
+                          ) : order.payment_method ? (
+                            <Badge className="bg-purple-50 text-purple-700 border-purple-200 px-2.5 py-1 rounded-lg font-bold text-[10px]">
+                              💳 {order.payment_method}
+                            </Badge>
+                          ) : null}
+                        </div>
                         <span className="text-[10px] text-brand-gray-400 font-mono tracking-tighter">ORDER #{order.id.slice(0, 8).toUpperCase()}</span>
                       </div>
                       
@@ -102,7 +113,9 @@ export default function MyOrdersPage() {
                     
                     <div className="bg-brand-gray-50 p-6 md:w-64 border-t md:border-t-0 md:border-l border-brand-gray-100 flex flex-col justify-between items-end min-w-[200px]">
                       <div className="text-right w-full">
-                        <p className="text-[10px] text-brand-gray-400 font-bold uppercase tracking-widest mb-1">Total Paid</p>
+                        <p className="text-[10px] text-brand-gray-400 font-bold uppercase tracking-widest mb-1">
+                          {order.payment_method === "Cash on Delivery" ? "Pay upon Delivery" : "Total Paid"}
+                        </p>
                         <p className="text-2xl font-black text-brand-gray-900">{formatCurrency(order.total_amount || 0)}</p>
                       </div>
                       <div className="flex flex-col gap-2 w-full mt-6">
