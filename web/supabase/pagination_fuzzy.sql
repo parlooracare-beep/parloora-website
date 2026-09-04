@@ -1,0 +1,6 @@
+-- ENABLE PG_TRGM EXTENSION FOR FUZZY SEARCH
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+-- CREATE TRIGRAM GIN INDEXES ON PARLOURS NAME AND TYPE FOR TYPO-TOLERANT SEARCH
+CREATE INDEX IF NOT EXISTS idx_parlours_name_trgm ON public.parlours USING GIN (name gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_parlours_type_trgm ON public.parlours USING GIN (type gin_trgm_ops);

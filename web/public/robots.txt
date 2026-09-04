@@ -1,0 +1,28 @@
+User-agent: *
+Allow: /
+
+# Allow all public-facing routes
+Allow: /blog/
+Allow: /parlours/
+Allow: /shop/
+Allow: /about/
+Allow: /privacy/
+Allow: /terms/
+
+# Block all authenticated / admin / API surfaces
+Disallow: /admin/
+Disallow: /seller/
+Disallow: /dashboard/
+Disallow: /profile/
+Disallow: /bookings/
+Disallow: /notifications/
+Disallow: /wishlist/
+Disallow: /checkout/
+Disallow: /orders/
+Disallow: /api/
+Disallow: /auth/
+
+# Block Next.js internals
+Disallow: /_next/
+
+Sitemap: https://www.parloora.com/sitemap.xml

@@ -1,0 +1,236 @@
+🧠 PROJECT NAME
+
+Build a scalable beauty marketplace platform called
+Parloora 
+
+Parloora is an online marketplace specializing in beauty and wellness service bookings. It connects customers with local beauty parlors, salons, and spas through a digital platform, simplifying appointment scheduling and service discovery. The company serves as a bridge between service providers and clients in Bangladesh’s rapidly digitizing personal care industry.
+
+Tagline: Book your selfcare services in seconds
+🎯 OBJECTIVE
+
+Create a high-performance, mobile-first platform that includes:
+
+• Customer Website
+• Mobile App (Android + iOS)
+• Parlour Owner Dashboard
+• Super Admin Panel
+
+The system must be:
+• Fast
+• Secure
+• Scalable
+• SEO optimized
+• Easy to manage from admin
+
+⚙️ FINAL TECH STACK (STRONGLY RECOMMENDED)
+
+This stack is optimized for speed + low cost + scalability.
+
+🌐 FRONTEND
+Website
+
+• Framework: Next.js
+• Styling: Tailwind CSS
+• State: Zustand / React Query
+• SEO: Next.js built-in SSR
+
+Mobile App
+
+• Framework: Flutter
+• Language: Dart
+• Reason: Single codebase, high performance
+
+🧠 BACKEND
+Backend Platform
+
+• Supabase
+
+Includes:
+• PostgreSQL database
+• Authentication
+• Storage
+• Realtime updates
+
+Optional Advanced Backend
+
+• Node.js (Express or NestJS)
+(Use only if scaling requires custom logic)
+
+🗄️ DATABASE
+
+• PostgreSQL (via Supabase)
+
+☁️ HOSTING
+
+• Website: Vercel
+• Backend: Supabase cloud
+• Storage: Supabase Storage
+
+🔐 AUTHENTICATION
+
+• Email & Password
+• Phone OTP
+• Google login
+
+💳 PAYMENT
+
+• Stripe (global)
+• SSLCommerz / bKash (Bangladesh)
+
+🧩 SYSTEM ARCHITECTURE
+Core Modules
+User System
+Parlour System
+Booking System
+Payment System
+Review System
+Notification System
+Admin Control System
+💻 CUSTOMER WEBSITE FEATURES
+Pages
+
+• Homepage (hero + search + featured parlours)
+• Parlour Listing Page
+• Parlour Details Page
+• Booking Page
+• User Dashboard
+• Blog (SEO growth)
+
+Functional Features
+
+• Smart search with filters
+• Location-based suggestions
+• Real-time booking
+• Reviews & ratings
+• Wishlist
+• Offers & discounts
+
+📱 MOBILE APP FEATURES
+Core UX
+
+• Fast navigation
+• Clean UI
+• One tap booking
+
+Features
+
+• Push notifications
+• Booking tracking
+• Rebooking
+• In-app chat
+• GPS location detection
+
+🏪 PARLOUR OWNER DASHBOARD
+Features
+
+• Register parlour
+• Add/edit services
+• Set pricing & time slots
+• Manage bookings
+• Earnings dashboard
+• Upload gallery
+
+🧑‍💼 ADMIN PANEL (HIGH LEVEL CONTROL)
+
+This must be very powerful.
+
+🔐 Access Control
+
+• Admin login
+• Role-based permissions
+
+📊 Dashboard
+
+• Total revenue
+• Daily bookings
+• Growth analytics
+
+👥 User Management
+
+• View / edit users
+• Ban users
+
+🏪 Parlour Management
+
+• Approve listings
+• Feature top parlours
+• Edit content
+
+📅 Booking Control
+
+• Monitor bookings
+• Cancel bookings
+• Dispute resolution
+
+💰 Finance
+
+• Commission settings
+• Revenue tracking
+• Withdraw system
+
+📢 Marketing
+
+• Promo codes
+• Push notifications
+• Campaign manager
+
+⭐ Reviews
+
+• Moderate reviews
+• Remove fake ones
+
+⚙️ System Settings
+
+• Platform fees
+• Categories
+• App configuration
+
+🤖 AI FEATURES (ADVANCED)
+
+• Recommendation engine
+• Smart search ranking
+• Fraud detection
+• Dynamic pricing insights
+
+🔐 SECURITY REQUIREMENTS
+
+• Secure API with JWT
+• Encrypted data
+• Rate limiting
+• Admin activity logs
+• Role-based access control
+
+💰 MONETIZATION SYSTEM
+
+• Commission per booking
+• Featured listings
+• Ads system
+• Subscription plans
+
+🎨 UI / UX DESIGN RULE
+
+• Mobile-first
+• Premium feel
+• Smooth animations
+• Clean layout
+
+Brand colors:
+• Deep Purple
+• Rose Gold
+
+⚡ PERFORMANCE REQUIREMENTS
+
+• Page load < 2 seconds
+• Optimized images
+• Lazy loading
+• CDN usage
+
+🧾 FINAL BUILD INSTRUCTION
+
+Build the system with:
+
+• Clean code architecture
+• Modular structure
+• Scalable backend
+• Strong admin control
+• Fast frontend performance

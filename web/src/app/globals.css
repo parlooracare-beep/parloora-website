@@ -1,0 +1,169 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Brand Colors Core Identity */
+  --color-primary: var(--primary);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: #1C1C1C;
+  
+  /* Core Brand Tokens */
+  --color-brand-purple: #4B1E6D;
+  --color-brand-rose: #E6B7A9;
+  --color-brand-lavender: #C8A2D6;
+  --color-brand-pink: #F4D6D0;
+  --color-brand-beige: #F5E9E2;
+  --color-brand-charcoal: #1C1C1C;
+  --color-brand-coolgray: #7A7A7A;
+  --color-brand-gold: #D4A373;
+
+  /* Deep Purple Palette (Legacy support) */
+  --color-deep-purple-50: #f3e5f5;
+  --color-deep-purple-100: #e1bee7;
+  --color-deep-purple-200: #ce93d8;
+  --color-deep-purple-300: #ba68c8;
+  --color-deep-purple-400: #ab47bc;
+  --color-deep-purple-500: #9c27b0;
+  --color-deep-purple-600: #8e24aa;
+  --color-deep-purple-700: #7b1fa2;
+  --color-deep-purple-800: #6a1b9a;
+  --color-deep-purple-900: #4a148c;
+
+  /* Rose Gold Palette (Legacy support) */
+  --color-rose-gold-50: #fdf4f5;
+  --color-rose-gold-100: #f9e1e4;
+  --color-rose-gold-200: #f4c4ca;
+  --color-rose-gold-300: #ec9da7;
+  --color-rose-gold-400: #e17482;
+  --color-rose-gold-500: #d14d5d;
+  --color-rose-gold-600: #b76e79;
+  --color-rose-gold-700: #9e2d3c;
+  --color-rose-gold-800: #832835;
+  --color-rose-gold-900: #6f252f;
+
+  /* Brand Gray (Tinted with Deep Purple - Legacy support) */
+  --color-brand-gray-50: #f8f7f9;
+  --color-brand-gray-100: #f1edf5;
+  --color-brand-gray-200: #e2dbeb;
+  --color-brand-gray-300: #cbbedb;
+  --color-brand-gray-400: #a791c2;
+  --color-brand-gray-500: #8369a8;
+  --color-brand-gray-600: #674e8c;
+  --color-brand-gray-700: #523e70;
+  --color-brand-gray-800: #3a2c50;
+  --color-brand-gray-900: #261c36;
+
+  /* Gradients */
+  --image-gradient-brand: linear-gradient(to right, #4B1E6D, #E6B7A9);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --radius-lg: calc(var(--radius) + 0.25rem);
+  --radius-md: var(--radius);
+  --radius-sm: calc(var(--radius) - 0.25rem);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+}
+
+@keyframes accordion-down {
+  from { height: 0; }
+  to { height: var(--radix-accordion-content-height); }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); }
+  to { height: 0; }
+}
+
+:root {
+  --background: #FFFFFF;
+  --foreground: #1C1C1C;
+  --card: #FFFFFF;
+  --card-foreground: #1C1C1C;
+  --popover: #FFFFFF;
+  --popover-foreground: #1C1C1C;
+  --primary: #4B1E6D;
+  --primary-foreground: #FFFFFF;
+  --secondary: #E6B7A9;
+  --secondary-foreground: #1C1C1C;
+  --muted: #F5E9E2;
+  --muted-foreground: #7A7A7A;
+  --accent: #D4A373;
+  --accent-foreground: #FFFFFF;
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+  --border: #F5E9E2;
+  --input: #F5E9E2;
+  --ring: #4B1E6D;
+}
+
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    overflow-x: hidden;
+  }
+  
+  /* Allow selection for inputs and content */
+  input, textarea, [contenteditable="true"], .selectable {
+    user-select: text;
+  }
+}
+
+/* Mobile App Feel Utilities */
+@layer utilities {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pb-safe-offset-2 {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 0.5rem);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .glass {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
