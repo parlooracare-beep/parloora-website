@@ -10,6 +10,9 @@ export interface CartItem extends Product {
 
 interface CartStore {
   items: CartItem[]
+  isOpen: boolean
+  openCart: () => void
+  closeCart: () => void
   addItem: (product: Product, quantity?: number) => void
   removeItem: (productId: string) => void
   updateQuantity: (productId: string, quantity: number) => void
@@ -22,6 +25,9 @@ export const useCart = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      isOpen: false,
+      openCart: () => set({ isOpen: true }),
+      closeCart: () => set({ isOpen: false }),
       
       addItem: (product, qty = 1) => {
         const currentItems = get().items
@@ -74,6 +80,7 @@ export const useCart = create<CartStore>()(
     }),
     {
       name: "parloora-cart-storage",
+      partialize: (state) => ({ items: state.items }),
     }
   )
 )

@@ -20,10 +20,9 @@ import { useI18n } from "@/lib/store/useI18n"
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = React.useState(false)
-  const [isCartOpen, setIsCartOpen] = React.useState(false)
+  const { totalItems, isOpen: isCartOpen, openCart, closeCart } = useCart()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = React.useState<any>(null)
-  const { totalItems } = useCart()
   const pathname = usePathname()
   const router = useRouter()
   const [isSearchOpen, setIsSearchOpen] = React.useState(false)
@@ -59,7 +58,8 @@ export function Navbar() {
   ]
 
   return (
-    <header
+    <>
+      <header
       className={cn(
         "fixed top-0 w-full z-50 transition-all duration-500",
         isScrolled
@@ -96,7 +96,7 @@ export function Navbar() {
               
               <Button 
                 variant="ghost" 
-                onClick={() => setIsCartOpen(true)}
+                onClick={openCart}
                 className="rounded-full relative p-2 h-10 w-10 hover:bg-primary/5"
               >
                 <ShoppingBag className="w-5 h-5 text-brand-gray-700" />
@@ -115,7 +115,7 @@ export function Navbar() {
               
               <Button 
                 variant="ghost" 
-                onClick={() => setIsCartOpen(true)}
+                onClick={openCart}
                 className="rounded-full relative p-2 h-10 w-10 hover:bg-primary/5"
               >
                 <ShoppingBag className="w-5 h-5 text-brand-gray-700" />
@@ -153,7 +153,7 @@ export function Navbar() {
           <NotificationBell />
           <Button 
             variant="ghost" 
-            onClick={() => setIsCartOpen(true)}
+            onClick={openCart}
             className="rounded-full relative p-2 h-9 w-9"
           >
             <ShoppingBag className="w-5 h-5" />
@@ -191,8 +191,10 @@ export function Navbar() {
           </form>
         </div>
       )}
-
-      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </header>
+
+    {/* Cart Drawer rendered via Portal outside header containing block */}
+    <CartDrawer isOpen={isCartOpen} onClose={closeCart} />
+  </>
   )
 }

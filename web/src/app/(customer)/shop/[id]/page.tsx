@@ -24,7 +24,7 @@ type Product = Database["public"]["Tables"]["products"]["Row"]
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params)
   const router = useRouter()
-  const addItem = useCart((state) => state.addItem)
+  const { addItem, openCart } = useCart()
   const [product, setProduct] = React.useState<Product | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [quantity, setQuantity] = React.useState(1)
@@ -54,6 +54,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     addItem(product, quantity)
     setAddedToCart(true)
     setTimeout(() => setAddedToCart(false), 2000)
+    openCart()
   }
 
   const handleBuyNow = () => {

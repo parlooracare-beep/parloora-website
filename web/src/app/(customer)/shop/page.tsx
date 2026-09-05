@@ -16,7 +16,6 @@ import { getProducts } from "@/lib/actions/products"
 import { Database } from "@/types/supabase"
 import { useCart } from "@/lib/store/useCart"
 import { motion, AnimatePresence } from "framer-motion"
-import { CartDrawer } from "@/components/shared/CartDrawer"
 
 type Product = Database["public"]["Tables"]["products"]["Row"]
 
@@ -29,8 +28,7 @@ export default function ShopPage() {
   const [search, setSearch] = React.useState(searchParams.get("search") || "")
   const [category, setCategory] = React.useState("All")
   const [isFilterOpen, setIsFilterOpen] = React.useState(false)
-  const [isCartOpen, setIsCartOpen] = React.useState(false)
-  const { addItem, totalItems } = useCart()
+  const { addItem, totalItems, openCart } = useCart()
 
   React.useEffect(() => {
     async function load() {
@@ -76,7 +74,7 @@ export default function ShopPage() {
               </div>
               <Button 
                 className="h-11 bg-primary hover:bg-primary/90 rounded-xl px-6 gap-2 w-full sm:w-auto animate-fade-in"
-                onClick={() => setIsCartOpen(true)}
+                onClick={openCart}
               >
                 <ShoppingBag className="w-4 h-4" />
                 Cart ({totalItems()})
@@ -170,7 +168,7 @@ export default function ShopPage() {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 addItem(product);
-                                setIsCartOpen(true);
+                                openCart();
                               }}
                               className="bg-brand-gray-900 hover:bg-primary text-white rounded-lg px-2 h-7 text-[10px] transition-colors"
                             >
@@ -229,7 +227,6 @@ export default function ShopPage() {
           </>
         )}
       </AnimatePresence>
-      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </div>
   )
 }
