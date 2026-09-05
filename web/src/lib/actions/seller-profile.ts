@@ -76,7 +76,7 @@ export async function getSellerProfile() {
     bookingRules: parlour.booking_rules || "",
     cancellationPolicy: parlour.cancellation_policy || "",
     profileCompletion: parlour.profile_completion || 0,
-    isBookingReady: parlour.is_booking_ready || false,
+    isBookingReady: true,
     hasOpeningHours: hasHours,
     hasPaymentInfo: hasPayment
   }
@@ -142,8 +142,8 @@ export async function updateSellerProfile(data: {
     hasPaymentInfo: hasPayment
   })
 
-  // Booking ready if completion is 30% or higher
-  const isBookingReady = completionScore >= 30
+  // Booking ready by default — sellers can accept bookings without mandatory profile thresholds
+  const isBookingReady = true
 
   // Build update payload — only include columns that should change
   // NOTE: status is NOT updated here — only admins change approval status
@@ -260,7 +260,7 @@ export async function uploadSellerFile(formData: FormData, fileType: "logo" | "c
   })
 
   updatePayload.profile_completion = completionScore
-  updatePayload.is_booking_ready = completionScore >= 30
+  updatePayload.is_booking_ready = true
 
   const { error: updateErr } = await supabase
     .from("parlours")

@@ -770,19 +770,6 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
           </div>
         ) : (
           <>
-            {/* Booking Readiness Gate Banner */}
-            {!parlour.is_booking_ready && (
-              <div className="mb-6 flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-2xl text-amber-800 text-sm animate-in fade-in">
-                <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-bold">Booking Unavailable</p>
-                  <p className="text-xs text-amber-700 mt-0.5">
-                    This parlour is currently updating its profile and documents. Online booking is temporarily disabled.
-                  </p>
-                </div>
-              </div>
-            )}
-
             {/* Info Card */}
             <Card className="mb-6 overflow-hidden shadow-lg border-0">
               <CardContent className="p-6">
@@ -884,16 +871,10 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                       </div>
                       <Button
                         size="sm"
-                        disabled={!parlour.is_booking_ready}
                         onClick={() => handleBook(service)}
-                        className={cn(
-                          "rounded-xl font-bold transition-all shadow-md h-10 w-full sm:w-auto px-6",
-                          parlour.is_booking_ready
-                            ? "bg-primary text-white hover:bg-primary/95 hover:scale-105 active:scale-95 cursor-pointer"
-                            : "bg-brand-gray-100 text-brand-gray-400 border border-brand-gray-200 cursor-not-allowed"
-                        )}
+                        className="rounded-xl font-bold transition-all shadow-md h-10 w-full sm:w-auto px-6 bg-primary text-white hover:bg-primary/95 hover:scale-105 active:scale-95 cursor-pointer"
                       >
-                        {parlour.is_booking_ready ? "Book Now" : "N/A"}
+                        Book Now
                       </Button>
                     </div>
                   </CardContent>

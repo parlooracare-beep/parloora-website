@@ -136,6 +136,7 @@ export async function getParlourById(id: string) {
 
   return {
     ...parlour,
+    is_booking_ready: true,
     services: services || [],
     reviews: reviews || []
   }
