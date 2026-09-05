@@ -11,6 +11,8 @@
  *   RESEND_FROM_NAME      — display name (default: Parloora)
  */
 
+import { getSiteUrl } from "./site-url"
+
 const RESEND_API = "https://api.resend.com/emails"
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "noreply@parloora.com"
 const FROM_NAME  = process.env.RESEND_FROM_NAME  || "Parloora"
@@ -19,7 +21,7 @@ const FROM       = `${FROM_NAME} <${FROM_EMAIL}>`
 // ─── Shared design tokens ────────────────────────────────────────────────────
 const BRAND_PURPLE = "#4B1E6D"
 const BRAND_ROSE   = "#E6B7A9"
-const SITE_URL     = process.env.NEXT_PUBLIC_SITE_URL || "https://www.parloora.com"
+const SITE_URL     = getSiteUrl()
 
 // ─── Low-level send helper ───────────────────────────────────────────────────
 async function sendEmail(payload: {

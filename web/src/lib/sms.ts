@@ -14,6 +14,8 @@
  *   The function signatures above it stay unchanged.
  */
 
+import { getSiteUrl } from "./site-url"
+
 // ─── Low-level sender ─────────────────────────────────────────────────────────
 export async function sendSMS(
   to: string,
@@ -75,7 +77,7 @@ export async function sendBookingConfirmationSMS(
     `Hi ${booking.customer_name || "there"}, your ${booking.service_name || "appointment"} ` +
     `at ${booking.parlour_name || "the parlour"} is booked for ` +
     `${booking.date || "—"} at ${booking.time || "—"}.\n` +
-    `View: parloora.com/bookings`
+    `View: ${getSiteUrl()}/bookings`
 
   return sendSMS(phone, body)
 }
@@ -114,7 +116,7 @@ export async function sendBookingStatusSMS(
   const body =
     `${emoji} Parloora: Your booking for ${booking.service_name || "your service"} ` +
     `at ${booking.parlour_name || "the parlour"} on ${booking.date || "—"} ` +
-    `has been ${status}. View: parloora.com/bookings`
+    `has been ${status}. View: ${getSiteUrl()}/bookings`
 
   return sendSMS(phone, body)
 }

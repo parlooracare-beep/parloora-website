@@ -24,5 +24,5 @@ export function getSiteUrl(): string {
   }
 
   // 5. Default production domain fallback
-  return "https://parloora-website.vercel.app"
+  return "https://parloora.vercel.app"
 }

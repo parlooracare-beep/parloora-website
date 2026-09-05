@@ -29,4 +29,4 @@ Disallow: /auth/
 # Block Next.js internals
 Disallow: /_next/
 
-Sitemap: https://parloora-website.vercel.app/sitemap.xml
+Sitemap: https://parloora.vercel.app/sitemap.xml
