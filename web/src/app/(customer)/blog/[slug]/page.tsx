@@ -8,12 +8,13 @@ import { getBlogPostBySlug, getRelatedBlogPosts } from "@/lib/actions/blog"
 import { formatDate } from "@/lib/utils"
 
 interface Props {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 // ─── Dynamic Metadata ──────────────────────────────────────────────────────────
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = await getBlogPostBySlug(params.slug)
+  const { slug } = await params
+  const post = await getBlogPostBySlug(slug)
   if (!post) return { title: "Post Not Found – Parloora Blog" }
 
   return {
@@ -35,18 +36,17 @@ function readingTime(content: string) {
   return Math.max(1, Math.ceil(words / 200))
 }
 
-
-
 export default async function BlogPostPage({ params }: Props) {
+  const { slug } = await params
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const post: any = await getBlogPostBySlug(params.slug)
+  const post: any = await getBlogPostBySlug(slug)
 
   if (!post) {
     notFound()
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const related: any[] = await getRelatedBlogPosts(params.slug, post.category, 3)
+  const related: any[] = await getRelatedBlogPosts(slug, post.category, 3)
   const minutes = readingTime(post.content || "")
   const authorName = post.users?.display_name || (post.users?.email?.split("@")[0] ?? "Parloora Editorial")
 

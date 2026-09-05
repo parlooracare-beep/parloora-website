@@ -2,12 +2,16 @@ User-agent: *
 Allow: /
 
 # Allow all public-facing routes
+Allow: /blog
 Allow: /blog/
+Allow: /parlours
 Allow: /parlours/
+Allow: /shop
 Allow: /shop/
-Allow: /about/
-Allow: /privacy/
-Allow: /terms/
+Allow: /about
+Allow: /privacy
+Allow: /terms
+Allow: /cookies
 
 # Block all authenticated / admin / API surfaces
 Disallow: /admin/
@@ -25,4 +29,4 @@ Disallow: /auth/
 # Block Next.js internals
 Disallow: /_next/
 
-Sitemap: https://www.parloora.com/sitemap.xml
+Sitemap: https://parloora-website.vercel.app/sitemap.xml

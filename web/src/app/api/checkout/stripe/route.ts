@@ -20,6 +20,14 @@ export async function POST(request: Request) {
       )
     }
 
+    const secretKey = process.env.STRIPE_SECRET_KEY
+    if (!secretKey || secretKey.includes('Placeholder') || secretKey === 'sk_test_placeholder_key_for_build_purposes') {
+      return NextResponse.json(
+        { success: false, error: 'Online card payment gateway is currently not configured.' },
+        { status: 503 }
+      )
+    }
+
     // 2. Create PaymentIntent with rich booking metadata linking to Supabase database
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount * 100), // Stripe processes in fractional units (cents/poisha)

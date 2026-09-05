@@ -90,8 +90,8 @@ export default async function BlogPage() {
                 {/* Image */}
                 <div className="aspect-[4/3] lg:aspect-auto overflow-hidden relative">
                   <Image
-                    src={featuredPost.cover_image}
-                    alt={featuredPost.title}
+                    src={featuredPost.cover_image || "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&auto=format&fit=crop&q=80"}
+                    alt={featuredPost.title || "Featured Story"}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-700"
                   />
@@ -143,8 +143,8 @@ export default async function BlogPage() {
                     {/* Card image */}
                     <div className="aspect-[16/9] overflow-hidden relative">
                       <Image
-                        src={post.cover_image}
-                        alt={post.title}
+                        src={post.cover_image || "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&auto=format&fit=crop&q=80"}
+                        alt={post.title || "Blog Post"}
                         fill
                         className="object-cover group-hover:scale-110 transition-transform duration-700"
                       />

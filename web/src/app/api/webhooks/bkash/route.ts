@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { getSiteUrl } from "@/lib/site-url"
 import { createAdminClient } from "@/lib/supabase/admin"
 
 /**
@@ -48,7 +49,7 @@ export async function GET(request: Request) {
   const bookingId = searchParams.get("bookingId")
   const orderId = searchParams.get("orderId")
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+  const siteUrl = getSiteUrl()
 
   // User cancelled
   if (status === "cancel" || status === "failure") {

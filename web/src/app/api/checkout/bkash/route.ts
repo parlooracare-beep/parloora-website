@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { getSiteUrl } from "@/lib/site-url"
 import { createClient } from "@/lib/supabase/server"
 
 /**
@@ -72,7 +73,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+    const siteUrl = getSiteUrl()
     const token = await getBkashToken()
 
     const merchantRef = `PRL-${Date.now()}-${(bookingId || orderId || "GUEST").slice(0, 6)}`

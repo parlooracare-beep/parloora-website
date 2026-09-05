@@ -6,6 +6,11 @@ const geistSans = { variable: "font-sans" };
 const geistMono = { variable: "font-mono" };
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes("localhost")
+      ? process.env.NEXT_PUBLIC_SITE_URL
+      : "https://parloora-website.vercel.app"
+  ),
   title: {
     default: "Parloora — Book Your Self Care Services In Seconds",
     template: "%s | Parloora"
@@ -40,7 +45,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Parloora — Book Your Self Care Services In Seconds",
     description: "Book premium beauty services and shop exclusive products worldwide.",
-    url: 'https://parloora.vercel.app',
+    url: 'https://parloora-website.vercel.app',
     siteName: 'Parloora',
     images: [
       {

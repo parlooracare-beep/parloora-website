@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { getSiteUrl } from "@/lib/site-url"
 
 /**
  * SSLCommerz Payment Initiation Route
@@ -45,7 +46,7 @@ export async function POST(request: Request) {
 
     const storeId = process.env.SSLCOMMERZ_STORE_ID
     const storePass = process.env.SSLCOMMERZ_STORE_PASS
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+    const siteUrl = getSiteUrl()
 
     if (!storeId || !storePass) {
       return NextResponse.json(
