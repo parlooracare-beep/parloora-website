@@ -216,8 +216,12 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user)
       if (user) {
+        const metaRole = (user.user_metadata?.role as string | undefined)?.toLowerCase()
+        if (metaRole) setUserRole(metaRole)
         supabase.from("users").select("role").eq("id", user.id).single()
-          .then(({ data }) => setUserRole(data?.role ?? "customer"))
+          .then(({ data }) => {
+            if (data?.role) setUserRole(data.role.toLowerCase())
+          })
       }
     })
 
@@ -225,8 +229,12 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
       const u = session?.user ?? null
       setUser(u)
       if (u) {
+        const metaRole = (u.user_metadata?.role as string | undefined)?.toLowerCase()
+        if (metaRole) setUserRole(metaRole)
         supabase.from("users").select("role").eq("id", u.id).single()
-          .then(({ data }) => setUserRole(data?.role ?? "customer"))
+          .then(({ data }) => {
+            if (data?.role) setUserRole(data.role.toLowerCase())
+          })
       } else {
         setUserRole(null)
       }
@@ -259,19 +267,6 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
       return
     }
 
-    let role = userRole
-    if (!role) {
-      const supabase = createClient()
-      const { data } = await supabase.from("users").select("role").eq("id", user.id).single()
-      role = data?.role ?? "customer"
-      setUserRole(role)
-    }
-
-    if (role !== "customer") {
-      alert("Only customer accounts can book services. Sellers and admins cannot create bookings.")
-      return
-    }
-
     setSelectedService(service)
     setShowBooking(true)
     setBookingStep(1)
@@ -294,7 +289,7 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
     } finally {
       setLoadingStaff(false)
     }
-  }, [id, router, user, userRole])
+  }, [id, router, user])
 
   React.useEffect(() => {
     if (parlour?.services && serviceParam && user && !selectedService) {
