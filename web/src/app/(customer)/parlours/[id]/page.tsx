@@ -240,8 +240,12 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
       setLoading(true)
       const data = await getParlourById(id)
       setParlour(data)
+
+      if (data?.username && id !== data.username && typeof window !== "undefined") {
+        window.history.replaceState(null, "", `/parlours/${data.username}`)
+      }
       
-      const verified = await hasCompletedBooking(id)
+      const verified = await hasCompletedBooking(data?.id || id)
       setCanReview(verified)
       
       setLoading(false)
@@ -788,6 +792,11 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                     </div>
 
                     <h1 className="text-2xl md:text-3xl font-bold text-brand-gray-900 mb-1">{formatParlourName(parlour.name)}</h1>
+                    {parlour.username && (
+                      <p className="text-xs font-mono text-primary/80 font-medium mb-1">
+                        @{parlour.username}
+                      </p>
+                    )}
 
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-brand-gray-500 mt-2">
                       <span className="flex items-center gap-1.5">

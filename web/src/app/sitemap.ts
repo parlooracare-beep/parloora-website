@@ -35,7 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const parlourUrls = parlours.map((parlour: any) => ({
-    url: `${baseUrl}/parlours/${parlour.id}`,
+    url: `${baseUrl}/parlours/${parlour.username || parlour.id}`,
     lastModified: parlour.updated_at ? new Date(parlour.updated_at) : new Date(),
     changeFrequency: "weekly" as const,
     priority: 0.8,

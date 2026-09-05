@@ -38,6 +38,7 @@ export default function SellerSettingsPage() {
 
   // Form State
   const [name, setName] = React.useState("")
+  const [username, setUsername] = React.useState("")
   const [phone, setPhone] = React.useState("")
   const [address, setAddress] = React.useState("")
   const [fullAddress, setFullAddress] = React.useState("")
@@ -74,6 +75,7 @@ export default function SellerSettingsPage() {
       if (p) {
         setProfile(p)
         setName(p.name || "")
+        setUsername(p.username || "")
         setPhone(p.phone || "")
         setAddress(p.address || "")
         setFullAddress(p.fullAddress || "")
@@ -109,6 +111,7 @@ export default function SellerSettingsPage() {
 
     const res = await updateSellerProfile({
       name,
+      username,
       phone,
       address,
       fullAddress,
@@ -340,6 +343,29 @@ export default function SellerSettingsPage() {
                           </div>
                         </div>
                       </div>
+                    </div>
+
+                    <div className="space-y-2 p-4 bg-primary/5 rounded-2xl border border-primary/15">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                        <Label className="text-xs font-bold text-brand-gray-800 uppercase tracking-wider flex items-center gap-1.5">
+                          <Globe className="w-3.5 h-3.5 text-primary" /> Custom Username / Public URL
+                        </Label>
+                        <span className="text-[11px] font-mono text-primary font-semibold truncate">
+                          parloora.vercel.app/parlours/{username || (name ? name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") : "your-username")}
+                        </span>
+                      </div>
+                      <div className="relative flex items-center">
+                        <span className="absolute left-3.5 text-brand-gray-400 font-bold text-sm select-none">@</span>
+                        <Input
+                          value={username}
+                          onChange={e => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
+                          placeholder={name ? name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") : "the-royal-spa"}
+                          className="pl-8 rounded-xl border-brand-gray-200 h-11 focus:ring-primary/20 bg-white font-mono text-xs"
+                        />
+                      </div>
+                      <p className="text-[11px] text-brand-gray-500">
+                        Clients can book and view your parlour directly using this clean custom URL. (Letters, numbers, and dashes allowed).
+                      </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

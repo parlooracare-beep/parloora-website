@@ -4,12 +4,16 @@ import { createClient } from "@/lib/supabase/server"
 import { Database } from "@/types/supabase"
 import { revalidatePath } from "next/cache"
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-type Parlour = Database["public"]["Tables"]["parlours"]["Row"]
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-type Service = Database["public"]["Tables"]["services"]["Row"]
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-type Review = Database["public"]["Tables"]["reviews"]["Row"]
+export type Parlour = Database["public"]["Tables"]["parlours"]["Row"]
+export type Service = Database["public"]["Tables"]["services"]["Row"]
+export type Review = Database["public"]["Tables"]["reviews"]["Row"]
+
+export type ParlourWithDetails = Parlour & {
+  username?: string | null
+  is_booking_ready?: boolean | null
+  services: Service[]
+  reviews: Review[]
+}
 
 export async function getFeaturedParlours() {
   const supabase = await createClient()
@@ -97,25 +101,69 @@ export async function getParlours(filters?: {
   }
 }
 
-export async function getParlourById(id: string) {
+export async function getParlourById(idOrIdentifier: string): Promise<ParlourWithDetails | null> {
   const supabase = await createClient()
-  
-  const { data: parlour, error: parlourError } = await supabase
-    .from("parlours")
-    .select("*")
-    .eq("id", id)
-    .single()
+  if (!idOrIdentifier) return null
 
-  if (parlourError || !parlour) {
-    console.error("Error fetching parlour:", parlourError)
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrIdentifier)
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let parlour: any = null
+
+  // 1. If UUID, look up by primary key ID first
+  if (isUuid) {
+    const { data, error } = await supabase
+      .from("parlours")
+      .select("*")
+      .eq("id", idOrIdentifier)
+      .maybeSingle()
+    if (!error && data) {
+      parlour = data
+    }
+  }
+
+  // 2. If not found by ID or if slug/username passed, look up by username column
+  if (!parlour) {
+    const { data, error } = await supabase
+      .from("parlours")
+      .select("*")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .ilike("username" as any, idOrIdentifier.toLowerCase())
+      .maybeSingle()
+    if (!error && data) {
+      parlour = data
+    }
+  }
+
+  // 3. Fallback: match against slugified parlour name
+  if (!parlour && !isUuid) {
+    const cleanTargetSlug = idOrIdentifier.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")
+    const { data: allParlours } = await supabase
+      .from("parlours")
+      .select("*")
+      .limit(100)
+    if (allParlours) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      parlour = allParlours.find((p: any) => {
+        if (p.username && p.username.toLowerCase() === idOrIdentifier.toLowerCase()) return true
+        const pSlug = (p.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")
+        return pSlug === cleanTargetSlug
+      }) || null
+    }
+  }
+
+  if (!parlour) {
+    console.error("Parlour not found for identifier:", idOrIdentifier)
     return null
   }
 
-  // Fetch services for this parlour
+  const actualId = parlour.id
+
+  // Fetch services for this parlour using the verified parlour UUID
   const { data: services, error: servicesError } = await supabase
     .from("services")
     .select("*")
-    .eq("parlour_id", id)
+    .eq("parlour_id", actualId)
     .eq("is_active", true)
 
   if (servicesError) {
@@ -127,19 +175,29 @@ export async function getParlourById(id: string) {
     .from("reviews")
     .select("*")
     // @ts-expect-error - parlour_id column needs to be added to reviews table in Supabase
-    .eq("parlour_id", id)
+    .eq("parlour_id", actualId)
     .order("created_at", { ascending: false })
 
   if (reviewsError) {
     console.error("Error fetching reviews:", reviewsError)
   }
 
+  const computedUsername =
+    parlour.username ||
+    (parlour.name
+      ? parlour.name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "")
+      : parlour.id)
+
   return {
     ...parlour,
+    username: computedUsername,
     is_booking_ready: true,
-    services: services || [],
-    reviews: reviews || []
-  }
+    services: (services || []) as Service[],
+    reviews: (reviews || []) as Review[]
+  } as ParlourWithDetails
 }
 
 export async function getParlourByOwnerId(ownerId: string) {

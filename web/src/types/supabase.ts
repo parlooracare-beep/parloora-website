@@ -337,6 +337,7 @@ export type Database = {
           cancellation_policy: string | null
           profile_completion: number | null
           is_booking_ready: boolean | null
+          username?: string | null
         }
         Insert: {
           address?: string | null
@@ -374,6 +375,7 @@ export type Database = {
           cancellation_policy?: string | null
           profile_completion?: number | null
           is_booking_ready?: boolean | null
+          username?: string | null
         }
         Update: {
           address?: string | null
@@ -411,6 +413,7 @@ export type Database = {
           cancellation_policy?: string | null
           profile_completion?: number | null
           is_booking_ready?: boolean | null
+          username?: string | null
         }
         Relationships: [
           {

@@ -78,7 +78,9 @@ export async function getSellerProfile() {
     profileCompletion: parlour.profile_completion || 0,
     isBookingReady: true,
     hasOpeningHours: hasHours,
-    hasPaymentInfo: hasPayment
+    hasPaymentInfo: hasPayment,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    username: (parlour as any).username || (parlour.name ? parlour.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") : "")
   }
 }
 
@@ -98,6 +100,7 @@ export async function updateSellerProfile(data: {
   tradeLicense?: string
   bookingRules?: string
   cancellationPolicy?: string
+  username?: string
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   openingHours?: any
 }) {
@@ -111,7 +114,7 @@ export async function updateSellerProfile(data: {
   // Fetch the existing parlour details
   const { data: currentParlour } = await supabase
     .from("parlours")
-    .select("logo_url, cover_url, opening_hours, bank_account, bkash_number, nagad_number")
+    .select("id, logo_url, cover_url, opening_hours, bank_account, bkash_number, nagad_number")
     .eq("owner_id", user.id)
     .maybeSingle()
 
@@ -168,6 +171,33 @@ export async function updateSellerProfile(data: {
   if (data.tradeLicense !== undefined) updatePayload.trade_license = data.tradeLicense
   if (data.bookingRules !== undefined) updatePayload.booking_rules = data.bookingRules
   if (data.cancellationPolicy !== undefined) updatePayload.cancellation_policy = data.cancellationPolicy
+
+  if (data.username !== undefined) {
+    const cleanUsername = data.username
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9-]/g, "")
+      .replace(/^-+|-+$/g, "")
+
+    if (cleanUsername) {
+      if (cleanUsername.length < 3) {
+        return { success: false, error: "Username must be at least 3 characters." }
+      }
+      // Check if username is already taken by another parlour
+      const { data: existing } = await supabase
+        .from("parlours")
+        .select("id")
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .ilike("username" as any, cleanUsername)
+        .neq("id", currentParlour.id)
+        .maybeSingle()
+
+      if (existing) {
+        return { success: false, error: "This username is already taken by another parlour." }
+      }
+      updatePayload.username = cleanUsername
+    }
+  }
 
   // Update parlour details
   const { error: updateErr } = await supabase
