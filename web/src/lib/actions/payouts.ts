@@ -1,10 +1,11 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { requireAdmin } from "@/lib/auth-guard"
 
 /**
  * Retrieves the total earnings, commissions, and withdrawal summary for a seller.
- * Net Balance = (Accrued Earnings - Accrued Platform Commissions) - (Approved Withdrawals)
+ * Net Balance = (Accrued Earnings - Accrued Platform Commissions) - (Approved Withdrawals + Pending Withdrawals)
  */
 export async function getSellerAccruedBalance() {
   const supabase = await createClient()
@@ -72,7 +73,8 @@ export async function getSellerAccruedBalance() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const pendingPayouts = pendingPayoutRequests.reduce((sum: number, p: any) => sum + Number(p.amount || 0), 0)
 
-  const netBalance = Math.max(0, netSellerEarnings - withdrawn)
+  // Net Balance deducts both completed withdrawals and active pending payout reservations
+  const netBalance = Math.max(0, netSellerEarnings - withdrawn - pendingPayouts)
 
   return {
     success: true,
@@ -100,6 +102,10 @@ export async function createPayoutRequest(payload: {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return { success: false, error: "Authentication required to request payouts." }
+  }
+
+  if (!payload.amount || payload.amount <= 0) {
+    return { success: false, error: "Please enter a valid payout amount greater than 0." }
   }
 
   // 1. Fetch parlour details
@@ -151,6 +157,7 @@ export async function createPayoutRequest(payload: {
  * Admin Action: Retrieves all payout requests.
  */
 export async function getAdminPayoutRequests() {
+  await requireAdmin()
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -194,6 +201,7 @@ export async function getAdminPayoutRequests() {
  * Admin Action: Approves or rejects a withdrawal request.
  */
 export async function updatePayoutStatus(payoutId: string, status: "approved" | "rejected", notes?: string) {
+  await requireAdmin()
   const supabase = await createClient()
 
   const { data, error } = await supabase

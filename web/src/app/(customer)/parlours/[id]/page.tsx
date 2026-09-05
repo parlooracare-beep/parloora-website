@@ -249,23 +249,7 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
     load()
   }, [id])
 
-  React.useEffect(() => {
-    if (parlour?.services && serviceParam && user && !selectedService) {
-      const targetService = parlour.services.find((s) => s.id === serviceParam)
-      if (targetService) {
-        handleBook(targetService)
-      }
-    }
-  }, [parlour, serviceParam, user, selectedService])
-
-  const filteredServices = React.useMemo(() => {
-    if (!parlour?.services) return []
-    return activeCategory === "All"
-      ? parlour.services
-      : parlour.services.filter((s) => s.category === activeCategory)
-  }, [parlour, activeCategory])
-
-  const handleBook = async (service: Service) => {
+  const handleBook = React.useCallback(async (service: Service) => {
     if (!user) {
       router.push(`/login?redirectedFrom=${encodeURIComponent(`/parlours/${id}?service=${service.id}`)}`)
       return
@@ -306,7 +290,23 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
     } finally {
       setLoadingStaff(false)
     }
-  }
+  }, [id, router, user, userRole])
+
+  React.useEffect(() => {
+    if (parlour?.services && serviceParam && user && !selectedService) {
+      const targetService = parlour.services.find((s) => s.id === serviceParam)
+      if (targetService) {
+        handleBook(targetService)
+      }
+    }
+  }, [parlour, serviceParam, user, selectedService, handleBook])
+
+  const filteredServices = React.useMemo(() => {
+    if (!parlour?.services) return []
+    return activeCategory === "All"
+      ? parlour.services
+      : parlour.services.filter((s) => s.category === activeCategory)
+  }, [parlour, activeCategory])
 
   const handleStripeBookingSuccess = async (piId: string) => {
     if (activeBookingId) {

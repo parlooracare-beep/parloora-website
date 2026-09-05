@@ -19,10 +19,12 @@ export function NotificationBell() {
   const unreadCount = notifications.filter(n => n.status === "unread").length
 
   const load = React.useCallback(async () => {
-    setLoading(true)
-    const data = await getNotifications()
-    setNotifications(data)
-    setLoading(false)
+    try {
+      const data = await getNotifications()
+      setNotifications(data)
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   React.useEffect(() => {
@@ -104,7 +106,7 @@ export function NotificationBell() {
                     <Bell className="w-6 h-6 text-brand-gray-300" />
                   </div>
                   <p className="text-sm font-medium text-brand-gray-900">No notifications yet</p>
-                  <p className="text-xs text-brand-gray-500 mt-1">We'll notify you when something happens.</p>
+                  <p className="text-xs text-brand-gray-500 mt-1">We&apos;ll notify you when something happens.</p>
                 </div>
               ) : (
                 notifications.map((n) => (

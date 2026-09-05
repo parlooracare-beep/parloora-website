@@ -5,15 +5,16 @@ import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin"
 import { Database } from "@/types/supabase"
 import { revalidatePath } from "next/cache"
 import { createNotification } from "./notifications"
+import { requireSeller, requireUser } from "@/lib/auth-guard"
 
 type OrderInsert = Database["public"]["Tables"]["orders"]["Insert"]
 
 export async function createOrder(orderData: OrderInsert) {
   // Enforce customer authentication: must be logged in to place an order
+  const { user } = await requireUser()
   const authClient = await createClient()
-  const { data: { user } } = await authClient.auth.getUser()
 
-  const finalCustomerId = user?.id || orderData.customer_id
+  const finalCustomerId = user.id || orderData.customer_id
   if (!finalCustomerId) {
     return { success: false, error: "Authentication required. Please log in or sign up to place an order." }
   }
@@ -30,15 +31,6 @@ export async function createOrder(orderData: OrderInsert) {
   if (error) {
     console.error("Error creating order:", error)
     return { success: false, error: error.message }
-  }
-
-  if (data) {
-    // Notify all sellers involved in the order (simplified: notify based on items if we had seller_ids in items)
-    // For now, if it's a multi-seller order, we might need more complex notification logic.
-    // Assuming seller_id is in the product data (which it is in the products table).
-    
-    // In a real app, we'd loop through items and notify each seller.
-    // For this implementation, we'll send a general notification to the system/admin or just success.
   }
 
   revalidatePath("/dashboard")
@@ -67,16 +59,16 @@ export async function getCustomerOrders() {
   return data
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function getSellerOrders(sellerId: string) {
-  const supabase = await createClient()
+  // Enforce seller or admin authentication
+  const { user, role } = await requireSeller()
+  const targetSellerId = role === "admin" && sellerId ? sellerId : user.id
 
-  // In a real app, we'd filter by seller_id in the items or have an order_items table.
-  // Given the current schema, we'll assume orders with a specific product_id belonging to the seller.
+  const supabase = hasServiceRoleKey() ? createAdminClient() : await createClient()
+
   const { data, error } = await supabase
     .from("orders")
     .select("*")
-    // This is a simplification for the demo
     .order("created_at", { ascending: false })
 
   if (error) {
@@ -84,11 +76,71 @@ export async function getSellerOrders(sellerId: string) {
     return []
   }
 
-  return data
+  if (!data) return []
+
+  // If super admin viewing without specific filter, return all
+  if (role === "admin" && !sellerId) {
+    return data
+  }
+
+  interface CartOrderItem {
+    id?: string
+    seller_id?: string
+    price?: number
+    quantity?: number
+    [key: string]: unknown
+  }
+
+  interface RawOrderRecord {
+    id: string
+    items: unknown
+    [key: string]: unknown
+  }
+
+  // Vendor isolation: Filter orders that contain products belonging to targetSellerId
+  const filteredOrders = (data as unknown as RawOrderRecord[]).filter((order) => {
+    if (!Array.isArray(order.items)) return false
+    return (order.items as CartOrderItem[]).some((item) => item?.seller_id === targetSellerId)
+  }).map((order) => {
+    const rawItems = (order.items as CartOrderItem[])
+    const sellerItems = rawItems.filter((item) => item?.seller_id === targetSellerId)
+    const sellerSubtotal = sellerItems.reduce(
+      (sum: number, item) => sum + Number(item.price || 0) * (item.quantity || 1),
+      0
+    )
+    return {
+      ...order,
+      items: sellerItems,
+      seller_subtotal: sellerSubtotal,
+    }
+  })
+
+  return filteredOrders
 }
 
 export async function updateOrderStatus(orderId: string, status: string) {
+  const { user, role } = await requireSeller()
   const supabase = hasServiceRoleKey() ? createAdminClient() : await createClient()
+
+  // Verify the order exists and caller has authority over it
+  const { data: existingOrder, error: fetchError } = await supabase
+    .from("orders")
+    .select("*")
+    .eq("id", orderId)
+    .maybeSingle()
+
+  if (fetchError || !existingOrder) {
+    return { success: false, error: "Order not found." }
+  }
+
+  if (role !== "admin") {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const items = Array.isArray(existingOrder.items) ? (existingOrder.items as any[]) : []
+    const isOwnerOfItem = items.some((item) => item?.seller_id === user.id)
+    if (!isOwnerOfItem) {
+      return { success: false, error: "Forbidden: You are not authorized to update this order." }
+    }
+  }
 
   const { data, error } = await supabase
     .from("orders")

@@ -53,6 +53,64 @@ const NAV_ITEMS = [
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ]
 
+interface AdminSidebarContentProps {
+  pathname: string
+  onClose: () => void
+  onLogout: () => void
+}
+
+function AdminSidebarContent({ pathname, onClose, onLogout }: AdminSidebarContentProps) {
+  return (
+    <div className="flex flex-col h-full">
+      {/* Logo */}
+      <div className="px-5 py-6 border-b border-brand-gray-100">
+        <ParlooraLogo
+          size="md"
+          variant="dark"
+          href="/admin/dashboard"
+          subtext="Super Admin"
+          subtextClassName="text-red-500 font-bold tracking-wider uppercase"
+        />
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
+        {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
+          const active = pathname === href || pathname.startsWith(href + "/")
+          return (
+            <Link
+              key={href}
+              href={href}
+              onClick={onClose}
+              className={cn(
+                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                active
+                  ? "bg-primary/10 text-primary shadow-sm"
+                  : "text-brand-gray-500 hover:bg-brand-gray-50 hover:text-brand-gray-900"
+              )}
+            >
+              <Icon className="w-4.5 h-4.5 shrink-0" strokeWidth={active ? 2.5 : 2} />
+              {label}
+              {active && <span className="ml-auto w-1.5 h-1.5 bg-primary rounded-full shadow-[0_0_8px_rgba(75,30,109,0.5)]" />}
+            </Link>
+          )
+        })}
+      </nav>
+
+      {/* Logout */}
+      <div className="px-3 py-4 border-t border-brand-gray-100">
+        <button
+          onClick={onLogout}
+          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-brand-gray-500 hover:bg-red-50 hover:text-red-600 transition-all w-full"
+        >
+          <LogOut className="w-4 h-4" />
+          System Logout
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
@@ -153,61 +211,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     router.refresh()
   }
 
-  const Sidebar = () => (
-    <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div className="px-5 py-6 border-b border-brand-gray-100">
-        <ParlooraLogo
-          size="md"
-          variant="dark"
-          href="/admin/dashboard"
-          subtext="Super Admin"
-          subtextClassName="text-red-500 font-bold tracking-wider uppercase"
-        />
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
-        {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
-          const active = pathname === href || pathname.startsWith(href + "/")
-          return (
-            <Link
-              key={href}
-              href={href}
-              onClick={() => setSidebarOpen(false)}
-              className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
-                active
-                  ? "bg-primary/10 text-primary shadow-sm"
-                  : "text-brand-gray-500 hover:bg-brand-gray-50 hover:text-brand-gray-900"
-              )}
-            >
-              <Icon className="w-4.5 h-4.5 shrink-0" strokeWidth={active ? 2.5 : 2} />
-              {label}
-              {active && <span className="ml-auto w-1.5 h-1.5 bg-primary rounded-full shadow-[0_0_8px_rgba(75,30,109,0.5)]" />}
-            </Link>
-          )
-        })}
-      </nav>
-
-      {/* Logout */}
-      <div className="px-3 py-4 border-t border-brand-gray-100">
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-brand-gray-500 hover:bg-red-50 hover:text-red-600 transition-all w-full"
-        >
-          <LogOut className="w-4 h-4" />
-          System Logout
-        </button>
-      </div>
-    </div>
-  )
-
   return (
     <div className="min-h-screen bg-brand-gray-100 flex">
       {/* Desktop Sidebar (Light Theme for Admin) */}
       <aside className="hidden md:flex w-64 shrink-0 bg-white border-r border-brand-gray-100 flex-col fixed inset-y-0 left-0 z-30">
-        <Sidebar />
+        <AdminSidebarContent
+          pathname={pathname}
+          onClose={() => setSidebarOpen(false)}
+          onLogout={handleLogout}
+        />
       </aside>
 
       {/* Mobile Sidebar Overlay */}
@@ -218,7 +230,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             onClick={() => setSidebarOpen(false)}
           />
           <aside className="absolute inset-y-0 left-0 w-64 bg-white flex flex-col shadow-2xl">
-            <Sidebar />
+            <AdminSidebarContent
+              pathname={pathname}
+              onClose={() => setSidebarOpen(false)}
+              onLogout={handleLogout}
+            />
           </aside>
         </div>
       )}

@@ -77,7 +77,8 @@ export async function signUpAction(formData: {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function signInAction(formData: any) {
   console.log("signInAction called for:", formData.email)
-  let { email, password } = formData
+  const { password } = formData
+  let { email } = formData
   const supabase = await createClient()
 
   // Resolve phone number to email if it looks like a phone number

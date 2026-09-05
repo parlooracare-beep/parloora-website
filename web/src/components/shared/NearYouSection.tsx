@@ -25,6 +25,41 @@ export function NearYouSection() {
   const [loading, setLoading] = React.useState(true)
   const [denied, setDenied] = React.useState(false)
 
+  const fetchAllParlours = React.useCallback(async () => {
+    const supabase = createClient()
+    const { data } = await supabase
+      .from("parlours")
+      .select("*")
+      .order("rating", { ascending: false })
+      .limit(8)
+    setParlours(data || [])
+    setLoading(false)
+  }, [])
+
+  const fetchParloursByCity = React.useCallback(async (cityName: string) => {
+    const supabase = createClient()
+    const { data } = await supabase
+      .from("parlours")
+      .select("*")
+      .ilike("city", `%${cityName}%`)
+      .order("rating", { ascending: false })
+      .limit(8)
+
+    if (data && data.length > 0) {
+      setParlours(data)
+    } else {
+      // Fallback: if no parlours in detected city, show all
+      const { data: allData } = await supabase
+        .from("parlours")
+        .select("*")
+        .order("rating", { ascending: false })
+        .limit(8)
+      setParlours(allData || [])
+      setCity(null)
+    }
+    setLoading(false)
+  }, [])
+
   React.useEffect(() => {
     if (!navigator.geolocation) {
       fetchAllParlours()
@@ -64,42 +99,7 @@ export function NearYouSection() {
       },
       { timeout: 8000 }
     )
-  }, [])
-
-  const fetchParloursByCity = async (cityName: string) => {
-    const supabase = createClient()
-    const { data } = await supabase
-      .from("parlours")
-      .select("*")
-      .ilike("city", `%${cityName}%`)
-      .order("rating", { ascending: false })
-      .limit(8)
-
-    if (data && data.length > 0) {
-      setParlours(data)
-    } else {
-      // Fallback: if no parlours in detected city, show all
-      const { data: allData } = await supabase
-        .from("parlours")
-        .select("*")
-        .order("rating", { ascending: false })
-        .limit(8)
-      setParlours(allData || [])
-      setCity(null)
-    }
-    setLoading(false)
-  }
-
-  const fetchAllParlours = async () => {
-    const supabase = createClient()
-    const { data } = await supabase
-      .from("parlours")
-      .select("*")
-      .order("rating", { ascending: false })
-      .limit(8)
-    setParlours(data || [])
-    setLoading(false)
-  }
+  }, [fetchAllParlours, fetchParloursByCity])
 
   if (loading) {
     return (

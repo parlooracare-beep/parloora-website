@@ -22,25 +22,26 @@ export function ProfileCompletionBanner({
   missingItems,
   dismissKey
 }: ProfileCompletionBannerProps) {
-  const [dismissed, setDismissed] = React.useState(true) // Start true, check localStorage in useEffect
+  const [mounted, setMounted] = React.useState(false)
+  const [userDismissed, setUserDismissed] = React.useState(false)
 
   React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      const isDismissed = localStorage.getItem(`dismiss_banner_${dismissKey}`)
-      if (!isDismissed && percentage < 80 && missingItems.length > 0) {
-        setDismissed(false)
-      }
-    }
-  }, [percentage, missingItems, dismissKey])
+    setMounted(true)
+  }, [])
+
+  const isLocallyDismissed = React.useMemo(() => {
+    if (!mounted || typeof window === "undefined") return true
+    return localStorage.getItem(`dismiss_banner_${dismissKey}`) === "true"
+  }, [mounted, dismissKey])
 
   const handleDismiss = () => {
     if (typeof window !== "undefined") {
       localStorage.setItem(`dismiss_banner_${dismissKey}`, "true")
-      setDismissed(true)
+      setUserDismissed(true)
     }
   }
 
-  if (dismissed || percentage >= 80 || missingItems.length === 0) {
+  if (!mounted || userDismissed || isLocallyDismissed || percentage >= 80 || missingItems.length === 0) {
     return null
   }
 

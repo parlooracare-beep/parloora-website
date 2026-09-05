@@ -30,6 +30,64 @@ const NAV_ITEMS = [
   { label: "Settings", href: "/seller/settings", icon: Settings },
 ]
 
+interface SidebarContentProps {
+  pathname: string
+  onClose: () => void
+  onLogout: () => void
+}
+
+function SidebarContent({ pathname, onClose, onLogout }: SidebarContentProps) {
+  return (
+    <div className="flex flex-col h-full">
+      {/* Logo */}
+      <div className="px-5 py-6 border-b border-white/10">
+        <ParlooraLogo
+          size="md"
+          variant="light"
+          href="/seller/dashboard"
+          subtext="Seller Portal"
+          subtextClassName="text-white/60 text-[10px] leading-none mt-0.5"
+        />
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
+        {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
+          const active = pathname === href || pathname.startsWith(href + "/")
+          return (
+            <Link
+              key={href}
+              href={href}
+              onClick={onClose}
+              className={cn(
+                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                active
+                  ? "bg-white/15 text-white shadow-inner"
+                  : "text-white/60 hover:bg-white/10 hover:text-white"
+              )}
+            >
+              <Icon className="w-4.5 h-4.5 shrink-0" strokeWidth={active ? 2.5 : 2} />
+              {label}
+              {active && <span className="ml-auto w-1.5 h-1.5 bg-rose-400 rounded-full" />}
+            </Link>
+          )
+        })}
+      </nav>
+
+      {/* Logout */}
+      <div className="px-3 py-4 border-t border-white/10">
+        <button
+          onClick={onLogout}
+          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white/50 hover:bg-white/10 hover:text-white transition-all w-full"
+        >
+          <LogOut className="w-4 h-4" />
+          Sign Out
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function SellerLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
@@ -129,61 +187,15 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
     return <div className="min-h-screen bg-brand-gray-50">{children}</div>
   }
 
-  const Sidebar = () => (
-    <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div className="px-5 py-6 border-b border-white/10">
-        <ParlooraLogo
-          size="md"
-          variant="light"
-          href="/seller/dashboard"
-          subtext="Seller Portal"
-          subtextClassName="text-white/60 text-[10px] leading-none mt-0.5"
-        />
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
-        {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
-          const active = pathname === href || pathname.startsWith(href + "/")
-          return (
-            <Link
-              key={href}
-              href={href}
-              onClick={() => setSidebarOpen(false)}
-              className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
-                active
-                  ? "bg-white/15 text-white shadow-inner"
-                  : "text-white/60 hover:bg-white/10 hover:text-white"
-              )}
-            >
-              <Icon className="w-4.5 h-4.5 shrink-0" strokeWidth={active ? 2.5 : 2} />
-              {label}
-              {active && <span className="ml-auto w-1.5 h-1.5 bg-rose-400 rounded-full" />}
-            </Link>
-          )
-        })}
-      </nav>
-
-      {/* Logout */}
-      <div className="px-3 py-4 border-t border-white/10">
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white/50 hover:bg-white/10 hover:text-white transition-all w-full"
-        >
-          <LogOut className="w-4 h-4" />
-          Sign Out
-        </button>
-      </div>
-    </div>
-  )
-
   return (
     <div className="min-h-screen bg-brand-gray-50 flex">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 shrink-0 bg-gradient-to-b from-[#2D0072] to-[#4A148C] flex-col fixed inset-y-0 left-0 z-30">
-        <Sidebar />
+        <SidebarContent
+          pathname={pathname}
+          onClose={() => setSidebarOpen(false)}
+          onLogout={handleLogout}
+        />
       </aside>
 
       {/* Mobile Sidebar Overlay */}
@@ -194,7 +206,11 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
             onClick={() => setSidebarOpen(false)}
           />
           <aside className="absolute inset-y-0 left-0 w-64 bg-gradient-to-b from-[#2D0072] to-[#4A148C] flex flex-col shadow-2xl">
-            <Sidebar />
+            <SidebarContent
+              pathname={pathname}
+              onClose={() => setSidebarOpen(false)}
+              onLogout={handleLogout}
+            />
           </aside>
         </div>
       )}

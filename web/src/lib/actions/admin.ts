@@ -1,8 +1,10 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { requireAdmin } from "@/lib/auth-guard"
 
 export async function getAdminMetrics() {
+  await requireAdmin()
   const supabase = await createClient()
 
   // 1. Total Revenue (sum of confirmed bookings)
@@ -44,6 +46,7 @@ export async function getAdminMetrics() {
 }
 
 export async function getAdminUsers() {
+  await requireAdmin()
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -67,6 +70,7 @@ export async function getAdminUsers() {
 }
 
 export async function getAdminTransactions() {
+  await requireAdmin()
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -83,6 +87,7 @@ export async function getAdminTransactions() {
 }
 
 export async function getAdminParlours() {
+  await requireAdmin()
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -111,6 +116,7 @@ export async function getAdminParlours() {
 }
 
 export async function getAdminServices() {
+  await requireAdmin()
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -133,6 +139,7 @@ export async function getAdminServices() {
 }
 
 export async function getAdminProducts() {
+  await requireAdmin()
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -155,6 +162,7 @@ export async function getAdminProducts() {
 }
 
 export async function getAdminOrders() {
+  await requireAdmin()
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -177,6 +185,7 @@ export async function getAdminOrders() {
 }
 
 export async function updateParlourStatus(parlourId: string, status: string) {
+  await requireAdmin()
   const supabase = await createClient()
   const { data, error } = await supabase.from("parlours").update({ status }).eq("id", parlourId).select().single()
   if (error) return { success: false, error: error.message }
@@ -194,6 +203,7 @@ export async function updateParlourStatus(parlourId: string, status: string) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function updateAdminEntity(table: string, id: string, payload: any) {
+  await requireAdmin()
   const supabase = await createClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await supabase.from(table as any).update(payload).eq("id", id).select().single()
@@ -213,6 +223,7 @@ export async function updateAdminEntity(table: string, id: string, payload: any)
 }
 
 export async function deleteAdminEntity(table: string, id: string) {
+  await requireAdmin()
   const supabase = await createClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await supabase.from(table as any).delete().eq("id", id)
@@ -226,6 +237,7 @@ export async function deleteAdminUser(id: string) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function updateAdminUser(id: string, payload: any) {
+  await requireAdmin()
   const supabase = await createClient()
   const { error } = await supabase.from("users").update(payload).eq("id", id)
   if (error) return { success: false, error: error.message }
@@ -234,6 +246,7 @@ export async function updateAdminUser(id: string, payload: any) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function updateAdminParlour(id: string, payload: any) {
+  await requireAdmin()
   const supabase = await createClient()
   const { error } = await supabase.from("parlours").update(payload).eq("id", id)
   if (error) return { success: false, error: error.message }
@@ -251,6 +264,7 @@ export async function updateAdminParlour(id: string, payload: any) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function updateAdminService(id: string, payload: any) {
+  await requireAdmin()
   const supabase = await createClient()
   const { error } = await supabase.from("services").update(payload).eq("id", id)
   if (error) return { success: false, error: error.message }
@@ -259,6 +273,7 @@ export async function updateAdminService(id: string, payload: any) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createAdminService(payload: any) {
+  await requireAdmin()
   const supabase = await createClient()
   const { data, error } = await supabase
     .from("services")
@@ -275,6 +290,7 @@ export async function createAdminService(payload: any) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function updateAdminProduct(id: string, payload: any) {
+  await requireAdmin()
   const supabase = await createClient()
   const { error } = await supabase.from("products").update(payload).eq("id", id)
   if (error) return { success: false, error: error.message }
@@ -283,6 +299,7 @@ export async function updateAdminProduct(id: string, payload: any) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createAdminProduct(payload: any) {
+  await requireAdmin()
   const supabase = await createClient()
   const { data, error } = await supabase
     .from("products")
@@ -299,6 +316,7 @@ export async function createAdminProduct(payload: any) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function updateAdminBooking(id: string, payload: any) {
+  await requireAdmin()
   const supabase = await createClient()
   const { error } = await supabase.from("bookings").update(payload).eq("id", id)
   if (error) return { success: false, error: error.message }
@@ -307,6 +325,7 @@ export async function updateAdminBooking(id: string, payload: any) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function updateAdminOrder(id: string, payload: any) {
+  await requireAdmin()
   const supabase = await createClient()
   const { error } = await supabase.from("orders").update(payload).eq("id", id)
   if (error) return { success: false, error: error.message }
@@ -314,6 +333,7 @@ export async function updateAdminOrder(id: string, payload: any) {
 }
 
 export async function getAdminReportsData() {
+  await requireAdmin()
   const supabase = await createClient()
 
   // Basic Counts
@@ -389,7 +409,7 @@ export async function getAdminReportsData() {
     name: p.name,
     city: p.city,
     bookings: p.total_bookings || 0,
-    revenue: `$${((p.total_bookings || 0) * 50).toLocaleString()}`, // rough estimation
+    revenue: `৳${((p.total_bookings || 0) * 50).toLocaleString()}`, // rough estimation
     rating: p.rating || 0,
     avatar: p.name.substring(0, 2).toUpperCase()
   })) || []
@@ -425,21 +445,8 @@ export async function getAdminReportsData() {
 }
 
 export async function getAdminActivityLogs() {
+  await requireAdmin()
   const supabase = await createClient()
-
-  // Authenticate user
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return []
-
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", user.id)
-    .single()
-
-  if (profile?.role?.toLowerCase() !== "admin") {
-    return []
-  }
 
   const { data, error } = await supabase
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

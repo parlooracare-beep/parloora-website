@@ -20,21 +20,24 @@
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Public can view basic user profiles" ON public.users;
+DROP POLICY IF EXISTS "Users can view own profile" ON public.users;
 DROP POLICY IF EXISTS "Users can update own profile" ON public.users;
 DROP POLICY IF EXISTS "Admins can manage all users" ON public.users;
+DROP POLICY IF EXISTS "Public can view seller profiles" ON public.users;
 
--- Anyone can read user display names and public profile fields
-CREATE POLICY "Public can view basic user profiles"
+-- 1. Users can only view their own private profile
+CREATE POLICY "Users can view own profile"
 ON public.users FOR SELECT
-USING (true);
+TO authenticated
+USING (auth.uid() = id);
 
--- Authenticated users can update their own profile
+-- 2. Authenticated users can update their own profile
 CREATE POLICY "Users can update own profile"
 ON public.users FOR UPDATE
 TO authenticated
 USING (auth.uid() = id);
 
--- Admins can manage all user records
+-- 3. Admins can manage all user records
 CREATE POLICY "Admins can manage all users"
 ON public.users FOR ALL
 TO authenticated
@@ -42,6 +45,17 @@ USING (
   EXISTS (
     SELECT 1 FROM public.users u
     WHERE u.id = auth.uid() AND LOWER(u.role) = 'admin'
+  )
+);
+
+-- 4. Public visitors can view parlour owners / sellers display info (keeps regular customers & admins private)
+CREATE POLICY "Public can view seller profiles"
+ON public.users FOR SELECT
+USING (
+  LOWER(role) = 'seller'
+  OR EXISTS (
+    SELECT 1 FROM public.parlours p
+    WHERE p.owner_id = users.id
   )
 );
 
@@ -67,8 +81,7 @@ WITH CHECK (true);
 CREATE POLICY "Customers can view own orders"
 ON public.orders FOR SELECT
 USING (
-  (auth.uid() IS NOT NULL AND auth.uid() = customer_id)
-  OR customer_id IS NULL
+  auth.uid() IS NOT NULL AND auth.uid() = customer_id
 );
 
 -- Sellers and Admins can view orders
@@ -130,8 +143,7 @@ WITH CHECK (true);
 CREATE POLICY "Customers can view own bookings"
 ON public.bookings FOR SELECT
 USING (
-  (auth.uid() IS NOT NULL AND auth.uid() = customer_id)
-  OR customer_id IS NULL
+  auth.uid() IS NOT NULL AND auth.uid() = customer_id
 );
 
 -- Sellers can view bookings for their parlour
