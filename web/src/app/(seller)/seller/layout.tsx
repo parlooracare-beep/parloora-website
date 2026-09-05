@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { ParlooraLogo } from "@/components/shared/Logo"
 import { usePathname } from "next/navigation"
 import {
   LayoutDashboard, Calendar, Scissors, Package, BarChart2,
@@ -131,12 +132,14 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
   const Sidebar = () => (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 py-6 border-b border-white/10">
-        <Image src="/logo.png" alt="Parloora Logo" width={40} height={40} className="rounded-xl object-contain" />
-        <div>
-          <span className="text-white font-bold tracking-tight">Parloora</span>
-          <p className="text-white/40 text-[10px] leading-none mt-0.5">Seller Portal</p>
-        </div>
+      <div className="px-5 py-6 border-b border-white/10">
+        <ParlooraLogo
+          size="md"
+          variant="light"
+          href="/seller/dashboard"
+          subtext="Seller Portal"
+          subtextClassName="text-white/60 text-[10px] leading-none mt-0.5"
+        />
       </div>
 
       {/* Navigation */}

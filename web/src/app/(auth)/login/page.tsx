@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { ParlooraLogo } from "@/components/shared/Logo"
 import { useRouter, useSearchParams } from "next/navigation"
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Sparkles, Mail, Lock, Eye, EyeOff, Loader2, ArrowLeft, ShieldCheck, ShoppingBag, Calendar } from "lucide-react"
@@ -79,9 +80,8 @@ function LoginForm() {
         />
 
         <div className="relative z-10 text-center max-w-sm">
-          <div className="flex items-center justify-center gap-3 mb-12">
-            <Image src="/logo.png" alt="Parloora Logo" width={56} height={56} className="rounded-2xl object-contain" />
-            <span className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent tracking-tight">Parloora</span>
+          <div className="flex justify-center mb-12">
+            <ParlooraLogo size="xl" href="/" />
           </div>
           <h2 className="text-4xl font-bold text-brand-gray-900 mb-4 leading-tight">
             Welcome Back, Beautiful!
@@ -121,11 +121,8 @@ function LoginForm() {
         </div>
 
         {/* Mobile Logo */}
-        <div className="lg:hidden flex items-center gap-2 mb-10 mt-12">
-          <Image src="/logo.png" alt="Parloora Logo" width={40} height={40} className="rounded-xl object-contain" />
-          <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Parloora
-          </span>
+        <div className="lg:hidden mb-10 mt-12">
+          <ParlooraLogo size="md" href="/" />
         </div>
 
         <div className="w-full max-w-md">

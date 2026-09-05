@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import NextImage from "next/image"
+import { ParlooraLogo } from "@/components/shared/Logo"
 import { usePathname } from "next/navigation"
 import {
   LayoutDashboard, Users, Store, Receipt, AlertTriangle,
@@ -155,12 +156,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const Sidebar = () => (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 py-6 border-b border-brand-gray-100">
-        <NextImage src="/logo.png" alt="Parloora Logo" width={40} height={40} className="rounded-xl object-contain" />
-        <div>
-          <span className="text-brand-gray-900 font-bold tracking-tight">Parloora</span>
-          <p className="text-brand-gray-500 text-[10px] font-bold leading-none mt-0.5 tracking-wider uppercase">Super Admin</p>
-        </div>
+      <div className="px-5 py-6 border-b border-brand-gray-100">
+        <ParlooraLogo
+          size="md"
+          variant="dark"
+          href="/admin/dashboard"
+          subtext="Super Admin"
+          subtextClassName="text-red-500 font-bold tracking-wider uppercase"
+        />
       </div>
 
       {/* Navigation */}

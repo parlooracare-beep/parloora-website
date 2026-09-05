@@ -7,7 +7,7 @@ const geistMono = { variable: "font-mono" };
 
 export const metadata: Metadata = {
   title: {
-    default: "Parloora | Global Premium Beauty & Salon Marketplace",
+    default: "Parloora — Book Your Self Care Services In Seconds",
     template: "%s | Parloora"
   },
   description: "The world's leading marketplace for premium salon services, spa treatments, and beauty products. Discover verified parlours and book instantly in any city.",
@@ -26,16 +26,28 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    shortcut: '/favicon.ico',
+  },
   openGraph: {
-    title: "Parloora | Global Beauty Marketplace",
+    title: "Parloora — Book Your Self Care Services In Seconds",
     description: "Book premium beauty services and shop exclusive products worldwide.",
-    url: 'https://parloora.com',
+    url: 'https://parloora.vercel.app',
     siteName: 'Parloora',
     images: [
       {
-        url: 'https://parloora.com/og-image.jpg',
-        width: 1200,
-        height: 630,
+        url: '/logo.png',
+        width: 512,
+        height: 512,
+        alt: 'Parloora',
       },
     ],
     locale: 'en_US',
@@ -43,18 +55,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Parloora | Global Beauty Marketplace',
+    title: 'Parloora — Book Your Self Care Services In Seconds',
     description: 'Book premium beauty services and shop exclusive products worldwide.',
     creator: '@parloora',
-    images: ['https://parloora.com/twitter-image.jpg'],
-  },
-  alternates: {
-    canonical: 'https://parloora.com',
-    languages: {
-      'en-US': 'https://parloora.com/en-us',
-      'ar-SA': 'https://parloora.com/ar-sa',
-      'bn-BD': 'https://parloora.com/bn-bd',
-    },
+    images: ['/logo.png'],
   },
   manifest: '/manifest.json',
   appleWebApp: {

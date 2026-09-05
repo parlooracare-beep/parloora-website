@@ -102,8 +102,11 @@ function layout(body: string, previewText = ""): string {
 <body>
   ${previewText ? `<div style="display:none;max-height:0;overflow:hidden;">${previewText}</div>` : ""}
   <div class="wrap">
-    <div class="header">
-      <div class="logo">Parlo<span>ora</span></div>
+    <div class="header" style="text-align: center;">
+      <a href="${SITE_URL}" style="text-decoration: none; display: inline-block;">
+        <img src="${SITE_URL}/logo.png" alt="Parloora" width="44" height="44" style="border-radius: 10px; display: block; margin: 0 auto 10px auto;" />
+        <div class="logo">Parlo<span>ora</span></div>
+      </a>
     </div>
     <div class="card">
       ${body}

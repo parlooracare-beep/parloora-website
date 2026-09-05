@@ -4,8 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { ParlooraLogo } from "@/components/shared/Logo"
 import { Sparkles, User, ShoppingBag, Search, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 
@@ -69,13 +68,8 @@ export function Navbar() {
       )}
     >
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <Image src="/logo.png" alt="Parloora Logo" width={40} height={40} className="rounded-xl object-contain" />
-          <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Parloora
-          </span>
-        </Link>
+        {/* Official Parloora Logo */}
+        <ParlooraLogo size="md" href="/" priority />
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8">

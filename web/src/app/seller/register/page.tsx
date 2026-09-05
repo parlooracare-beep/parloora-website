@@ -3,6 +3,7 @@
 import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { ParlooraLogo } from "@/components/shared/Logo"
 import { useRouter } from "next/navigation"
 import { 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -105,10 +106,9 @@ export default function SellerSignupPage() {
       <div className="hidden lg:flex w-1/3 bg-brand-gray-900 flex-col p-12 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -mr-32 -mt-32" />
         
-        <Link href="/" className="flex items-center gap-2 mb-20 relative z-10">
-          <Image src="/logo.png" alt="Parloora Logo" width={48} height={48} className="rounded-xl object-contain" />
-          <span className="text-2xl font-black">Parloora</span>
-        </Link>
+        <div className="mb-20 relative z-10">
+          <ParlooraLogo size="lg" variant="light" href="/" />
+        </div>
 
         <div className="space-y-12 relative z-10">
           <div>
@@ -161,6 +161,9 @@ export default function SellerSignupPage() {
             </div>
           ) : (
             <>
+              <div className="lg:hidden mb-8">
+                <ParlooraLogo size="md" href="/" />
+              </div>
               <div className="mb-10">
                 <div className="flex items-center gap-2 mb-6">
                   {[1, 2].map((i) => (

@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { ParlooraLogo } from "@/components/shared/Logo"
 import { motion, AnimatePresence } from "framer-motion"
 import { Sparkles, Mail, ArrowLeft, Loader2, CheckCircle2, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -53,13 +54,8 @@ export default function ForgotPasswordPage() {
 
       <div className="w-full max-w-md relative z-10">
         {/* Logo */}
-        <div className="text-center mb-10">
-          <Link href="/" className="inline-flex items-center gap-2 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/25 group-hover:scale-110 transition-transform">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-2xl font-black text-brand-gray-900 tracking-tight">Parloora</span>
-          </Link>
+        <div className="text-center mb-10 flex justify-center">
+          <ParlooraLogo size="lg" href="/" />
         </div>
 
         <AnimatePresence mode="wait">

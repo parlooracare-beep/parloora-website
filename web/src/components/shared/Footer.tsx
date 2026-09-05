@@ -5,6 +5,7 @@ import * as React from "react"
 import { Sparkles, Mail, Phone, MapPin } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { ParlooraLogo } from "@/components/shared/Logo"
 import { getFooterSettings, FooterSettings } from "@/lib/actions/site"
 
 // Inline SVG social icons (lucide-react may not have these)
@@ -63,12 +64,7 @@ export function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mb-10 md:mb-20">
           {/* Brand & Description */}
           <div className="space-y-6">
-            <Link href="/" className="flex items-center gap-2.5">
-              <Image src="/logo.png" alt="Parloora Logo" width={48} height={48} className="rounded-2xl object-contain shadow-2xl" />
-              <span className="text-2xl font-black tracking-tighter text-white">
-                Parloora
-              </span>
-            </Link>
+            <ParlooraLogo size="lg" variant="light" href="/" />
             <p className="text-brand-gray-400 text-sm leading-relaxed font-medium">
               {about_text}
             </p>
