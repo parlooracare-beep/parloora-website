@@ -3,16 +3,27 @@
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Sparkles, Mail, Lock, Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react"
+import { Sparkles, Mail, Lock, Eye, EyeOff, Loader2, ArrowLeft, ShieldCheck, ShoppingBag, Calendar } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { createClient } from "@/lib/supabase/client"
 import { signInAction } from "@/lib/actions/auth"
 
 export default function LoginPage() {
+  return (
+    <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-brand-gray-50"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
+      <LoginForm />
+    </React.Suspense>
+  )
+}
+
+function LoginForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTarget = searchParams.get("redirectedFrom") || searchParams.get("redirect")
+
   const [email, setEmail] = React.useState("")
   const [password, setPassword] = React.useState("")
   const [showPassword, setShowPassword] = React.useState(false)
@@ -35,13 +46,15 @@ export default function LoginPage() {
         return
       }
 
-      // Role-based redirect
-      if (result.role === "Seller") {
+      // If a specific destination was requested (e.g. /checkout or /parlours/...), redirect there
+      if (redirectTarget && redirectTarget.startsWith("/")) {
+        router.push(redirectTarget)
+      } else if (result.role === "Seller") {
         router.push("/seller/dashboard")
       } else if (result.role === "Admin") {
         router.push("/admin")
       } else {
-        router.push("/")
+        router.push("/dashboard")
       }
       
       router.refresh()
@@ -117,10 +130,35 @@ export default function LoginPage() {
 
         <div className="w-full max-w-md">
           <div className="mb-8">
+            {redirectTarget?.includes("/checkout") && (
+              <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-2xl flex items-center gap-3 text-primary">
+                <div className="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center shrink-0">
+                  <ShoppingBag className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="font-bold text-sm text-brand-gray-900">Sign in to complete your order</p>
+                  <p className="text-xs text-brand-gray-600">Your cart items are saved and ready for checkout.</p>
+                </div>
+              </div>
+            )}
+            {redirectTarget?.includes("/parlours") && (
+              <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-2xl flex items-center gap-3 text-primary">
+                <div className="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center shrink-0">
+                  <Calendar className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="font-bold text-sm text-brand-gray-900">Sign in to book your appointment</p>
+                  <p className="text-xs text-brand-gray-600">You will be returned directly to the booking screen.</p>
+                </div>
+              </div>
+            )}
             <h1 className="text-3xl font-bold text-brand-gray-900 mb-2">Sign in to your account</h1>
             <p className="text-brand-gray-500">
               Don&apos;t have an account?{" "}
-              <Link href="/signup" className="text-primary font-medium hover:underline">
+              <Link 
+                href={redirectTarget ? `/signup?redirectedFrom=${encodeURIComponent(redirectTarget)}` : "/signup"} 
+                className="text-primary font-medium hover:underline"
+              >
                 Sign up for free
               </Link>
             </p>

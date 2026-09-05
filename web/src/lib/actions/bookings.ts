@@ -37,11 +37,20 @@ function parseTimeToHours(timeStr: string | null): number | null {
 // ─── createBooking ────────────────────────────────────────────────────────────
 
 export async function createBooking(bookingData: BookingInsert) {
-  const supabase = hasServiceRoleKey() ? createAdminClient() : await createClient()
+  // Enforce customer authentication: must be logged in to book an appointment
+  const authClient = await createClient()
+  const { data: { user } } = await authClient.auth.getUser()
+
+  const finalCustomerId = user?.id || bookingData.customer_id
+  if (!finalCustomerId) {
+    return { success: false, error: "Authentication required. Please log in or sign up to book a service." }
+  }
+
+  const supabase = hasServiceRoleKey() ? createAdminClient() : authClient
 
   const { data, error } = await supabase
     .from("bookings")
-    .insert([bookingData])
+    .insert([{ ...bookingData, customer_id: finalCustomerId }])
     .select()
     .single()
 

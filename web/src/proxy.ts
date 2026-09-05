@@ -22,6 +22,10 @@ import { NextResponse, type NextRequest } from 'next/server'
 const PROTECTED_ROUTES: { prefix: string; allowedRoles: string[] }[] = [
   { prefix: '/admin', allowedRoles: ['admin'] },
   { prefix: '/seller', allowedRoles: ['seller', 'admin'] },
+  { prefix: '/checkout', allowedRoles: ['customer', 'seller', 'admin'] },
+  { prefix: '/bookings', allowedRoles: ['customer', 'seller', 'admin'] },
+  { prefix: '/orders', allowedRoles: ['customer', 'seller', 'admin'] },
+  { prefix: '/dashboard', allowedRoles: ['customer', 'seller', 'admin'] },
 ]
 
 // Auth routes that should redirect authenticated users away

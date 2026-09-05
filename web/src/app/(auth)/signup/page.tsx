@@ -25,6 +25,7 @@ function SignupForm() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const router = useRouter()
   const searchParams = useSearchParams()
+  const redirectTarget = searchParams.get("redirectedFrom") || searchParams.get("redirect")
   const initialRole = searchParams.get("role") === "seller" ? "Seller" : "Customer"
 
   const [fullName, setFullName] = React.useState("")
@@ -193,10 +194,29 @@ function SignupForm() {
 
         <div className="w-full max-w-md py-8">
           <div className="mb-8">
+            {redirectTarget?.includes("/checkout") && (
+              <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-2xl flex items-center gap-3 text-primary">
+                <div>
+                  <p className="font-bold text-sm text-brand-gray-900">Create an account to complete your order</p>
+                  <p className="text-xs text-brand-gray-600">Quick and easy registration. Your cart is preserved!</p>
+                </div>
+              </div>
+            )}
+            {redirectTarget?.includes("/parlours") && (
+              <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-2xl flex items-center gap-3 text-primary">
+                <div>
+                  <p className="font-bold text-sm text-brand-gray-900">Create an account to book your appointment</p>
+                  <p className="text-xs text-brand-gray-600">You will return directly to the parlour booking screen.</p>
+                </div>
+              </div>
+            )}
             <h1 className="text-3xl font-bold text-brand-gray-900 mb-2">Create your account</h1>
             <p className="text-brand-gray-500">
               Already have an account?{" "}
-              <Link href="/login" className="text-primary font-medium hover:underline">
+              <Link 
+                href={redirectTarget ? `/login?redirectedFrom=${encodeURIComponent(redirectTarget)}` : "/login"} 
+                className="text-primary font-medium hover:underline"
+              >
                 Sign in
               </Link>
             </p>

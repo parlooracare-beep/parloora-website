@@ -86,6 +86,8 @@ export default function CheckoutPage() {
     paymentMethod: "Cash on Delivery"
   })
 
+  const [authLoading, setAuthLoading] = React.useState(true)
+
   React.useEffect(() => {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -93,12 +95,26 @@ export default function CheckoutPage() {
         setUser(user)
         setFormData(prev => ({
           ...prev,
-          name: user.user_metadata?.display_name || "",
-          email: user.email || ""
+          name: user.user_metadata?.display_name || user.user_metadata?.full_name || prev.name,
+          email: user.email || prev.email,
+          phone: user.user_metadata?.phone || prev.phone
         }))
+        setAuthLoading(false)
+      } else {
+        // Customer MUST be logged in or signed up to place an order
+        router.push("/login?redirectedFrom=/checkout")
       }
     })
-  }, [])
+  }, [router])
+
+  if (authLoading && !isSuccess) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center bg-brand-gray-50/50">
+        <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
+        <p className="text-brand-gray-600 font-medium">Verifying your secure session...</p>
+      </div>
+    )
+  }
 
   if (items.length === 0 && !isSuccess) {
     return (
@@ -117,10 +133,14 @@ export default function CheckoutPage() {
 
   const handleStripeSuccess = async (piId: string) => {
     setShowStripeModal(false)
+    if (!user) {
+      router.push("/login?redirectedFrom=/checkout")
+      return
+    }
     setIsSubmitting(true)
     try {
       const baseOrderData = {
-        customer_id: user?.id || null,
+        customer_id: user.id,
         customer_name: formData.name,
         phone: formData.phone,
         address: `${formData.address}, ${formData.city}, ${formData.postalCode}`,
@@ -157,11 +177,15 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!user) {
+      router.push("/login?redirectedFrom=/checkout")
+      return
+    }
     setIsSubmitting(true)
 
     try {
       const baseOrderData = {
-        customer_id: user?.id || null,
+        customer_id: user.id,
         customer_name: formData.name,
         phone: formData.phone,
         address: `${formData.address}, ${formData.city}, ${formData.postalCode}`,

@@ -3,7 +3,7 @@
 import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import {
   Star, MapPin, Clock, Phone, ChevronLeft, Heart, Share2,
   CheckCircle2, Scissors, Calendar, ChevronRight, X, Loader2, Users, Sparkles, CreditCard, Store,
@@ -42,6 +42,8 @@ const TIME_SLOTS = [
 export default function ParlourDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const serviceParam = searchParams.get("service")
   const [parlour, setParlour] = React.useState<ParlourWithDetails | null>(null)
   const [loading, setLoading] = React.useState(true)
 
@@ -247,6 +249,15 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
     load()
   }, [id])
 
+  React.useEffect(() => {
+    if (parlour?.services && serviceParam && user && !selectedService) {
+      const targetService = parlour.services.find((s) => s.id === serviceParam)
+      if (targetService) {
+        handleBook(targetService)
+      }
+    }
+  }, [parlour, serviceParam, user, selectedService])
+
   const filteredServices = React.useMemo(() => {
     if (!parlour?.services) return []
     return activeCategory === "All"
@@ -256,8 +267,7 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
 
   const handleBook = async (service: Service) => {
     if (!user) {
-      alert("Please log in first to book a service.")
-      router.push(`/login?redirect=/parlours/${id}`)
+      router.push(`/login?redirectedFrom=${encodeURIComponent(`/parlours/${id}?service=${service.id}`)}`)
       return
     }
 
@@ -381,6 +391,12 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
+    if (!user) {
+      setIsBooking(false)
+      router.push(`/login?redirectedFrom=${encodeURIComponent(`/parlours/${id}?service=${selectedService.id}`)}`)
+      return
+    }
+
     const bookingData = {
       parlour_id: parlour.id,
       parlour_name: parlour.name,
@@ -393,8 +409,8 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
       status: "pending",
       payment_status: "pending",
       payment_method: bookingPaymentMethod,
-      customer_id: user?.id || null,
-      customer_name: user?.user_metadata?.display_name || "Guest",
+      customer_id: user.id,
+      customer_name: user.user_metadata?.display_name || user.user_metadata?.full_name || user.email || "Valued Customer",
       seller_id: parlour.owner_id,
       staff_id: selectedStaff?.id || null
     }

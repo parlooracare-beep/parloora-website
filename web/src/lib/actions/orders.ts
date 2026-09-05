@@ -9,12 +9,21 @@ import { createNotification } from "./notifications"
 type OrderInsert = Database["public"]["Tables"]["orders"]["Insert"]
 
 export async function createOrder(orderData: OrderInsert) {
+  // Enforce customer authentication: must be logged in to place an order
+  const authClient = await createClient()
+  const { data: { user } } = await authClient.auth.getUser()
+
+  const finalCustomerId = user?.id || orderData.customer_id
+  if (!finalCustomerId) {
+    return { success: false, error: "Authentication required. Please log in or sign up to place an order." }
+  }
+
   // Use service role client if configured to bypass RLS, otherwise fallback to server client
-  const supabase = hasServiceRoleKey() ? createAdminClient() : await createClient()
+  const supabase = hasServiceRoleKey() ? createAdminClient() : authClient
 
   const { data, error } = await supabase
     .from("orders")
-    .insert([orderData])
+    .insert([{ ...orderData, customer_id: finalCustomerId }])
     .select()
     .single()
 
