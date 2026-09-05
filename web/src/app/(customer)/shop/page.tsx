@@ -98,9 +98,9 @@ export default function ShopPage() {
           {/* Product Grid */}
           <main className="flex-1">
             {loading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                  <div key={i} className="bg-white rounded-2xl h-[280px] animate-pulse border border-brand-gray-100" />
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="bg-white rounded-3xl h-[360px] animate-pulse border border-brand-gray-100 p-3" />
                 ))}
               </div>
             ) : products.length === 0 ? (
@@ -115,11 +115,12 @@ export default function ShopPage() {
                 </Button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 {products.map((product) => (
-                  <Link key={product.id} href={`/shop/${product.id}`} className="group">
-                    <Card className="overflow-hidden border-brand-gray-100 hover:border-primary/30 hover:shadow-xl transition-all duration-300 h-full flex flex-col group">
-                      <div className="relative aspect-square bg-brand-gray-100 overflow-hidden">
+                  <Link key={product.id} href={`/shop/${product.id}`} className="group block h-full">
+                    <Card className="overflow-hidden border border-brand-gray-100/80 bg-white rounded-3xl p-3 md:p-3.5 hover:border-primary/30 hover:shadow-xl transition-all duration-300 h-full flex flex-col group">
+                      {/* Square Image Box */}
+                      <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-brand-gray-50 border border-brand-gray-100/60 mb-3">
                         {product.image_url ? (
                           <Image 
                             src={product.image_url} 
@@ -128,55 +129,61 @@ export default function ShopPage() {
                             className="object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-brand-gray-300">
-                            <ShoppingBag className="w-10 h-10" />
+                          <div className="w-full h-full flex flex-col items-center justify-center text-brand-gray-300 bg-gradient-to-b from-brand-gray-50 to-brand-gray-100/50">
+                            <div className="w-12 h-12 rounded-2xl bg-white/80 shadow-sm flex items-center justify-center text-primary/50 group-hover:scale-110 transition-transform">
+                              <ShoppingBag className="w-6 h-6" />
+                            </div>
                           </div>
                         )}
-                        <div className="absolute top-2 left-2">
-                          <Badge className="bg-white/90 text-brand-gray-900 border-0 backdrop-blur-sm shadow-sm text-[9px] uppercase font-black px-2 py-0.5">
+                        <div className="absolute top-2.5 left-2.5">
+                          <Badge className="bg-white/95 text-brand-gray-900 border-0 backdrop-blur-md shadow-sm text-[10px] uppercase font-black px-2.5 py-0.5 rounded-lg">
                             {product.category}
                           </Badge>
                         </div>
                       </div>
                       
-                      <CardContent className="p-2.5 md:p-4 flex-1 flex flex-col">
-                        <div className="mb-1">
-                          <p className="text-[9px] text-primary font-black uppercase tracking-widest mb-0.5">{product.brand || "Parloora Selection"}</p>
-                          <h3 className="font-bold text-brand-gray-900 text-sm line-clamp-1 group-hover:text-primary transition-colors">{product.name}</h3>
+                      {/* Card Info */}
+                      <div className="flex-1 flex flex-col px-1">
+                        <div className="mb-1.5">
+                          <p className="text-[10px] text-primary font-black uppercase tracking-widest mb-0.5">
+                            {product.brand || "Parloora Selection"}
+                          </p>
+                          <h3 className="font-bold text-brand-gray-900 text-sm md:text-base line-clamp-1 group-hover:text-primary transition-colors">
+                            {product.name}
+                          </h3>
                         </div>
                         
-                        <div className="flex items-center gap-1 mb-3">
+                        <div className="flex items-center gap-1.5 mb-3">
                           <div className="flex items-center gap-0.5">
                             {[1, 2, 3, 4, 5].map((s) => (
-                              <Star key={s} className={cn("w-2.5 h-2.5", s <= (Number(product.rating) || 5) ? "text-amber-400 fill-amber-400" : "text-brand-gray-200")} />
+                              <Star key={s} className={cn("w-3 h-3", s <= (Number(product.rating) || 5) ? "text-amber-400 fill-amber-400" : "text-brand-gray-200")} />
                             ))}
                           </div>
-                          <span className="text-[9px] text-brand-gray-400 font-medium">(42)</span>
+                          <span className="text-[10px] text-brand-gray-400 font-semibold">(42)</span>
                         </div>
                         
-                        <div className="mt-auto flex items-center justify-between gap-2">
-                          <span className="text-sm md:text-base font-black text-brand-gray-900">{formatCurrency(Number(product.price))}</span>
-                          <div className="flex gap-1.5">
-                            <Link href={`/shop/${product.id}`} className="hidden sm:block">
-                              <Button size="sm" variant="outline" className="rounded-lg px-2 h-7 text-[10px]">
-                                Details
-                              </Button>
-                            </Link>
-                            <Button 
-                              size="sm" 
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                addItem(product);
-                                openCart();
-                              }}
-                              className="bg-brand-gray-900 hover:bg-primary text-white rounded-lg px-2 h-7 text-[10px] transition-colors"
-                            >
-                              Add
-                            </Button>
+                        {/* Price & Action Row */}
+                        <div className="mt-auto pt-2.5 border-t border-brand-gray-100 flex items-center justify-between gap-2">
+                          <div className="min-w-0">
+                            <span className="text-base md:text-lg font-black text-brand-gray-900 tracking-tight block truncate">
+                              {formatCurrency(Number(product.price))}
+                            </span>
                           </div>
+                          <Button 
+                            size="sm" 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              addItem(product);
+                              openCart();
+                            }}
+                            className="bg-brand-gray-900 hover:bg-primary text-white rounded-xl px-3.5 h-8 md:h-9 text-xs font-bold transition-all shadow-sm hover:shadow-md flex items-center gap-1.5 shrink-0 active:scale-95"
+                          >
+                            <ShoppingBag className="w-3.5 h-3.5" />
+                            <span>Add</span>
+                          </Button>
                         </div>
-                      </CardContent>
+                      </div>
                     </Card>
                   </Link>
                 ))}
