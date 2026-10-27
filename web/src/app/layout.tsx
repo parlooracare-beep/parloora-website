@@ -15,11 +15,11 @@ export const metadata: Metadata = {
     default: "Parloora — Book Your Self Care Services In Seconds",
     template: "%s | Parloora"
   },
-  description: "The world's leading marketplace for premium salon services, spa treatments, and beauty products. Discover verified parlours and book instantly in any city.",
-  keywords: ["beauty services", "salon booking", "premium spa", "skincare products", "hair styling", "worldwide beauty"],
+  description: "Discover and book top-rated beauty parlours, salons, and spas across Bangladesh. Real-time appointments, verified professionals, guaranteed satisfaction.",
+  keywords: ["beauty services", "salon booking", "parlour booking bangladesh", "premium spa", "skincare", "hair styling", "dhaka salons"],
   authors: [{ name: "Parloora Team" }],
   creator: "Parloora",
-  publisher: "Parloora Global",
+  publisher: "Parloora",
   robots: {
     index: true,
     follow: true,
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Parloora — Book Your Self Care Services In Seconds",
-    description: "Book premium beauty services and shop exclusive products worldwide.",
+    description: "Book self-care services and treatments with verified parlours across Bangladesh in seconds.",
     url: 'https://parloora.vercel.app',
     siteName: 'Parloora',
     images: [
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Parloora — Book Your Self Care Services In Seconds',
-    description: 'Book premium beauty services and shop exclusive products worldwide.',
+    description: "Book self-care services and treatments with verified parlours across Bangladesh in seconds.",
     creator: '@parloora',
     images: ['/logo.png'],
   },
@@ -77,7 +77,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport = {
-  themeColor: '#4B1E6D',
+  themeColor: '#4B1D5F',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -86,6 +86,9 @@ export const viewport = {
 };
 
 import { getThemeSettings } from "@/lib/actions/site";
+import { PwaRegistrar } from "@/components/shared/PwaRegistrar";
+import { NetworkStatusBanner } from "@/components/shared/NetworkStatusBanner";
+import { PwaInstallPrompt } from "@/components/shared/PwaInstallPrompt";
 
 function hexToRgb(hex: string): string {
   hex = hex.replace(/^#/, '');
@@ -93,7 +96,7 @@ function hexToRgb(hex: string): string {
   const r = (bigint >> 16) & 255;
   const g = (bigint >> 8) & 255;
   const b = bigint & 255;
-  return `${isNaN(r) ? 75 : r}, ${isNaN(g) ? 30 : g}, ${isNaN(b) ? 109 : b}`;
+  return `${isNaN(r) ? 75 : r}, ${isNaN(g) ? 29 : g}, ${isNaN(b) ? 95 : b}`;
 }
 
 export default async function RootLayout({
@@ -103,7 +106,7 @@ export default async function RootLayout({
 }>) {
   const theme = await getThemeSettings();
   
-  return (
+  return (\
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
@@ -116,14 +119,19 @@ export default async function RootLayout({
             --secondary: ${theme.secondary_color};
             --secondary-rgb: ${hexToRgb(theme.secondary_color)};
             --radius: ${theme.border_radius};
-            --font-family: ${theme.font_family}, sans-serif;
+            --font-family: ${theme.font_family}, sans-serif;\
           }
           body {
             font-family: var(--font-family) !important;
           }
         `}} />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col antialiased selection:bg-primary selection:text-white">
+        <NetworkStatusBanner />
+        <PwaRegistrar />
+        {children}
+        <PwaInstallPrompt />
+      </body>
     </html>
   );
 }

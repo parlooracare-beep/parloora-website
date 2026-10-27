@@ -1,11 +1,15 @@
 {
+  "id": "/",
   "name": "Parloora — Book Your Self Care Services In Seconds",
   "short_name": "Parloora",
-  "description": "Book premium beauty services and shop exclusive products worldwide.",
+  "description": "Book your self care services in seconds. Discover top-rated beauty parlours, salons, and spas near you.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#4B1E6D",
+  "orientation": "portrait-primary",
+  "background_color": "#FFFFFF",
+  "theme_color": "#4B1D5F",
+  "categories": ["beauty", "lifestyle", "shopping"],
   "icons": [
     {
       "src": "/icon-192.png",
@@ -22,7 +26,31 @@
     {
       "src": "/logo.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Explore Parlours",
+      "short_name": "Explore",
+      "description": "Find top rated salons and parlours near you",
+      "url": "/parlours",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" } ]
+    },
+    {
+      "name": "My Bookings",
+      "short_name": "Bookings",
+      "description": "View and manage your appointments",
+      "url": "/bookings",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" } ]
+    },
+    {
+      "name": "Favorites",
+      "short_name": "Favorites",
+      "description": "Your saved parlours and salons",
+      "url": "/wishlist",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" } ]
     }
   ]
 }
