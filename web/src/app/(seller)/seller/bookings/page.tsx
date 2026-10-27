@@ -88,106 +88,195 @@ export default function BookingsPage() {
               <p>No bookings found.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b bg-brand-gray-50/50">
-                    <th className="text-left text-xs font-semibold text-brand-gray-500 px-6 py-4">Booking ID</th>
-                    <th className="text-left text-xs font-semibold text-brand-gray-500 px-4 py-4">Customer</th>
-                    <th className="text-left text-xs font-semibold text-brand-gray-500 px-4 py-4">Service</th>
-                    <th className="text-left text-xs font-semibold text-brand-gray-500 px-4 py-4">Date & Time</th>
-                    <th className="text-right text-xs font-semibold text-brand-gray-500 px-4 py-4">Amount</th>
-                    <th className="text-center text-xs font-semibold text-brand-gray-500 px-6 py-4">Status & Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-brand-gray-50">
-                  {bookings.map((booking) => {
-                    const statusKey = booking.status as keyof typeof STATUS_MAP
-                    const status = STATUS_MAP[statusKey] || STATUS_MAP.pending
-                    const StatusIcon = status.icon
+            <>
+              {/* Mobile App Booking Cards (Hidden on Desktop) */}
+              <div className="md:hidden divide-y divide-brand-gray-100">
+                {bookings.map((booking) => {
+                  const statusKey = booking.status as keyof typeof STATUS_MAP
+                  const status = STATUS_MAP[statusKey] || STATUS_MAP.pending
+                  const StatusIcon = status.icon
 
-                    return (
-                      <tr key={booking.id} className="hover:bg-brand-gray-50/50 transition-colors">
-                        <td className="px-6 py-4 text-xs text-brand-gray-400 font-mono">
-                          {booking.id.substring(0, 8).toUpperCase()}
-                        </td>
-                        <td className="px-4 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-primary text-sm font-bold shrink-0">
-                              {booking.customer_name?.[0]?.toUpperCase() || "U"}
-                            </div>
-                            <div>
-                              <p className="text-sm font-medium text-brand-gray-800">{booking.customer_name || "Unknown Customer"}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-4">
-                          <p className="text-sm text-brand-gray-700 font-medium">{booking.service_name}</p>
-                        </td>
-                        <td className="px-4 py-4">
-                          <div className="text-xs text-brand-gray-600">
-                            <p className="font-semibold text-brand-gray-800">{booking.date}</p>
-                            <p className="flex items-center gap-1 mt-0.5"><Clock className="w-3 h-3 text-brand-gray-400" /> {booking.time}</p>
-                          </div>
-                        </td>
-                        <td className="px-4 py-4 text-right">
-                          <p className="text-sm font-bold text-brand-gray-900">৳{(booking.amount || 0).toLocaleString()}</p>
-                          <div className="mt-0.5">
-                            {booking.payment_method === "cash" ? (
-                              <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
-                                Cash on Service
-                              </span>
-                            ) : (
-                              <span className="text-[10px] font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-1.5 py-0.5 rounded uppercase">
-                                {booking.payment_method || "Online"}
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <div className="flex flex-col items-center gap-2">
-                            <Badge className={cn("text-xs gap-1", status.class)}>
-                              <StatusIcon className="w-3 h-3" />
-                              {status.label}
-                            </Badge>
-                            
-                            {/* Approve / Decline for pending */}
-                            {booking.status === "pending" && (
-                              <div className="flex gap-1 mt-1">
-                                <button
-                                  disabled={updatingId === booking.id}
-                                  onClick={() => handleUpdateStatus(booking.id, "confirmed")}
-                                  className="text-[10px] bg-emerald-100 text-emerald-700 hover:bg-emerald-200 px-2 py-1 rounded font-semibold transition-colors disabled:opacity-50"
-                                >
-                                  {updatingId === booking.id ? "..." : "Approve"}
-                                </button>
-                                <button
-                                  disabled={updatingId === booking.id}
-                                  onClick={() => handleUpdateStatus(booking.id, "cancelled")}
-                                  className="text-[10px] bg-red-100 text-red-700 hover:bg-red-200 px-2 py-1 rounded font-semibold transition-colors disabled:opacity-50"
-                                >
-                                  Decline
-                                </button>
+                  return (
+                    <div key={booking.id} className="p-4 space-y-3 bg-white hover:bg-brand-gray-50/50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-mono text-brand-gray-400 font-bold">
+                          #{booking.id.substring(0, 8).toUpperCase()}
+                        </span>
+                        <Badge className={cn("text-[10px] gap-1 px-2 py-0.5 font-bold", status.class)}>
+                          <StatusIcon className="w-3 h-3" />
+                          {status.label}
+                        </Badge>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-primary text-sm font-bold shrink-0 shadow-xs">
+                          {booking.customer_name?.[0]?.toUpperCase() || "U"}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-brand-gray-900 truncate">
+                            {booking.customer_name || "Unknown Customer"}
+                          </p>
+                          <p className="text-xs text-primary font-semibold truncate">
+                            {booking.service_name}
+                          </p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="text-sm font-black text-brand-gray-900">
+                            ৳{(booking.amount || 0).toLocaleString()}
+                          </p>
+                          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded inline-block">
+                            {booking.payment_method === "cash" ? "Cash" : booking.payment_method || "Paid"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs text-brand-gray-500 bg-brand-gray-50 p-2.5 rounded-xl border border-brand-gray-100">
+                        <div className="flex items-center gap-1.5 font-medium">
+                          <Calendar className="w-3.5 h-3.5 text-primary" />
+                          <span>{booking.date}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 font-medium">
+                          <Clock className="w-3.5 h-3.5 text-primary" />
+                          <span>{booking.time}</span>
+                        </div>
+                      </div>
+
+                      {/* Touch Action Buttons */}
+                      {booking.status === "pending" && (
+                        <div className="grid grid-cols-2 gap-2 pt-1">
+                          <button
+                            disabled={updatingId === booking.id}
+                            onClick={() => handleUpdateStatus(booking.id, "confirmed")}
+                            className="h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center shadow-xs active:scale-98 transition-all disabled:opacity-50"
+                          >
+                            {updatingId === booking.id ? <Loader2 className="w-4 h-4 animate-spin" /> : "Approve Booking"}
+                          </button>
+                          <button
+                            disabled={updatingId === booking.id}
+                            onClick={() => handleUpdateStatus(booking.id, "cancelled")}
+                            className="h-10 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 font-bold text-xs flex items-center justify-center active:scale-98 transition-all disabled:opacity-50"
+                          >
+                            Decline
+                          </button>
+                        </div>
+                      )}
+
+                      {booking.status === "confirmed" && (
+                        <button
+                          disabled={updatingId === booking.id}
+                          onClick={() => handleUpdateStatus(booking.id, "completed")}
+                          className="w-full h-10 rounded-xl bg-primary text-white font-bold text-xs flex items-center justify-center shadow-xs active:scale-98 transition-all disabled:opacity-50"
+                        >
+                          {updatingId === booking.id ? <Loader2 className="w-4 h-4 animate-spin" /> : "Mark Appointment Done"}
+                        </button>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Desktop Booking Table (Hidden on Mobile) */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b bg-brand-gray-50/50">
+                      <th className="text-left text-xs font-semibold text-brand-gray-500 px-6 py-4">Booking ID</th>
+                      <th className="text-left text-xs font-semibold text-brand-gray-500 px-4 py-4">Customer</th>
+                      <th className="text-left text-xs font-semibold text-brand-gray-500 px-4 py-4">Service</th>
+                      <th className="text-left text-xs font-semibold text-brand-gray-500 px-4 py-4">Date & Time</th>
+                      <th className="text-right text-xs font-semibold text-brand-gray-500 px-4 py-4">Amount</th>
+                      <th className="text-center text-xs font-semibold text-brand-gray-500 px-6 py-4">Status & Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-brand-gray-50">
+                    {bookings.map((booking) => {
+                      const statusKey = booking.status as keyof typeof STATUS_MAP
+                      const status = STATUS_MAP[statusKey] || STATUS_MAP.pending
+                      const StatusIcon = status.icon
+
+                      return (
+                        <tr key={booking.id} className="hover:bg-brand-gray-50/50 transition-colors">
+                          <td className="px-6 py-4 text-xs text-brand-gray-400 font-mono">
+                            {booking.id.substring(0, 8).toUpperCase()}
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-primary text-sm font-bold shrink-0">
+                                {booking.customer_name?.[0]?.toUpperCase() || "U"}
                               </div>
-                            )}
-                            {/* Mark as Completed for confirmed bookings */}
-                            {booking.status === "confirmed" && (
-                              <button
-                                disabled={updatingId === booking.id}
-                                onClick={() => handleUpdateStatus(booking.id, "completed")}
-                                className="text-[10px] bg-brand-gray-100 text-brand-gray-600 hover:bg-brand-gray-200 px-2 py-1 rounded font-semibold transition-colors mt-1 disabled:opacity-50"
-                              >
-                                {updatingId === booking.id ? "..." : "Mark Done"}
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
+                              <div>
+                                <p className="text-sm font-medium text-brand-gray-800">{booking.customer_name || "Unknown Customer"}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4">
+                            <p className="text-sm text-brand-gray-700 font-medium">{booking.service_name}</p>
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="text-xs text-brand-gray-600">
+                              <p className="font-semibold text-brand-gray-800">{booking.date}</p>
+                              <p className="flex items-center gap-1 mt-0.5"><Clock className="w-3 h-3 text-brand-gray-400" /> {booking.time}</p>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 text-right">
+                            <p className="text-sm font-bold text-brand-gray-900">৳{(booking.amount || 0).toLocaleString()}</p>
+                            <div className="mt-0.5">
+                              {booking.payment_method === "cash" ? (
+                                <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
+                                  Cash on Service
+                                </span>
+                              ) : (
+                                <span className="text-[10px] font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-1.5 py-0.5 rounded uppercase">
+                                  {booking.payment_method || "Online"}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <div className="flex flex-col items-center gap-2">
+                              <Badge className={cn("text-xs gap-1", status.class)}>
+                                <StatusIcon className="w-3 h-3" />
+                                {status.label}
+                              </Badge>
+                              
+                              {/* Approve / Decline for pending */}
+                              {booking.status === "pending" && (
+                                <div className="flex gap-1 mt-1">
+                                  <button
+                                    disabled={updatingId === booking.id}
+                                    onClick={() => handleUpdateStatus(booking.id, "confirmed")}
+                                    className="text-[10px] bg-emerald-100 text-emerald-700 hover:bg-emerald-200 px-2 py-1 rounded font-semibold transition-colors disabled:opacity-50"
+                                  >
+                                    {updatingId === booking.id ? "..." : "Approve"}
+                                  </button>
+                                  <button
+                                    disabled={updatingId === booking.id}
+                                    onClick={() => handleUpdateStatus(booking.id, "cancelled")}
+                                    className="text-[10px] bg-red-100 text-red-700 hover:bg-red-200 px-2 py-1 rounded font-semibold transition-colors disabled:opacity-50"
+                                  >
+                                    Decline
+                                  </button>
+                                </div>
+                              )}
+                              {/* Mark as Completed for confirmed bookings */}
+                              {booking.status === "confirmed" && (
+                                <button
+                                  disabled={updatingId === booking.id}
+                                  onClick={() => handleUpdateStatus(booking.id, "completed")}
+                                  className="text-[10px] bg-brand-gray-100 text-brand-gray-600 hover:bg-brand-gray-200 px-2 py-1 rounded font-semibold transition-colors mt-1 disabled:opacity-50"
+                                >
+                                  {updatingId === booking.id ? "..." : "Mark Done"}
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

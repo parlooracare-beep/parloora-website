@@ -122,10 +122,10 @@ export default function SellerDashboardPage() {
   const totalBookings = bookings.length
   const pendingBookings = bookings.filter(b => b.status === "pending").length
   
-  // A crude "today" check based on created_at matching today's ISO date string
+  // Today's appointments (matching scheduled appointment date b.date === todayStr, with fallback to created_at)
   const todayStr = new Date().toISOString().split("T")[0]
-  const todayBookings = bookings.filter(b => b.created_at && typeof b.created_at === 'string' && b.created_at.startsWith(todayStr)).length
-  const todayRevenue = bookings.filter(b => (b.status === "confirmed" || b.status === "completed") && b.created_at && typeof b.created_at === 'string' && b.created_at.startsWith(todayStr)).reduce((sum, b) => sum + (b.amount || 0), 0)
+  const todayBookings = bookings.filter(b => (b.date === todayStr) || (!b.date && b.created_at && typeof b.created_at === 'string' && b.created_at.startsWith(todayStr))).length
+  const todayRevenue = bookings.filter(b => (b.status === "confirmed" || b.status === "completed") && ((b.date === todayStr) || (!b.date && b.created_at && typeof b.created_at === 'string' && b.created_at.startsWith(todayStr)))).reduce((sum, b) => sum + (b.amount || 0), 0)
 
   const STATS = [
     {
@@ -239,7 +239,7 @@ export default function SellerDashboardPage() {
             <Card key={stat.title} className="border-brand-gray-100 hover:shadow-md transition-shadow">
               <CardContent className="p-5">
                 <div className="flex items-start justify-between mb-4">
-                  <div className={cn("p-2.5 rounded-xl", stat.bg)}>
+                  <div className={cn("p-2.5 rounded-xl", stat.bg)} className="p-2.5 rounded-xl bg-primary/10">
                     <Icon className={cn("w-5 h-5", stat.text)} />
                   </div>
                   <span className={cn(
@@ -330,60 +330,117 @@ export default function SellerDashboardPage() {
               No recent bookings found.
             </div>
           ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b bg-brand-gray-50/50">
-                  <th className="text-left text-xs font-semibold text-brand-gray-500 px-6 py-3">ID</th>
-                  <th className="text-left text-xs font-semibold text-brand-gray-500 px-4 py-3">Customer</th>
-                  <th className="text-left text-xs font-semibold text-brand-gray-500 px-4 py-3">Service</th>
-                  <th className="text-left text-xs font-semibold text-brand-gray-500 px-4 py-3">Date & Time</th>
-                  <th className="text-right text-xs font-semibold text-brand-gray-500 px-4 py-3">Amount</th>
-                  <th className="text-right text-xs font-semibold text-brand-gray-500 px-6 py-3">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-brand-gray-50">
+            <>
+              {/* Mobile Recent Bookings List (Hidden on Desktop) */}
+              <div className="md:hidden divide-y divide-brand-gray-100">
                 {bookings.slice(0, 5).map((booking) => {
                   const statusKey = booking.status as keyof typeof STATUS_MAP
                   const status = STATUS_MAP[statusKey] || STATUS_MAP.pending
                   const StatusIcon = status.icon
+
                   return (
-                    <tr key={booking.id} className="hover:bg-brand-gray-50/50 transition-colors">
-                      <td className="px-6 py-4 text-xs text-brand-gray-400 font-mono">
-                        {booking.id.substring(0, 8).toUpperCase()}
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center text-primary text-xs font-bold shrink-0">
-                            {booking.customer_name?.[0]?.toUpperCase() || "U"}
-                          </div>
-                          <span className="text-sm font-medium text-brand-gray-800">
-                            {booking.customer_name || "Unknown"}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 text-sm text-brand-gray-600">{booking.service_name}</td>
-                      <td className="px-4 py-4">
-                        <div className="text-xs text-brand-gray-600">
-                          <p className="font-medium">{booking.time || "N/A"}</p>
-                          <p className="text-brand-gray-400">{booking.date || (booking.created_at ? new Date(booking.created_at).toLocaleDateString() : "N/A")}</p>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 text-right text-sm font-bold text-brand-gray-900">
-                        ৳{(booking.amount || 0).toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <Badge className={cn("text-xs gap-1", status.class)}>
+                    <div key={booking.id} className="p-4 space-y-2.5 bg-white hover:bg-brand-gray-50/50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-mono text-brand-gray-400 font-bold">
+                          #{booking.id.substring(0, 8).toUpperCase()}
+                        </span>
+                        <Badge className={cn("text-[10px] gap-1 px-2 py-0.5 font-bold", status.class)}>
                           <StatusIcon className="w-3 h-3" />
                           {status.label}
                         </Badge>
-                      </td>
-                    </tr>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center text-primary text-xs font-bold shrink-0">
+                          {booking.customer_name?.[0]?.toUpperCase() || "U"}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-brand-gray-900 truncate">
+                            {booking.customer_name || "Unknown"}
+                          </p>
+                          <p className="text-xs text-brand-gray-500 truncate">
+                            {booking.service_name}
+                          </p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="text-sm font-black text-brand-gray-900">
+                            ৳{(booking.amount || 0).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs text-brand-gray-500 pt-1 border-t border-brand-gray-50">
+                        <span className="flex items-center gap-1 font-medium">
+                          <Clock className="w-3 h-3 text-primary" /> {booking.time || "N/A"} • {booking.date || "Today"}
+                        </span>
+                        <Link
+                          href="/seller/bookings"
+                          className="text-xs font-bold text-primary hover:underline flex items-center gap-0.5"
+                        >
+                          Manage <ChevronRight className="w-3 h-3" />
+                        </Link>
+                      </div>
+                    </div>
                   )
                 })}
-              </tbody>
-            </table>
-          </div>
+              </div>
+
+              {/* Desktop Recent Bookings Table (Hidden on Mobile) */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b bg-brand-gray-50/50">
+                      <th className="text-left text-xs font-semibold text-brand-gray-500 px-6 py-3">ID</th>
+                      <th className="text-left text-xs font-semibold text-brand-gray-500 px-4 py-3">Customer</th>
+                      <th className="text-left text-xs font-semibold text-brand-gray-500 px-4 py-3">Service</th>
+                      <th className="text-left text-xs font-semibold text-brand-gray-500 px-4 py-3">Date & Time</th>
+                      <th className="text-right text-xs font-semibold text-brand-gray-500 px-4 py-3">Amount</th>
+                      <th className="text-right text-xs font-semibold text-brand-gray-500 px-6 py-3">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-brand-gray-50">
+                    {bookings.slice(0, 5).map((booking) => {
+                      const statusKey = booking.status as keyof typeof STATUS_MAP
+                      const status = STATUS_MAP[statusKey] || STATUS_MAP.pending
+                      const StatusIcon = status.icon
+                      return (
+                        <tr key={booking.id} className="hover:bg-brand-gray-50/50 transition-colors">
+                          <td className="px-6 py-4 text-xs text-brand-gray-400 font-mono">
+                            {booking.id.substring(0, 8).toUpperCase()}
+                          </td>
+                          <td className="px-4 py-4">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center text-primary text-xs font-bold shrink-0">
+                                {booking.customer_name?.[0]?.toUpperCase() || "U"}
+                              </div>
+                              <span className="text-sm font-medium text-brand-gray-800">
+                                {booking.customer_name || "Unknown"}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 text-sm text-brand-gray-600">{booking.service_name}</td>
+                          <td className="px-4 py-4">
+                            <div className="text-xs text-brand-gray-600">
+                              <p className="font-medium">{booking.time || "N/A"}</p>
+                              <p className="text-brand-gray-400">{booking.date || (booking.created_at ? new Date(booking.created_at).toLocaleDateString() : "N/A")}</p>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 text-right text-sm font-bold text-brand-gray-900">
+                            ৳{(booking.amount || 0).toLocaleString()}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <Badge className={cn("text-xs gap-1", status.class)}>
+                              <StatusIcon className="w-3 h-3" />
+                              {status.label}
+                            </Badge>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
