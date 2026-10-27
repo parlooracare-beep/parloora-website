@@ -129,66 +129,116 @@ export default function AdminBookingsPage() {
               <p>No bookings found.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left">
-                <thead className="bg-brand-gray-50 text-brand-gray-500 text-xs uppercase font-semibold">
-                  <tr>
-                    <th className="px-6 py-4">Booking Info</th>
-                    <th className="px-6 py-4">Customer</th>
-                    <th className="px-6 py-4">Parlour</th>
-                    <th className="px-6 py-4">Schedule</th>
-                    <th className="px-6 py-4 text-right">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-brand-gray-100 bg-white">
-                   {filteredBookings.map((booking) => (
-                    <tr 
-                      key={booking.id} 
-                      className="hover:bg-brand-gray-50 transition-colors bg-white cursor-pointer"
-                      onClick={() => handleViewDetails(booking)}
-                    >
-                      <td className="px-6 py-4">
-                        <p className="font-bold text-brand-gray-900">{booking.service_name}</p>
-                        <p className="text-[10px] text-brand-gray-400 font-mono mt-0.5 uppercase tracking-wider">#{booking.id.substring(0,8)}</p>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full bg-brand-gray-100 flex items-center justify-center text-[10px] font-bold text-brand-gray-600">
-                            {(booking.customer_name || 'U').charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <p className="font-medium text-brand-gray-800 text-xs">{booking.customer_name || 'Anonymous'}</p>
-                            <p className="text-[10px] text-brand-gray-400">{booking.customer_email || 'No Email'}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-1.5 text-brand-gray-700 font-medium">
-                          <Store className="w-3.5 h-3.5 text-brand-gray-400" />
-                          <span className="text-xs">{booking.parlour_name}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-1.5 text-brand-gray-600">
-                          <Clock className="w-3.5 h-3.5 text-brand-gray-400" />
-                          <span className="text-xs">{new Date(booking.created_at).toLocaleDateString()}</span>
-                        </div>
-                        <p className="text-[10px] text-brand-gray-400 ml-5">Requested: {new Date(booking.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <Badge variant="outline" className={cn(
-                          "uppercase text-[10px] font-bold border-0",
-                          booking.status?.toLowerCase() === 'confirmed' ? 'bg-emerald-100 text-emerald-700' :
-                          booking.status?.toLowerCase() === 'pending' ? 'bg-amber-100 text-amber-700' :
-                          'bg-red-100 text-red-700'
-                        )}>
-                          {booking.status}
-                        </Badge>
-                      </td>
+            <div>
+              {/* Mobile Card List */}
+              <div className="md:hidden divide-y divide-brand-gray-100">
+                {filteredBookings.map((booking) => (
+                  <div
+                    key={booking.id}
+                    onClick={() => handleViewDetails(booking)}
+                    className="p-4 space-y-3 active:bg-brand-gray-50 transition-colors cursor-pointer"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <span className="font-mono text-[10px] text-brand-gray-400 uppercase tracking-wider block">
+                          #{booking.id.substring(0, 8)}
+                        </span>
+                        <p className="font-bold text-brand-gray-900 text-sm">{booking.service_name}</p>
+                      </div>
+                      <Badge variant="outline" className={cn(
+                        "uppercase text-[10px] font-bold border-0 shrink-0",
+                        booking.status?.toLowerCase() === 'confirmed' ? 'bg-emerald-100 text-emerald-700' :
+                        booking.status?.toLowerCase() === 'pending' ? 'bg-amber-100 text-amber-700' :
+                        'bg-red-100 text-red-700'
+                      )}>
+                        {booking.status}
+                      </Badge>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-xs text-brand-gray-600 bg-brand-gray-50/70 p-2.5 rounded-xl">
+                      <div>
+                        <span className="text-[10px] font-semibold text-brand-gray-400 block uppercase">Customer</span>
+                        <p className="font-medium text-brand-gray-900 truncate">{booking.customer_name || 'Anonymous'}</p>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-semibold text-brand-gray-400 block uppercase">Parlour</span>
+                        <p className="font-medium text-brand-gray-900 truncate">{booking.parlour_name}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs text-brand-gray-500 pt-1">
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-brand-gray-400" />
+                        <span>{new Date(booking.created_at).toLocaleDateString()}</span>
+                      </div>
+                      <span className="text-emerald-700 font-semibold text-xs">Tap to Manage →</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-brand-gray-50 text-brand-gray-500 text-xs uppercase font-semibold">
+                    <tr>
+                      <th className="px-6 py-4">Booking Info</th>
+                      <th className="px-6 py-4">Customer</th>
+                      <th className="px-6 py-4">Parlour</th>
+                      <th className="px-6 py-4">Schedule</th>
+                      <th className="px-6 py-4 text-right">Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-brand-gray-100 bg-white">
+                     {filteredBookings.map((booking) => (
+                      <tr 
+                        key={booking.id} 
+                        className="hover:bg-brand-gray-50 transition-colors bg-white cursor-pointer"
+                        onClick={() => handleViewDetails(booking)}
+                      >
+                        <td className="px-6 py-4">
+                          <p className="font-bold text-brand-gray-900">{booking.service_name}</p>
+                          <p className="text-[10px] text-brand-gray-400 font-mono mt-0.5 uppercase tracking-wider">#{booking.id.substring(0,8)}</p>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-full bg-brand-gray-100 flex items-center justify-center text-[10px] font-bold text-brand-gray-600">
+                              {(booking.customer_name || 'U').charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <p className="font-medium text-brand-gray-800 text-xs">{booking.customer_name || 'Anonymous'}</p>
+                              <p className="text-[10px] text-brand-gray-400">{booking.customer_email || 'No Email'}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-1.5 text-brand-gray-700 font-medium">
+                            <Store className="w-3.5 h-3.5 text-brand-gray-400" />
+                            <span className="text-xs">{booking.parlour_name}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-1.5 text-brand-gray-600">
+                            <Clock className="w-3.5 h-3.5 text-brand-gray-400" />
+                            <span className="text-xs">{new Date(booking.created_at).toLocaleDateString()}</span>
+                          </div>
+                          <p className="text-[10px] text-brand-gray-400 ml-5">Requested: {new Date(booking.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <Badge variant="outline" className={cn(
+                            "uppercase text-[10px] font-bold border-0",
+                            booking.status?.toLowerCase() === 'confirmed' ? 'bg-emerald-100 text-emerald-700' :
+                            booking.status?.toLowerCase() === 'pending' ? 'bg-amber-100 text-amber-700' :
+                            'bg-red-100 text-red-700'
+                          )}>
+                            {booking.status}
+                          </Badge>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </CardContent>

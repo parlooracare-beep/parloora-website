@@ -299,7 +299,37 @@ export default function AdminDashboardPage() {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
+          {/* Mobile Cards View */}
+          <div className="md:hidden divide-y divide-brand-gray-100">
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {metrics.recentTransactions.map((txn: any) => (
+              <div key={txn.id} className="p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[11px] font-bold text-brand-gray-500 bg-brand-gray-100 px-2 py-0.5 rounded">
+                    #{txn.id.substring(0, 8).toUpperCase()}
+                  </span>
+                  <Badge variant="outline" className={cn(
+                    "text-[10px] uppercase font-bold border-0",
+                    txn.status?.toLowerCase() === "confirmed" ? "bg-emerald-100 text-emerald-700" :
+                    txn.status?.toLowerCase() === "cancelled" ? "bg-red-100 text-red-700" :
+                    "bg-amber-100 text-amber-700"
+                  )}>
+                    {txn.status}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-brand-gray-900 text-sm">{txn.parlour_name}</p>
+                    <p className="text-xs text-brand-gray-500">{new Date(txn.created_at).toLocaleDateString()}</p>
+                  </div>
+                  <p className="font-bold text-brand-gray-900 text-base">৳{txn.amount.toLocaleString()}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-sm text-left">
               <thead className="bg-brand-gray-50 text-brand-gray-500 text-xs uppercase font-semibold">
                 <tr>
@@ -335,6 +365,7 @@ export default function AdminDashboardPage() {
           </div>
         </CardContent>
       </Card>
+
     </div>
   )
 }

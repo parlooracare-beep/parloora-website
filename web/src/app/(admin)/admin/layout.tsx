@@ -29,9 +29,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { User as UserIcon, Mail, LogOut as LogOutIcon, Settings as SettingsIcon, Bell as BellIcon, ChevronDown as ChevronDownIcon } from "lucide-react"
+import { User as UserIcon, Settings as SettingsIcon, LogOut as LogOutIcon } from "lucide-react"
 import { NotificationBell } from "@/components/shared/NotificationBell"
+import { AdminMobileNav } from "@/components/admin/AdminMobileNav"
+
 
 const NAV_ITEMS = [
   { label: "Overview", href: "/admin/dashboard", icon: LayoutDashboard },
@@ -305,10 +306,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 md:p-6 lg:p-8">
+        <main className="flex-1 p-4 md:p-6 lg:p-8 pb-24 pb-safe md:pb-8">
           {children}
         </main>
+
+        {/* Mobile App Navigation */}
+        <AdminMobileNav onOpenMenu={() => setSidebarOpen(true)} />
       </div>
     </div>
   )
 }
+
