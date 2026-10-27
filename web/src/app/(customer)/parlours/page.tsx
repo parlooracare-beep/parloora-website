@@ -2,12 +2,10 @@
 
 import * as React from "react"
 import Link from "next/link"
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import Image from "next/image"
 import { Search, SlidersHorizontal, Star, MapPin, Clock, ChevronDown, X, ChevronLeft, ChevronRight } from "lucide-react"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -26,16 +24,15 @@ const CITIES = ["All Cities", ...BANGLADESH_DISTRICTS]
 const TYPES = ["All Types", "Full Service Salon", "Hair & Skin", "Bridal & Makeup", "Nail Art & Spa", "Spa & Relaxation"]
 const SORT_OPTIONS = ["Most Popular", "Highest Rated"]
 
-// Gradient colors for card image placeholders
-const CARD_GRADIENTS = [
-  "from-violet-400/30 to-purple-600/30",
-  "from-rose-300/30 to-pink-500/30",
-  "from-amber-300/30 to-orange-500/30",
-  "from-sky-300/30 to-blue-500/30",
-  "from-emerald-300/30 to-teal-500/30",
-  "from-fuchsia-300/30 to-purple-500/30",
-  "from-indigo-300/30 to-violet-500/30",
-  "from-red-300/30 to-rose-500/30",
+const PARLOUR_FALLBACK_IMAGES = [
+  "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1595085816353-d1f5e2239fc4?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?auto=format&fit=crop&w=600&q=80",
 ]
 
 export default function ParloursPage() {
@@ -109,7 +106,7 @@ export default function ParloursPage() {
             if (sortBy === "Highest Rated") {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              filtered.sort((a: any, b: any) => (b.rating || 5.0) - (a.rating || 5.0))
+              filtered.sort((a: any, b: any) => (b.rating || 5.0) - (a.rating || 5.0))\
             } else {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -219,9 +216,244 @@ export default function ParloursPage() {
       </div>
 
       {/* Content Area */}
-      <div className="container mx-auto px-4 md:px-6 -mt-10">
-        {/* Filter Bar */}
-        <div className="bg-white rounded-2xl shadow-lg p-3 sm:p-4 mb-6 sm:mb-8 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3">
+      <div className="container mx-auto px-4 md:px-6 -mt-8 md:-mt-10">
+        {/* Mobile Filter Bar & Quick Pills */}
+        <div className="md:hidden mb-4 space-y-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <button
+              onClick={() => setShowFilters(true)}
+              className={cn(
+                "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold border transition-all active:scale-95 shadow-sm",
+                hasActiveFilters
+                  ? "bg-primary text-white border-primary shadow-primary/20"
+                  : "bg-white text-brand-charcoal border-brand-gray-200"
+              )}
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              <span>Filters</span>
+              {hasActiveFilters && (
+                <span className="w-4 h-4 rounded-full bg-white text-primary text-[10px] flex items-center justify-center font-black">
+                  {(city !== "All Cities" ? 1 : 0) + (type !== "All Types" ? 1 : 0) + (minRating > 0 ? 1 : 0)}
+                </span>
+              )}
+            </button>
+
+            {/* Quick Sort Toggle */}
+            <button
+              onClick={() => {
+                setSortBy(sortBy === "Most Popular" ? "Highest Rated" : "Most Popular")
+                setCurrentPage(1)
+              }}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white border border-brand-gray-200 text-brand-charcoal shadow-sm active:scale-95 transition-all"
+            >
+              <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+              <span>{sortBy}</span>
+            </button>
+
+            {/* Result count */}
+            <span className="text-[11px] text-brand-coolgray font-medium ml-auto">
+              {totalCount} Found
+            </span>
+          </div>
+
+          {/* Quick Filter Horizontal Scroll Chips */}
+          <div className="flex overflow-x-auto gap-2 pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            {["All", "Dhaka", "Chittagong", "Sylhet"].map((cName) => {
+              const active = (cName === "All" && city === "All Cities") || city === cName
+              return (
+                <button
+                  key={cName}
+                  onClick={() => {
+                    setCity(cName === "All" ? "All Cities" : cName)
+                    setCurrentPage(1)
+                  }}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full text-[11px] font-semibold shrink-0 transition-all border",
+                    active
+                      ? "bg-primary/10 border-primary text-primary font-bold"
+                      : "bg-white border-brand-gray-200 text-brand-coolgray hover:border-brand-gray-300"
+                  )}
+                >
+                  {cName}
+                </button>
+              )
+            })}
+
+            <button
+              onClick={() => {
+                setMinRating(minRating === 4.5 ? 0 : 4.5)
+                setCurrentPage(1)
+              }}
+              className={cn(
+                "px-3 py-1.5 rounded-full text-[11px] font-semibold shrink-0 transition-all border flex items-center gap-1",
+                minRating >= 4.5
+                  ? "bg-amber-50 border-amber-300 text-amber-800 font-bold"
+                  : "bg-white border-brand-gray-200 text-brand-coolgray hover:border-brand-gray-300"
+              )}
+            >
+              <Star className="w-3 h-3 text-amber-400 fill-amber-400" /> 4.5+ Stars
+            </button>
+
+            {["Bridal & Makeup", "Hair & Skin", "Spa & Relaxation"].map((tName) => {
+              const active = type === tName
+              return (
+                <button
+                  key={tName}
+                  onClick={() => {
+                    setType(type === tName ? "All Types" : tName)
+                    setCurrentPage(1)
+                  }}
+                  className={cn(
+                    "px-3 py-1.5 rounded-full text-[11px] font-semibold shrink-0 transition-all border",
+                    active
+                      ? "bg-primary/10 border-primary text-primary font-bold"
+                      : "bg-white border-brand-gray-200 text-brand-coolgray hover:border-brand-gray-300"
+                  )}
+                >
+                  {tName}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Mobile Filter Bottom Sheet Modal */}
+        {showFilters && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end justify-center p-0 md:hidden animate-in fade-in duration-200">
+            <div className="bg-white w-full rounded-t-3xl max-h-[85vh] flex flex-col shadow-2xl animate-in slide-in-from-bottom duration-300">
+              <div className="p-4 border-b border-brand-gray-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <SlidersHorizontal className="w-4 h-4 text-primary" />
+                  <h3 className="font-bold text-base text-brand-charcoal">Filter Parlours</h3>
+                </div>
+                <button
+                  onClick={() => setShowFilters(false)}
+                  className="p-1.5 rounded-full text-brand-coolgray hover:text-brand-charcoal hover:bg-brand-gray-100"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="p-5 overflow-y-auto space-y-5">
+                {/* City Filter */}
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-brand-coolgray mb-2 block">
+                    City / District
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={city}
+                      onChange={(e) => { setCity(e.target.value); setCurrentPage(1); }}
+                      className="w-full appearance-none px-3.5 py-2.5 text-sm border border-brand-gray-200 rounded-xl bg-white text-brand-charcoal font-medium focus:outline-none focus:border-primary"
+                    >
+                      {CITIES.map((c) => <option key={c}>{c}</option>)}
+                    </select>
+                    <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-coolgray" />
+                  </div>
+                </div>
+
+                {/* Service Type Filter */}
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-brand-coolgray mb-2 block">
+                    Service Speciality
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {TYPES.map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => { setType(t); setCurrentPage(1); }}
+                        className={cn(
+                          "p-2.5 rounded-xl border text-xs text-left transition-all",
+                          type === t
+                            ? "border-primary bg-primary/10 text-primary font-bold shadow-xs"
+                            : "border-brand-gray-200 text-brand-charcoal hover:bg-brand-gray-50"
+                        )}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Minimum Rating */}
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-brand-coolgray mb-2 block">
+                    Minimum Rating
+                  </label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[
+                      { label: "All", val: 0 },
+                      { label: "3.5+ ★", val: 3.5 },
+                      { label: "4.0+ ★", val: 4.0 },
+                      { label: "4.5+ ★", val: 4.5 },
+                    ].map((r) => (
+                      <button
+                        key={r.val}
+                        onClick={() => { setMinRating(r.val); setCurrentPage(1); }}
+                        className={cn(
+                          "py-2 px-1 text-center rounded-xl border text-xs transition-all",
+                          minRating === r.val
+                            ? "border-primary bg-primary/10 text-primary font-bold shadow-xs"
+                            : "border-brand-gray-200 text-brand-charcoal hover:bg-brand-gray-50"
+                        )}
+                      >
+                        {r.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Sort Order */}
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-brand-coolgray mb-2 block">
+                    Sort Order
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {SORT_OPTIONS.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => { setSortBy(s); setCurrentPage(1); }}
+                        className={cn(
+                          "p-2.5 rounded-xl border text-xs text-center transition-all",
+                          sortBy === s
+                            ? "border-primary bg-primary/10 text-primary font-bold shadow-xs"
+                            : "border-brand-gray-200 text-brand-charcoal hover:bg-brand-gray-50"
+                        )}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Sheet Actions */}
+              <div className="p-4 border-t border-brand-gray-100 flex gap-3 bg-white pb-safe-offset-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setCity("All Cities")
+                    setType("All Types")
+                    setMinRating(0)
+                    setCurrentPage(1)
+                  }}
+                  className="flex-1 rounded-xl text-xs h-11 border-brand-gray-200"
+                >
+                  Reset
+                </Button>
+                <Button
+                  onClick={() => setShowFilters(false)}
+                  className="flex-2 rounded-xl text-xs font-bold h-11 bg-primary text-white shadow-md shadow-primary/20"
+                >
+                  Apply Filters ({totalCount})
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Desktop Filter Bar (Hidden on Mobile) */}
+        <div className="hidden md:flex bg-white rounded-2xl shadow-lg p-3 sm:p-4 mb-6 sm:mb-8 flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3">
           <div className="flex flex-wrap gap-2 items-center">
             {/* City Dropdown */}
             <div className="relative flex-1 sm:flex-none min-w-[110px]">
@@ -292,6 +524,7 @@ export default function ParloursPage() {
           </div>
         </div>
 
+
         {/* Parlour Grid */}
         {loading ? (
           <div className="text-center py-24">
@@ -312,41 +545,55 @@ export default function ParloursPage() {
         ) : (
           <>
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6 mb-8">
-              {parlours.map((parlour, i) => (
-                <Link key={parlour.id} href={`/parlours/${parlour.id}`}>
-                  <Card className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden border-brand-gray-100 h-full">
-                    {/* Image */}
-                    <div className={`relative aspect-square bg-gradient-to-br ${CARD_GRADIENTS[i % CARD_GRADIENTS.length]} overflow-hidden`}>
-                      <div className="absolute inset-0 bg-white/10" />
-                      <div className="absolute top-2 left-2 flex flex-wrap gap-1">
-                        {parlour.featured && (
-                          <Badge className="bg-primary text-white border-0 text-[8px] px-1.5 py-0">Featured</Badge>
-                        )}
+              {parlours.map((parlour, i) => {
+                const coverSrc = parlour.cover_url || parlour.image || parlour.logo_url || 
+                  PARLOUR_FALLBACK_IMAGES[i % PARLOUR_FALLBACK_IMAGES.length]
+
+                return (
+                  <Link key={parlour.id} href={`/parlours/${parlour.id}`}>
+                    <Card className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden border-brand-gray-100 h-full flex flex-col">
+                      {/* Image */}
+                      <div className="relative aspect-square bg-brand-gray-100 overflow-hidden">
+                        <Image
+                          src={coverSrc}
+                          alt={parlour.name}
+                          fill
+                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 280px"
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute top-2 left-2 flex flex-wrap gap-1 z-10">
+                          {parlour.featured && (
+                            <Badge className="bg-primary text-white border-0 text-[8px] md:text-[9px] px-2 py-0.5 font-bold shadow-xs">
+                              Featured
+                            </Badge>
+                          )}
+                        </div>
+                        {/* Favorite Button */}
+                        <button
+                          onClick={async (e) => {
+                            e.preventDefault()
+                            if (!user) return alert("Log in to save favorites")
+                            const res = await toggleFavorite(parlour.id)
+                            if (res.success) {
+                              setFavorites(prev => 
+                                res.action === "added" 
+                                  ? [...prev, parlour.id] 
+                                  : prev.filter(id => id !== parlour.id)
+                              )
+                            }
+                          }}
+                          className={cn(
+                            "absolute top-2 right-2 p-2 rounded-full backdrop-blur-md transition-all z-10",
+                            favorites.includes(parlour.id) 
+                              ? "bg-red-500 text-white shadow-lg shadow-red-500/30" 
+                              : "bg-white/80 text-brand-charcoal hover:bg-white hover:text-red-500 shadow-xs"
+                          )}
+                          aria-label="Save to favorites"
+                        >
+                          <Heart className={cn("w-3.5 h-3.5", favorites.includes(parlour.id) && "fill-current")} />
+                        </button>
                       </div>
-                      {/* Favorite Button */}
-                      <button
-                        onClick={async (e) => {
-                          e.preventDefault()
-                          if (!user) return alert("Log in to save favorites")
-                          const res = await toggleFavorite(parlour.id)
-                          if (res.success) {
-                            setFavorites(prev => 
-                              res.action === "added" 
-                                ? [...prev, parlour.id] 
-                                : prev.filter(id => id !== parlour.id)
-                            )
-                          }
-                        }}
-                        className={cn(
-                          "absolute top-2 right-2 p-1.5 rounded-full backdrop-blur-md transition-all z-10",
-                          favorites.includes(parlour.id) 
-                            ? "bg-red-500 text-white shadow-lg shadow-red-500/30" 
-                            : "bg-white/50 text-white hover:bg-white hover:text-red-500"
-                        )}
-                      >
-                        <Heart className={cn("w-3 h-3", favorites.includes(parlour.id) && "fill-current")} />
-                      </button>
-                    </div>
 
                     <CardContent className="p-2.5 md:p-4 flex-1 flex flex-col">
                       <h3 className="font-bold text-brand-gray-900 group-hover:text-primary transition-colors leading-tight text-sm md:text-base line-clamp-1">
@@ -365,8 +612,12 @@ export default function ParloursPage() {
                           <span className="text-xs md:text-sm font-semibold text-brand-gray-800">{parlour.rating || 5.0}</span>
                           <span className="hidden xs:inline text-[9px] text-brand-gray-400">({parlour.total_bookings || 0})</span>
                         </div>
-                        <span className="text-xs font-bold text-primary">Book</span>
+                        <span className="text-[11px] font-bold bg-primary text-white px-2.5 py-1 rounded-lg group-hover:bg-primary/90 transition-colors shadow-xs">
+                          Book
+                        </span>
                       </div>
+
+
                     </CardContent>
                   </Card>
                 </Link>
