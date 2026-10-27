@@ -64,28 +64,28 @@ export default function OfflinePage() {
           <Button
             onClick={handleRetry}
             disabled={isRetrying}
-            className="w-full h-12 bg-primary hover:bg-primary/95 text-white font-bold rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center gap-2 touch-press"
+            className="w-full h-13 rounded-2xl bg-gradient-to-r from-primary to-secondary text-white font-bold text-base shadow-lg shadow-primary/25 active:scale-98 transition-all"
           >
-            <RefreshCw className={`w-4 h-4 ${isRetrying ? "animate-spin" : ""}`} />
-            {isRetrying ? "Checking connection..." : "Retry Connection"}
+            <RefreshCw className={`w-5 h-5 mr-2 ${isRetrying ? "animate-spin" : ""}`} />
+            {isRetrying ? "Rechecking Connection..." : isOnline ? "Go to Home" : "Retry Connection"}
           </Button>
 
           <Button
             asChild
             variant="outline"
-            className="w-full h-12 border-brand-gray-200 text-brand-charcoal font-semibold rounded-xl hover:bg-brand-gray-50 touch-press"
+            className="w-full h-12 rounded-2xl border-brand-gray-200 text-brand-charcoal font-semibold text-sm hover:bg-brand-gray-50"
           >
-            <Link href="/" className="flex items-center justify-center gap-2">
-              <Home className="w-4 h-4" /> Go to Cached Home
+            <Link href="/">
+              <Home className="w-4 h-4 mr-2" /> Return to Home
             </Link>
           </Button>
         </div>
       </div>
 
-      {/* Support footer */}
-      <div className="text-xs text-brand-coolgray flex items-center gap-1.5 py-4">
-        <Sparkles className="w-3.5 h-3.5 text-secondary" />
-        <span>Parloora Beauty Experience • Available Across Bangladesh</span>
+      {/* Safety Notice */}
+      <div className="max-w-xs text-[11px] text-brand-coolgray flex items-center justify-center gap-1.5 opacity-80">
+        <Sparkles className="w-3.5 h-3.5 text-primary shrink-0" />
+        <span>Appointments and payments are secured via live server validation</span>
       </div>
     </div>
   )

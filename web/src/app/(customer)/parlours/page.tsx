@@ -106,7 +106,7 @@ export default function ParloursPage() {
             if (sortBy === "Highest Rated") {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              filtered.sort((a: any, b: any) => (b.rating || 5.0) - (a.rating || 5.0))\
+              filtered.sort((a: any, b: any) => (b.rating || 5.0) - (a.rating || 5.0))
             } else {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -621,7 +621,8 @@ export default function ParloursPage() {
                     </CardContent>
                   </Card>
                 </Link>
-              ))}
+              )
+            })}
             </div>
 
             {/* Pagination Controls */}

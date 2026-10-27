@@ -183,7 +183,7 @@ export default async function HomePage() {
 
                       {/* Headline */}
                       <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-white mb-6 leading-[1.1] tracking-tighter">
-                        {(content.hero_title || defaultContent.hero_title).split(' ').map((word, i) => (\
+                        {(content.hero_title || defaultContent.hero_title).split(' ').map((word, i) => (
                           <span key={i} className={i > 3 ? "text-[#E6B7A9]" : ""}>{word} </span>
                         ))}
                       </h1>

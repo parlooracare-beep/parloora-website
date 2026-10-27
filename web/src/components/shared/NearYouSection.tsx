@@ -138,7 +138,7 @@ export function NearYouSection() {
                   <Navigation className="w-3 h-3" /> Showing results in <span className="font-semibold text-emerald-600">{city}</span>
                 </p>
               )}
-              {!city && !denied && (\
+              {!city && !denied && (
                 <p className="text-xs text-brand-gray-400 mt-0.5">Top-rated parlours near your area</p>
               )}
               {denied && (

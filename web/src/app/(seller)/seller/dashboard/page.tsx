@@ -239,7 +239,7 @@ export default function SellerDashboardPage() {
             <Card key={stat.title} className="border-brand-gray-100 hover:shadow-md transition-shadow">
               <CardContent className="p-5">
                 <div className="flex items-start justify-between mb-4">
-                  <div className={cn("p-2.5 rounded-xl", stat.bg)} className="p-2.5 rounded-xl bg-primary/10">
+                  <div className={cn("p-2.5 rounded-xl", stat.bg)}>
                     <Icon className={cn("w-5 h-5", stat.text)} />
                   </div>
                   <span className={cn(

@@ -111,7 +111,7 @@ export function PwaInstallPrompt() {
           </div>
         </div>
 
-        {showIosInstructions ? (\
+        {showIosInstructions ? (
           <div className="bg-brand-gray-50 rounded-xl p-3 text-xs text-brand-charcoal space-y-2 border border-brand-gray-100">
             <p className="font-semibold text-primary flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" /> How to install on iPhone / iPad:

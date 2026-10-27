@@ -83,7 +83,7 @@ export function MobileHomeHeader({ categories, pillText }: MobileHomeHeaderProps
 
         <div className="flex items-center gap-1.5">
           <span className="flex items-center gap-1 text-[10px] font-bold tracking-wider uppercase text-rose-200 bg-white/10 px-2.5 py-1 rounded-full border border-white/10">
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" /> {pillText || "Instant Booking"}
+            <Sparkles className="w-3 h-3 text-amber-300" /> {pillText || "Instant Booking"}
           </span>
         </div>
       </div>
