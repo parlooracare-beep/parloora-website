@@ -35,7 +35,7 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    }).then(() => self.clients.claim())\
+    }).then(() => self.clients.claim())
   );
 });
 
@@ -86,7 +86,6 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(request)
         .then((networkResponse) => {
-          // If network succeeds, optionally cache recent HTML for smooth returning
           if (networkResponse && networkResponse.status === 200) {
             const responseClone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
@@ -108,26 +107,25 @@ self.addEventListener('fetch', (event) => {
           return new Response(
             `<!DOCTYPE html>
             <html lang="en">
-              <head>
-                <meta charset="utf-8" />
-                <meta name="viewport" content="width=device-width, initial-scale=1" />
-                <title>Parloora - Offline</title>
-                <style>
-                  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #FAF5F8; color: #1C1C1C; text-align: center; padding: 24px; }
-                  .card { background: white; border-radius: 24px; padding: 36px 28px; max-width: 400px; box-shadow: 0 10px 30px rgba(75, 30, 109, 0.08); }
-                  h1 { font-size: 22px; margin-top: 16px; margin-bottom: 8px; color: #4B1D5F; }
-                  p { font-size: 14px; color: #7A7A7A; line-height: 1.5; margin-bottom: 24px; }
-                  button { background: #4B1D5F; color: white; border: none; padding: 14px 28px; border-radius: 14px; font-weight: 600; font-size: 14px; cursor: pointer; }
-                </style>
-              </head>
-              <body>
-                <div class="card">
-                  <div style="font-size: 48px;">📡</div>
-                  <h1>You're Offline</h1>
-                  <p>Check your internet connection to continue browsing beauty services and salons.</p>
-                  <button onclick="window.location.reload()">Try Again</button>
-                </div>
-              </body>
+            <head>
+              <meta charset="utf-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1">
+              <title>Offline | Parloora</title>
+              <style>
+                body { font-family: system-ui, -apple-system, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #fff; color: #1C1C1C; text-align: center; padding: 20px; }
+                .card { max-width: 400px; padding: 32px; border: 1px solid #f1edf5; border-radius: 24px; box-shadow: 0 10px 30px rgba(75, 29, 95, 0.08); }
+                h1 { color: #4B1D5F; font-size: 22px; margin-bottom: 8px; }
+                p { color: #7A7A7A; font-size: 14px; line-height: 1.5; margin-bottom: 24px; }
+                button { background: #4B1D5F; color: #fff; border: none; padding: 12px 24px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+              </style>
+            </head>
+            <body>
+              <div class="card">
+                <h1>You're Offline</h1>
+                <p>Please check your internet connection to continue browsing parlours and booking beauty services.</p>
+                <button onclick="window.location.reload()">Retry Connection</button>
+              </div>
+            </body>
             </html>`,
             { headers: { 'Content-Type': 'text/html' } }
           );

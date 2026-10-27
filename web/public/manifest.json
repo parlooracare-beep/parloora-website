@@ -36,21 +36,21 @@
       "short_name": "Explore",
       "description": "Find top rated salons and parlours near you",
       "url": "/parlours",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" } ]
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "My Bookings",
       "short_name": "Bookings",
       "description": "View and manage your appointments",
       "url": "/bookings",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" } ]
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Favorites",
       "short_name": "Favorites",
       "description": "Your saved parlours and salons",
       "url": "/wishlist",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" } ]
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
