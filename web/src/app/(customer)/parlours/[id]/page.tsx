@@ -1050,6 +1050,14 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                     <div className="absolute top-1/2 -right-3 -translate-y-1/2 w-6 h-6 bg-brand-gray-50 rounded-full border-l-2 border-brand-gray-100" />
                     
                     <div className="p-6 space-y-4">
+                      {activeBookingId && (
+                        <div className="flex justify-between items-center pb-3 border-b border-dashed border-brand-gray-200">
+                          <p className="text-[10px] uppercase font-bold text-brand-gray-400 tracking-widest">Booking Reference</p>
+                          <span className="text-xs font-mono font-black text-primary bg-primary/10 px-2.5 py-0.5 rounded-lg border border-primary/20">
+                            #{activeBookingId.slice(0, 8).toUpperCase()}
+                          </span>
+                        </div>
+                      )}
                       <div className="flex justify-between items-center pb-3 border-b border-dashed border-brand-gray-200">
                         <div>
                           <p className="text-[10px] uppercase font-bold text-brand-gray-400 tracking-widest">Service</p>
@@ -1103,12 +1111,23 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                     </div>
                   </div>
                   
-                  <Button 
-                    onClick={() => setShowBooking(false)} 
-                    className="w-full bg-brand-gray-900 hover:bg-brand-gray-800 text-white rounded-xl h-14 font-bold text-lg shadow-xl shadow-brand-gray-200"
-                  >
-                    Return to Parlour
-                  </Button>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Button 
+                      asChild
+                      className="flex-1 bg-primary hover:bg-primary/90 text-white rounded-xl h-12 font-bold text-sm shadow-md shadow-primary/20"
+                    >
+                      <Link href="/bookings">
+                        View My Bookings
+                      </Link>
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      onClick={() => setShowBooking(false)} 
+                      className="flex-1 border-brand-gray-200 text-brand-gray-700 hover:bg-brand-gray-50 rounded-xl h-12 font-bold text-sm"
+                    >
+                      Return to Parlour
+                    </Button>
+                  </div>
                 </div>
               ) : showStripeBookingForm && bookingStripeClientSecret ? (
                 /* Stripe Payment Form (Step 3 - Stripe View) */
@@ -1592,28 +1611,32 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                     {!user ? (
                       <Button
                         asChild
-                        className="flex-1 h-14 bg-brand-gray-900 hover:bg-brand-gray-800 text-white rounded-2xl font-bold text-lg shadow-xl shadow-brand-gray-100"
+                        className="flex-1 h-14 bg-brand-gray-900 hover:bg-brand-gray-800 text-white rounded-2xl font-bold text-base sm:text-lg shadow-xl shadow-brand-gray-100"
                       >
-                        <Link href={`/login?redirectedFrom=/parlours/${id}`}>
+                        <Link href={`/login?redirectedFrom=${encodeURIComponent(`/parlours/${id}${selectedService ? `?service=${selectedService.id}` : ''}`)}`}>
                           Log in to Confirm
                         </Link>
                       </Button>
                     ) : (
                       <Button
-                        className="flex-1 h-14 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-bold text-lg shadow-xl shadow-primary/20 disabled:opacity-50 transition-all active:scale-95"
+                        className="flex-1 h-14 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-bold text-sm sm:text-base md:text-lg shadow-xl shadow-primary/20 disabled:opacity-50 transition-all active:scale-95 px-3"
                         disabled={isBooking}
                         onClick={handleConfirmBooking}
                       >
                         {isBooking ? (
-                          <><Loader2 className="w-5 h-5 mr-3 animate-spin" /> Processing...</>
+                          <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Confirming...</>
                         ) : bookingPaymentMethod === "cash" ? (
-                          "Book with Cash on Service (Pay at Parlour)"
+                          <>
+                            <span className="sm:hidden">Confirm Booking (Cash)</span>
+                            <span className="hidden sm:inline">Book with Cash on Service (Pay at Parlour)</span>
+                          </>
                         ) : (
                           "Proceed to Payment"
                         )}
                       </Button>
                     )}
                   </div>
+
                 )}
               </div>
             )}
