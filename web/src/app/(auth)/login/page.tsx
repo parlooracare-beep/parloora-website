@@ -66,8 +66,6 @@ function LoginForm() {
     }
   }
 
-
-
   return (
     <div className="min-h-screen flex">
       {/* Left Panel — Brand */}
@@ -91,16 +89,16 @@ function LoginForm() {
           </p>
           <div className="mt-12 grid grid-cols-3 gap-6 text-center border-t border-brand-gray-200 pt-8">
             <div>
-              <p className="text-3xl font-bold text-primary">500+</p>
-              <p className="text-brand-gray-400 text-sm mt-1">Parlours</p>
+              <p className="text-2xl font-bold text-primary">Verified</p>
+              <p className="text-brand-gray-400 text-xs mt-1">Top Parlours</p>
             </div>
             <div>
-              <p className="text-3xl font-bold text-primary">50k+</p>
-              <p className="text-brand-gray-400 text-sm mt-1">Happy Customers</p>
+              <p className="text-2xl font-bold text-primary">Instant</p>
+              <p className="text-brand-gray-400 text-xs mt-1">Direct Booking</p>
             </div>
             <div>
-              <p className="text-3xl font-bold text-primary">4.8★</p>
-              <p className="text-brand-gray-400 text-sm mt-1">Avg Rating</p>
+              <p className="text-2xl font-bold text-primary">Genuine</p>
+              <p className="text-brand-gray-400 text-xs mt-1">Client Reviews</p>
             </div>
           </div>
         </div>
@@ -160,8 +158,6 @@ function LoginForm() {
               </Link>
             </p>
           </div>
-
-
 
           {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-5">

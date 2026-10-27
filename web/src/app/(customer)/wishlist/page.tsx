@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import Image from "next/image"
 import { Heart, MapPin, Star, Search, ArrowRight, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -12,11 +12,11 @@ import { Database } from "@/types/supabase"
 
 type Parlour = Database["public"]["Tables"]["parlours"]["Row"]
 
-const CARD_GRADIENTS = [
-  "from-violet-400/30 to-purple-600/30",
-  "from-rose-300/30 to-pink-500/30",
-  "from-amber-300/30 to-orange-500/30",
-  "from-sky-300/30 to-blue-500/30",
+const PARLOUR_FALLBACK_IMAGES = [
+  "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=600&q=80",
 ]
 
 export default function WishlistPage() {
@@ -82,18 +82,30 @@ export default function WishlistPage() {
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {wishlist.map((parlour, i) => (
-              <Card key={parlour.id} className="group hover:shadow-xl transition-all duration-300 overflow-hidden border-0 shadow-lg h-full">
-                {/* Image Placeholder */}
-                <div className={`h-40 bg-gradient-to-br ${CARD_GRADIENTS[i % CARD_GRADIENTS.length]} relative`}>
-                  <button 
-                    onClick={() => handleRemove(parlour.id)}
-                    className="absolute top-3 right-3 p-2 rounded-full bg-red-500 text-white shadow-lg z-10 hover:scale-110 transition-transform"
-                  >
-                    <Heart className="w-4 h-4 fill-current" />
-                  </button>
-                  <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
+            {wishlist.map((parlour, i) => {
+              const coverSrc = parlour.cover_url || parlour.image || parlour.logo_url || 
+                PARLOUR_FALLBACK_IMAGES[i % PARLOUR_FALLBACK_IMAGES.length]
+
+              return (
+                <Card key={parlour.id} className="group hover:shadow-xl transition-all duration-300 overflow-hidden border border-brand-gray-100 shadow-sm h-full flex flex-col">
+                  {/* Image */}
+                  <div className="h-44 relative bg-brand-gray-100 overflow-hidden">
+                    <Image
+                      src={coverSrc}
+                      alt={parlour.name}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 300px"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <button 
+                      onClick={() => handleRemove(parlour.id)}
+                      className="absolute top-3 right-3 p-2 rounded-full bg-red-500 text-white shadow-lg z-10 hover:scale-110 active:scale-95 transition-transform"
+                      aria-label="Remove from wishlist"
+                    >
+                      <Heart className="w-4 h-4 fill-current" />
+                    </button>
+                  </div>
 
                 <CardContent className="p-5">
                   <Badge className="bg-brand-gray-100 text-brand-gray-600 border-0 mb-3 text-[10px] uppercase tracking-wider font-bold">
@@ -119,7 +131,8 @@ export default function WishlistPage() {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+            )
+          })}
           </div>
         )}
       </div>
