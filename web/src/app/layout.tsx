@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL && !process.env.NEXT_PUBLIC_SITE_URL.includes("localhost")
       ? process.env.NEXT_PUBLIC_SITE_URL
-      : "https://parloora.vercel.app"
+      : "https://parloora.com"
   ),
   title: {
     default: "Parloora — Book Your Self Care Services In Seconds",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Parloora — Book Your Self Care Services In Seconds",
     description: "Book self-care services and treatments with verified parlours across Bangladesh in seconds.",
-    url: 'https://parloora.vercel.app',
+    url: 'https://parloora.com',
     siteName: 'Parloora',
     images: [
       {
@@ -106,7 +106,7 @@ export default async function RootLayout({
 }>) {
   const theme = await getThemeSettings();
   
-  return (\
+  return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
@@ -119,7 +119,7 @@ export default async function RootLayout({
             --secondary: ${theme.secondary_color};
             --secondary-rgb: ${hexToRgb(theme.secondary_color)};
             --radius: ${theme.border_radius};
-            --font-family: ${theme.font_family}, sans-serif;\
+            --font-family: ${theme.font_family}, sans-serif;
           }
           body {
             font-family: var(--font-family) !important;
