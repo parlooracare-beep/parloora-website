@@ -56,9 +56,9 @@ export default function CustomerLayout({
   }
 
   return (
-    <div className="min-h-screen flex flex-col pt-[72px] md:pt-[72px]">
+    <div className="min-h-screen flex flex-col pt-[64px] md:pt-[72px] overflow-x-hidden">
       <Navbar />
-      <main className="flex-1 pb-20 md:pb-0">
+      <main className="flex-1 pb-24 pb-safe-offset-4 md:pb-0">
         {children}
       </main>
       <Footer />

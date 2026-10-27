@@ -138,7 +138,7 @@ export function NearYouSection() {
                   <Navigation className="w-3 h-3" /> Showing results in <span className="font-semibold text-emerald-600">{city}</span>
                 </p>
               )}
-              {!city && !denied && (
+              {!city && !denied && (\
                 <p className="text-xs text-brand-gray-400 mt-0.5">Top-rated parlours near your area</p>
               )}
               {denied && (
@@ -185,7 +185,12 @@ export function NearYouSection() {
                     </div>
                   </div>
                   <p className="text-[10px] text-brand-gray-500 line-clamp-1">{parlour.address || parlour.city}</p>
-                  <p className="text-[9px] md:text-[10px] text-brand-gray-400">{parlour.type || "Beauty Salon"}</p>
+                  <div className="flex items-center justify-between mt-1 pt-1 border-t border-brand-gray-100/60">
+                    <span className="text-[9px] md:text-[10px] text-brand-gray-400 truncate max-w-[100px]">{parlour.type || "Beauty Salon"}</span>
+                    <span className="text-[10px] font-bold bg-primary text-white px-2 py-0.5 rounded-md group-hover:bg-primary/90 transition-colors shadow-xs">
+                      Book
+                    </span>
+                  </div>
                 </div>
               </div>
             </Link>
