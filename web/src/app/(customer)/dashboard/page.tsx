@@ -126,8 +126,8 @@ export default function CustomerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-brand-gray-50/50 pt-24 pb-20">
-      <div className="max-w-6xl mx-auto px-4 md:px-6">
+    <div className="min-h-screen bg-brand-gray-50/50 pt-16 md:pt-24 pb-20">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6">
         
         {/* Profile Completion Nudge Banner */}
         <ProfileCompletionBanner 
@@ -137,59 +137,100 @@ export default function CustomerDashboard() {
         />
 
         {/* Profile Header */}
-        <div className="bg-white rounded-3xl p-8 mb-10 shadow-sm border border-brand-gray-100 relative overflow-hidden">
+        <div className="bg-white rounded-3xl p-5 sm:p-8 mb-6 sm:mb-10 shadow-sm border border-brand-gray-100 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-full -mr-32 -mt-32 blur-3xl" />
           
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 relative z-10">
-            <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-tr from-primary to-secondary p-1 shrink-0">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-6 relative z-10">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-tr from-primary to-secondary p-1 shrink-0 shadow-md">
               <div className="relative w-full h-full rounded-full bg-white flex items-center justify-center overflow-hidden">
                 {user.user_metadata?.avatar_url ? (
                   <Image src={user.user_metadata.avatar_url} alt="Profile" fill className="object-cover" />
                 ) : (
-                  <User className="w-10 h-10 text-brand-gray-300" />
+                  <User className="w-8 h-8 sm:w-10 sm:h-10 text-brand-gray-300" />
                 )}
               </div>
             </div>
             
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl md:text-3xl font-black text-brand-gray-900 mb-1 truncate">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-brand-gray-900 mb-0.5 truncate">
                 Hello, {user.user_metadata?.display_name || "Beauty Lover"}! ✨
               </h1>
-              <p className="text-brand-gray-500 font-medium text-sm truncate">{user.email}</p>
-              <div className="flex flex-wrap gap-2 mt-3">
-                <Badge variant="outline" className="bg-brand-gray-50 text-brand-gray-600 border-brand-gray-100 px-2 py-1 rounded-lg text-xs">
-                  <Calendar className="w-3 h-3 mr-1.5 text-primary" /> {bookings.length} Bookings
+              <p className="text-brand-gray-500 font-medium text-xs sm:text-sm truncate">{user.email}</p>
+              <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2 sm:mt-3">
+                <Badge variant="outline" className="bg-brand-gray-50 text-brand-gray-600 border-brand-gray-100 px-2 py-0.5 rounded-lg text-[10px] sm:text-xs">
+                  <Calendar className="w-3 h-3 mr-1 text-primary" /> {bookings.length} Bookings
                 </Badge>
-                <Badge variant="outline" className="bg-brand-gray-50 text-brand-gray-600 border-brand-gray-100 px-2 py-1 rounded-lg text-xs">
-                  <ShoppingBag className="w-3 h-3 mr-1.5 text-primary" /> {orders.length} Orders
+                <Badge variant="outline" className="bg-brand-gray-50 text-brand-gray-600 border-brand-gray-100 px-2 py-0.5 rounded-lg text-[10px] sm:text-xs">
+                  <ShoppingBag className="w-3 h-3 mr-1 text-primary" /> {orders.length} Orders
                 </Badge>
-                <Badge variant="outline" className="bg-brand-gray-50 text-brand-gray-600 border-brand-gray-100 px-2 py-1 rounded-lg text-xs">
-                  <Star className="w-3 h-3 mr-1.5 text-luxury-gold" /> Gold Member
+                <Badge variant="outline" className="bg-brand-gray-50 text-brand-gray-600 border-brand-gray-100 px-2 py-0.5 rounded-lg text-[10px] sm:text-xs">
+                  <Star className="w-3 h-3 mr-1 text-amber-500 fill-amber-500" /> Member
                 </Badge>
               </div>
             </div>
 
-            <div className="flex items-center justify-between sm:flex-col sm:items-end gap-3 w-full sm:w-auto">
+            <div className="flex items-center justify-between sm:flex-col sm:items-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-brand-gray-100">
               {/* Profile Completion Circle */}
-              <div className="flex items-center gap-3 bg-brand-gray-50 border border-brand-gray-100 rounded-2xl p-3">
-                <ProfileCompletionRing percentage={profileCompletion} size={48} strokeWidth={5} />
+              <div className="flex items-center gap-2.5 bg-brand-gray-50 border border-brand-gray-100 rounded-2xl p-2 sm:p-3">
+                <ProfileCompletionRing percentage={profileCompletion} size={40} strokeWidth={4} />
                 <div className="text-left">
                   <p className="text-[9px] font-bold uppercase tracking-widest text-brand-gray-400">Profile</p>
-                  <p className="text-xs font-black text-brand-gray-800">{profileCompletion}% Set</p>
+                  <p className="text-xs font-black text-brand-gray-800">{profileCompletion}%</p>
                 </div>
               </div>
 
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="rounded-xl border-brand-gray-200" asChild>
-                  <Link href="/profile"><Settings className="w-3.5 h-3.5 mr-1.5" />Settings</Link>
+                <Button variant="outline" size="sm" className="rounded-xl border-brand-gray-200 text-xs h-9" asChild>
+                  <Link href="/profile"><Settings className="w-3.5 h-3.5 mr-1" />Settings</Link>
                 </Button>
-                <Button size="sm" className="bg-brand-gray-900 hover:bg-brand-gray-800 text-white rounded-xl" asChild>
+                <Button size="sm" className="bg-brand-gray-900 hover:bg-brand-gray-800 text-white rounded-xl text-xs h-9" asChild>
                   <Link href="/profile">Edit Profile</Link>
                 </Button>
               </div>
             </div>
           </div>
         </div>
+
+        {/* Mobile Quick Shortcuts Bar */}
+        <div className="grid grid-cols-4 gap-2 mb-6 md:hidden">
+          <Link
+            href="/bookings"
+            className="flex flex-col items-center justify-center bg-white p-3 rounded-2xl border border-brand-gray-100 shadow-xs active:scale-95 transition-transform"
+          >
+            <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-1">
+              <Calendar className="w-4 h-4" />
+            </div>
+            <span className="text-[10px] font-bold text-brand-charcoal">Bookings</span>
+          </Link>
+          <Link
+            href="/wishlist"
+            className="flex flex-col items-center justify-center bg-white p-3 rounded-2xl border border-brand-gray-100 shadow-xs active:scale-95 transition-transform"
+          >
+            <div className="w-9 h-9 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500 mb-1">
+              <Heart className="w-4 h-4" />
+            </div>
+            <span className="text-[10px] font-bold text-brand-charcoal">Favorites</span>
+          </Link>
+          <Link
+            href="/notifications"
+            className="flex flex-col items-center justify-center bg-white p-3 rounded-2xl border border-brand-gray-100 shadow-xs active:scale-95 transition-transform"
+          >
+            <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 mb-1">
+              <MessageSquare className="w-4 h-4" />
+            </div>
+            <span className="text-[10px] font-bold text-brand-charcoal">Alerts</span>
+          </Link>
+          <Link
+            href="/profile"
+            className="flex flex-col items-center justify-center bg-white p-3 rounded-2xl border border-brand-gray-100 shadow-xs active:scale-95 transition-transform"
+          >
+            <div className="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 mb-1">
+              <User className="w-4 h-4" />
+            </div>
+            <span className="text-[10px] font-bold text-brand-charcoal">Profile</span>
+          </Link>
+        </div>
+
 
 
         {/* Tabs */}
@@ -275,12 +316,12 @@ export default function CustomerDashboard() {
                           </div>
                         </div>
                         
-                        <div className="bg-brand-gray-50 p-6 md:w-64 border-l border-brand-gray-100 flex flex-col justify-between items-end">
-                          <div className="text-right">
-                            <p className="text-xs text-brand-gray-400 font-bold uppercase tracking-widest mb-1">Amount</p>
-                            <p className="text-2xl font-black text-primary">{formatCurrency(booking.amount)}</p>
+                        <div className="bg-brand-gray-50 p-4 sm:p-6 md:w-64 border-t md:border-t-0 md:border-l border-brand-gray-100 flex flex-row md:flex-col justify-between items-center md:items-end gap-3">
+                          <div className="text-left md:text-right">
+                            <p className="text-[10px] sm:text-xs text-brand-gray-400 font-bold uppercase tracking-widest mb-0.5">Amount</p>
+                            <p className="text-xl sm:text-2xl font-black text-primary">{formatCurrency(booking.amount)}</p>
                           </div>
-                          <Button asChild variant="outline" size="sm" className="rounded-xl border-brand-gray-200 mt-4">
+                          <Button asChild variant="outline" size="sm" className="rounded-xl border-brand-gray-200 mt-0 md:mt-4 text-xs h-9">
                             <Link href={`/parlours/${booking.parlour_id}`}>View Details <ChevronRight className="w-4 h-4 ml-1" /></Link>
                           </Button>
                         </div>
@@ -347,14 +388,14 @@ export default function CustomerDashboard() {
                           </div>
                         </div>
                         
-                        <div className="bg-brand-gray-50 p-6 md:w-64 border-l border-brand-gray-100 flex flex-col justify-between items-end">
-                          <div className="text-right">
-                            <p className="text-xs text-brand-gray-400 font-bold uppercase tracking-widest mb-1">Total Paid</p>
-                            <p className="text-2xl font-black text-brand-gray-900">{formatCurrency(order.total_amount)}</p>
+                        <div className="bg-brand-gray-50 p-4 sm:p-6 md:w-64 border-t md:border-t-0 md:border-l border-brand-gray-100 flex flex-row md:flex-col justify-between items-center md:items-end gap-3">
+                          <div className="text-left md:text-right">
+                            <p className="text-[10px] sm:text-xs text-brand-gray-400 font-bold uppercase tracking-widest mb-0.5">Total Paid</p>
+                            <p className="text-xl sm:text-2xl font-black text-brand-gray-900">{formatCurrency(order.total_amount)}</p>
                           </div>
-                          <div className="flex gap-2 mt-4">
-                            <Button variant="ghost" size="sm" className="text-brand-gray-500">Track</Button>
-                            <Button variant="outline" size="sm" className="rounded-xl border-brand-gray-200">View Invoice</Button>
+                          <div className="flex gap-2 mt-0 md:mt-4">
+                            <Button variant="ghost" size="sm" className="text-brand-gray-500 text-xs h-9">Track</Button>
+                            <Button variant="outline" size="sm" className="rounded-xl border-brand-gray-200 text-xs h-9">View Invoice</Button>
                           </div>
                         </div>
                       </div>
