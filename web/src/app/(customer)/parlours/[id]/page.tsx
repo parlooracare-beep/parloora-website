@@ -244,21 +244,39 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
   }, [])
 
   React.useEffect(() => {
+    let isMounted = true
     async function load() {
       setLoading(true)
-      const data = await getParlourById(id)
-      setParlour(data)
+      try {
+        const data = await getParlourById(id)
+        if (!isMounted) return
+        setParlour(data)
+        setLoading(false)
 
-      if (data?.username && id !== data.username && typeof window !== "undefined") {
-        window.history.replaceState(null, "", `/parlours/${data.username}`)
+        if (data?.username && id !== data.username && typeof window !== "undefined") {
+          window.history.replaceState(null, "", `/parlours/${data.username}`)
+        }
+
+        // Non-blocking background verification check
+        if (data?.id) {
+          hasCompletedBooking(data.id)
+            .then((verified) => {
+              if (isMounted) setCanReview(verified)
+            })
+            .catch(() => {})
+        }
+      } catch (err) {
+        console.error("Error loading parlour:", err)
+        if (isMounted) {
+          setParlour(null)
+          setLoading(false)
+        }
       }
-      
-      const verified = await hasCompletedBooking(data?.id || id)
-      setCanReview(verified)
-      
-      setLoading(false)
     }
     load()
+    return () => {
+      isMounted = false
+    }
   }, [id])
 
   const handleBook = React.useCallback(async (service: Service) => {
@@ -762,10 +780,67 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
       )}
 
       <div className="container mx-auto px-4 md:px-6 -mt-10 pb-16">
-        {loading || !parlour ? (
-          <div className="text-center py-24 bg-white rounded-2xl shadow-lg mt-10">
-            <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto mb-4" />
-            <p className="text-brand-gray-500">Loading parlour details...</p>
+        {loading ? (
+          /* Instant Shimmer Skeleton UI */
+          <div className="space-y-6 animate-pulse">
+            <div className="bg-white rounded-3xl p-6 shadow-lg border border-brand-gray-100">
+              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                <div className="space-y-3 flex-1">
+                  <div className="flex gap-2">
+                    <div className="h-5 w-20 bg-brand-gray-200 rounded-full" />
+                    <div className="h-5 w-24 bg-brand-gray-200 rounded-full" />
+                  </div>
+                  <div className="h-8 w-64 bg-brand-gray-200 rounded-xl" />
+                  <div className="h-4 w-48 bg-brand-gray-100 rounded-lg" />
+                </div>
+                <div className="flex gap-2">
+                  <div className="h-10 w-24 bg-brand-gray-200 rounded-xl" />
+                  <div className="h-10 w-24 bg-brand-gray-200 rounded-xl" />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-4">
+                <div className="h-12 w-full bg-white rounded-2xl border border-brand-gray-100 shadow-sm" />
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="h-28 bg-white rounded-2xl border border-brand-gray-100 p-4 shadow-sm flex items-center justify-between">
+                      <div className="space-y-2">
+                        <div className="h-5 w-40 bg-brand-gray-200 rounded-lg" />
+                        <div className="h-4 w-60 bg-brand-gray-100 rounded-md" />
+                        <div className="h-4 w-24 bg-brand-gray-200 rounded-md" />
+                      </div>
+                      <div className="h-10 w-24 bg-brand-gray-200 rounded-xl" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="h-72 bg-white rounded-3xl border border-brand-gray-100 shadow-sm" />
+            </div>
+          </div>
+        ) : !parlour ? (
+          /* Parlour Not Found State with instant navigation */
+          <div className="text-center py-16 bg-white rounded-3xl shadow-xl mt-6 border border-brand-gray-100 max-w-lg mx-auto px-6">
+            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4 text-primary">
+              <Store className="w-8 h-8" />
+            </div>
+            <h2 className="text-2xl font-bold text-brand-gray-900 mb-2">Parlour Not Found</h2>
+            <p className="text-sm text-brand-gray-500 mb-6">
+              The parlour you are looking for may have been moved, renamed, or is currently unavailable.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link href="/parlours" className="w-full sm:w-auto">
+                <Button className="w-full sm:w-auto rounded-full bg-primary hover:bg-primary/90 text-white px-6 shadow-md shadow-primary/20">
+                  Explore Active Parlours
+                </Button>
+              </Link>
+              <Link href="/" className="w-full sm:w-auto">
+                <Button variant="outline" className="w-full sm:w-auto rounded-full px-6">
+                  Back to Home
+                </Button>
+              </Link>
+            </div>
           </div>
         ) : (
           <>

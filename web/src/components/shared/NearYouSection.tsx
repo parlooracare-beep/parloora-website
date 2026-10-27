@@ -61,44 +61,44 @@ export function NearYouSection() {
   }, [])
 
   React.useEffect(() => {
-    if (!navigator.geolocation) {
-      fetchAllParlours()
-      return
-    }
+    // 1. Immediately fetch top parlours so UI paints in <100ms
+    fetchAllParlours()
 
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          const { latitude, longitude } = position.coords
-          // Reverse geocode to get city name
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=en`
-          )
-          const geo = await res.json()
-          const detectedCity =
-            geo?.address?.city ||
-            geo?.address?.town ||
-            geo?.address?.village ||
-            geo?.address?.county ||
-            null
+    // 2. Non-blocking geolocation check in background (optional enhancement)
+    if (typeof window !== "undefined" && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords
+            const controller = new AbortController()
+            const timer = setTimeout(() => controller.abort(), 2500)
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=en`,
+              { signal: controller.signal }
+            )
+            clearTimeout(timer)
+            const geo = await res.json()
+            const detectedCity =
+              geo?.address?.city ||
+              geo?.address?.town ||
+              geo?.address?.village ||
+              geo?.address?.county ||
+              null
 
-          if (detectedCity) {
-            setCity(detectedCity)
-            fetchParloursByCity(detectedCity)
-          } else {
-            fetchAllParlours()
+            if (detectedCity) {
+              setCity(detectedCity)
+              fetchParloursByCity(detectedCity)
+            }
+          } catch {
+            // Silently maintain already displayed parlours
           }
-        } catch {
-          fetchAllParlours()
-        }
-      },
-      () => {
-        // Permission denied or error
-        setDenied(true)
-        fetchAllParlours()
-      },
-      { timeout: 8000 }
-    )
+        },
+        () => {
+          setDenied(true)
+        },
+        { timeout: 3000 }
+      )
+    }
   }, [fetchAllParlours, fetchParloursByCity])
 
   if (loading) {

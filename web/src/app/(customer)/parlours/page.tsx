@@ -146,10 +146,15 @@ export default function ParloursPage() {
       setLoading(false)
     }
     
-    // Add a small debounce for search
+    // Execute immediately on initial navigation; debounce only when user types
+    if (!search) {
+      load()
+      return
+    }
+
     const timer = setTimeout(() => {
       load()
-    }, 300)
+    }, 250)
     
     return () => clearTimeout(timer)
   }, [search, city, type, sortBy, minRating, isSemantic, currentPage])

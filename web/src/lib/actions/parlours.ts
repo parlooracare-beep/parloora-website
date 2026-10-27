@@ -101,16 +101,25 @@ export async function getParlours(filters?: {
   }
 }
 
+// Fast in-memory cache for parlour details (60s TTL)
+const parlourCache = new Map<string, { data: ParlourWithDetails; expires: number }>()
+
 export async function getParlourById(idOrIdentifier: string): Promise<ParlourWithDetails | null> {
-  const supabase = await createClient()
   if (!idOrIdentifier) return null
 
+  // Check in-memory cache first (0ms instant return)
+  const cached = parlourCache.get(idOrIdentifier)
+  if (cached && Date.now() < cached.expires) {
+    return cached.data
+  }
+
+  const supabase = await createClient()
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrIdentifier)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let parlour: any = null
 
-  // 1. If UUID, look up by primary key ID first
+  // 1. If UUID, look up by primary key ID directly
   if (isUuid) {
     const { data, error } = await supabase
       .from("parlours")
@@ -122,82 +131,74 @@ export async function getParlourById(idOrIdentifier: string): Promise<ParlourWit
     }
   }
 
-  // 2. If not found by ID or if slug/username passed, look up by username column
-  if (!parlour) {
-    const { data, error } = await supabase
-      .from("parlours")
-      .select("*")
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .ilike("username" as any, idOrIdentifier.toLowerCase())
-      .maybeSingle()
-    if (!error && data) {
-      parlour = data
-    }
-  }
-
-  // 3. Fallback: match against slugified parlour name
+  // 2. If not found by ID or if slug passed, match against parlour name
   if (!parlour && !isUuid) {
     const cleanTargetSlug = idOrIdentifier.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")
-    const { data: allParlours } = await supabase
+    const { data: matchedParlours } = await supabase
       .from("parlours")
       .select("*")
-      .limit(100)
-    if (allParlours) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      parlour = allParlours.find((p: any) => {
-        if (p.username && p.username.toLowerCase() === idOrIdentifier.toLowerCase()) return true
+      .ilike("name", `%${idOrIdentifier.replace(/-/g, " ")}%`)
+      .limit(10)
+
+    if (matchedParlours && matchedParlours.length > 0) {
+      parlour = matchedParlours.find((p: any) => {
         const pSlug = (p.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")
         return pSlug === cleanTargetSlug
-      }) || null
+      }) || matchedParlours[0]
     }
   }
 
   if (!parlour) {
-    console.error("Parlour not found for identifier:", idOrIdentifier)
     return null
   }
 
   const actualId = parlour.id
 
-  // Fetch services for this parlour using the verified parlour UUID
-  const { data: services, error: servicesError } = await supabase
-    .from("services")
-    .select("*")
-    .eq("parlour_id", actualId)
-    .eq("is_active", true)
+  // Fetch services and reviews in PARALLEL to eliminate sequential roundtrips
+  const [servicesRes, reviewsRes] = await Promise.all([
+    supabase
+      .from("services")
+      .select("*")
+      .eq("parlour_id", actualId)
+      .eq("is_active", true),
+    supabase
+      .from("reviews")
+      .select("*")
+      // @ts-expect-error - parlour_id column in reviews table
+      .eq("parlour_id", actualId)
+      .order("created_at", { ascending: false })
+  ])
 
-  if (servicesError) {
-    console.error("Error fetching services:", servicesError)
+  if (servicesRes.error) {
+    console.error("Error fetching services:", servicesRes.error)
   }
-
-  // Fetch reviews for this parlour
-  const { data: reviews, error: reviewsError } = await supabase
-    .from("reviews")
-    .select("*")
-    // @ts-expect-error - parlour_id column needs to be added to reviews table in Supabase
-    .eq("parlour_id", actualId)
-    .order("created_at", { ascending: false })
-
-  if (reviewsError) {
-    console.error("Error fetching reviews:", reviewsError)
+  if (reviewsRes.error) {
+    console.error("Error fetching reviews:", reviewsRes.error)
   }
 
   const computedUsername =
-    parlour.username ||
-    (parlour.name
+    parlour.name
       ? parlour.name
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, "-")
           .replace(/^-+|-+$/g, "")
-      : parlour.id)
+      : parlour.id
 
-  return {
+  const result: ParlourWithDetails = {
     ...parlour,
     username: computedUsername,
     is_booking_ready: true,
-    services: (services || []) as Service[],
-    reviews: (reviews || []) as Review[]
-  } as ParlourWithDetails
+    services: (servicesRes.data || []) as Service[],
+    reviews: (reviewsRes.data || []) as Review[]
+  }
+
+  // Save to cache (60 seconds)
+  parlourCache.set(idOrIdentifier, { data: result, expires: Date.now() + 60_000 })
+  if (result.id !== idOrIdentifier) {
+    parlourCache.set(result.id, { data: result, expires: Date.now() + 60_000 })
+  }
+
+  return result
 }
 
 export async function getParlourByOwnerId(ownerId: string) {
