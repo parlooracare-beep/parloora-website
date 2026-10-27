@@ -2,10 +2,9 @@
 
 import * as React from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { ParlooraLogo } from "@/components/shared/Logo"
-import { Sparkles, User, ShoppingBag, Search, X } from "lucide-react"
+import { Home, Sparkles, ShoppingBag, Heart, Calendar, Search, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 import { createClient } from "@/lib/supabase/client"
@@ -50,11 +49,11 @@ export function Navbar() {
   const { t } = useI18n()
 
   const navLinks = [
-    { name: t("Home"), href: "/" },
-    { name: t("Parlours"), href: "/parlours" },
-    { name: t("Shop"), href: "/shop" },
-    { name: t("Wishlist"), href: "/wishlist" },
-    { name: t("My Bookings"), href: "/bookings" },
+    { name: t("Home"), href: "/", icon: Home },
+    { name: t("Parlours"), href: "/parlours", icon: Sparkles },
+    { name: t("Shop"), href: "/shop", icon: ShoppingBag },
+    { name: t("Wishlist"), href: "/wishlist", icon: Heart },
+    { name: t("My Bookings"), href: "/bookings", icon: Calendar },
   ]
 
   return (
@@ -71,20 +70,32 @@ export function Navbar() {
         {/* Official Parloora Logo */}
         <ParlooraLogo size="md" href="/" priority />
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              href={link.href}
-              className={cn(
-                "text-sm font-medium transition-colors hover:text-primary relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-primary after:transition-transform hover:after:origin-bottom-left hover:after:scale-x-100",
-                pathname === link.href ? "text-primary" : "text-muted-foreground"
-              )}
-            >
-              {link.name}
-            </Link>
-          ))}
+        {/* Desktop Navigation Buttons */}
+        <nav className="hidden md:flex items-center p-1 bg-white/75 backdrop-blur-md border border-brand-gray-200/70 rounded-full shadow-sm gap-1">
+          {navLinks.map((link) => {
+            const Icon = link.icon
+            const isActive = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href)
+            return (
+              <Link
+                key={link.name}
+                href={link.href}
+                className={cn(
+                  "group relative flex items-center gap-1.5 md:gap-2 px-3 md:px-3.5 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-200 select-none",
+                  isActive
+                    ? "bg-gradient-to-r from-primary to-[#6B2D8B] text-white shadow-sm shadow-primary/25 scale-[1.02]"
+                    : "text-brand-gray-600 hover:text-primary hover:bg-primary/5 active:scale-95"
+                )}
+              >
+                <Icon
+                  className={cn(
+                    "w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-200 group-hover:scale-110",
+                    isActive ? "text-white" : "text-brand-gray-400 group-hover:text-primary"
+                  )}
+                />
+                <span>{link.name}</span>
+              </Link>
+            )
+          })}
         </nav>
 
         {/* Actions */}
