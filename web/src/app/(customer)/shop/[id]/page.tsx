@@ -146,15 +146,15 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               <h1 className="text-3xl md:text-4xl font-black text-brand-gray-900 leading-tight">{product.name}</h1>
               
               <div className="flex items-center gap-4 mt-4">
-                <div className="flex items-center gap-1">
-                  <div className="flex items-center gap-0.5">
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <Star key={s} className={cn("w-4 h-4", s <= (product.rating || 5) ? "text-amber-400 fill-amber-400" : "text-brand-gray-200")} />
-                    ))}
+                {product.rating ? (
+                  <div className="flex items-center gap-1.5">
+                    <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                    <span className="text-sm font-bold text-brand-gray-900">{Number(product.rating).toFixed(1)}</span>
                   </div>
-                  <span className="text-sm font-bold text-brand-gray-900 ml-1">{product.rating || 5.0}</span>
-                </div>
-                <span className="text-brand-gray-400 text-sm border-l pl-4">124 Orders</span>
+                ) : null}
+                <span className="text-brand-gray-500 text-xs font-medium flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Genuine Parloora Partner Product
+                </span>
               </div>
             </div>
 

@@ -48,9 +48,86 @@ export async function createBooking(bookingData: BookingInsert) {
 
   const supabase = hasServiceRoleKey() ? createAdminClient() : authClient
 
+  // 1. Validate parlour exists and is valid
+  if (!bookingData.parlour_id) {
+    return { success: false, error: "Parlour is required for booking." }
+  }
+
+  const { data: parlour, error: parlourErr } = await supabase
+    .from("parlours")
+    .select("id, name, owner_id, status")
+    .eq("id", bookingData.parlour_id)
+    .single()
+
+  if (parlourErr || !parlour) {
+    return { success: false, error: "Selected parlour was not found or is currently unavailable." }
+  }
+
+  // 2. Validate service exists for this parlour and verify authentic base price
+  if (!bookingData.service_id) {
+    return { success: false, error: "Service is required for booking." }
+  }
+
+  const { data: service, error: serviceErr } = await supabase
+    .from("services")
+    .select("id, name, price, duration, is_active")
+    .eq("id", bookingData.service_id)
+    .eq("parlour_id", bookingData.parlour_id)
+    .single()
+
+  if (serviceErr || !service) {
+    return { success: false, error: "Selected service is no longer available at this parlour." }
+  }
+
+  // 3. Double-booking check: verify slot availability on server
+  if (!bookingData.date || !bookingData.time) {
+    return { success: false, error: "Appointment date and time are required." }
+  }
+
+  const { data: conflictingBookings } = await supabase
+    .from("bookings")
+    .select("id")
+    .eq("parlour_id", bookingData.parlour_id)
+    .eq("date", bookingData.date)
+    .eq("time", bookingData.time)
+    .not("status", "in", '("cancelled","rejected")')
+    .limit(1)
+
+  if (conflictingBookings && conflictingBookings.length > 0) {
+    return {
+      success: false,
+      error: "This time slot was just booked by another customer. Please select another time.",
+    }
+  }
+
+  // 4. Resolve customer details
+  let customerName = bookingData.customer_name
+  let customerPhone = bookingData.customer_phone
+  if (user) {
+    if (!customerName) {
+      customerName = (user.user_metadata?.display_name || user.user_metadata?.full_name || user.email || "Valued Customer")
+    }
+    if (!customerPhone && user.user_metadata?.phone) {
+      customerPhone = user.user_metadata.phone
+    }
+  }
+
+  // 5. Construct verified booking record with authentic database prices
+  const verifiedBookingData: BookingInsert = {
+    ...bookingData,
+    customer_id: finalCustomerId,
+    customer_name: customerName,
+    customer_phone: customerPhone,
+    seller_id: parlour.owner_id || bookingData.seller_id,
+    parlour_name: parlour.name,
+    service_name: service.name,
+    price: service.price,
+    amount: bookingData.amount ?? service.price,
+  }
+
   const { data, error } = await supabase
     .from("bookings")
-    .insert([{ ...bookingData, customer_id: finalCustomerId }])
+    .insert([verifiedBookingData])
     .select()
     .single()
 
@@ -320,7 +397,7 @@ export async function getBookedSlots(parlourId: string, date: string) {
     .select("time")
     .eq("parlour_id", parlourId)
     .eq("date", date)
-    .not("status", "eq", "cancelled")
+    .not("status", "in", '("cancelled","rejected")')
 
   if (error) {
     console.error("Error fetching booked slots:", error)

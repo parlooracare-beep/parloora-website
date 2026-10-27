@@ -66,6 +66,8 @@ function LoginForm() {
     }
   }
 
+
+
   return (
     <div className="min-h-screen flex">
       {/* Left Panel — Brand */}
@@ -158,6 +160,8 @@ function LoginForm() {
               </Link>
             </p>
           </div>
+
+
 
           {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-5">

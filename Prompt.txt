@@ -1,4 +1,4 @@
-🧠 PROJECT NAME
+🧠 PROJECT NAME : Parloora
 
 Build a scalable beauty marketplace platform called
 Parloora 
@@ -36,8 +36,8 @@ Website
 
 Mobile App
 
-• Framework: Flutter
-• Language: Dart
+• Framework: React Native
+• Language: t
 • Reason: Single codebase, high performance
 
 🧠 BACKEND

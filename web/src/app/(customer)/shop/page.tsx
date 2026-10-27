@@ -154,12 +154,14 @@ export default function ShopPage() {
                         </div>
                         
                         <div className="flex items-center gap-1.5 mb-3">
-                          <div className="flex items-center gap-0.5">
-                            {[1, 2, 3, 4, 5].map((s) => (
-                              <Star key={s} className={cn("w-3 h-3", s <= (Number(product.rating) || 5) ? "text-amber-400 fill-amber-400" : "text-brand-gray-200")} />
-                            ))}
-                          </div>
-                          <span className="text-[10px] text-brand-gray-400 font-semibold">(42)</span>
+                          {product.rating ? (
+                            <div className="flex items-center gap-1">
+                              <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                              <span className="text-xs font-bold text-brand-gray-800">{Number(product.rating).toFixed(1)}</span>
+                            </div>
+                          ) : (
+                            <span className="text-[11px] text-brand-gray-400 font-medium">Verified Product</span>
+                          )}
                         </div>
                         
                         {/* Price & Action Row */}
