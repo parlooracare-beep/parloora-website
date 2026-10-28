@@ -6,6 +6,8 @@ import { Sparkles, Mail, Phone, MapPin } from "lucide-react"
 import Link from "next/link"
 import { ParlooraLogo } from "@/components/shared/Logo"
 import { getFooterSettings, FooterSettings } from "@/lib/actions/site"
+import { useI18n } from "@/lib/store/useI18n"
+import { LanguageSwitcher } from "./LanguageSwitcher"
 
 // Inline SVG social icons (lucide-react may not have these)
 const FacebookIcon = () => (
@@ -30,6 +32,7 @@ const YoutubeIcon = () => (
 )
 
 export function Footer() {
+  const { t, currentLang } = useI18n()
   const [settings, setSettings] = React.useState<FooterSettings | null>(null)
 
   React.useEffect(() => {
@@ -93,16 +96,16 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-black text-white uppercase tracking-widest text-xs mb-4 md:mb-8">Quick Links</h3>
+            <h3 className="font-black text-white uppercase tracking-widest text-xs mb-4 md:mb-8">{t("footer.quickLinks")}</h3>
             <ul className="space-y-4">
               {[
-                { name: "About Us", href: "/about" },
-                { name: "Find a Parlour", href: "/parlours" },
-                { name: "Bangladesh Locations", href: "/locations" },
-                { name: "All Services", href: "/parlours" },
-                { name: "Beauty Blog", href: "/blog" }
+                { name: t("footer.aboutUs"), href: "/about" },
+                { name: t("footer.findParlour"), href: "/parlours" },
+                { name: t("footer.bangladeshLocations"), href: "/locations" },
+                { name: t("footer.allServices"), href: "/parlours" },
+                { name: t("footer.beautyBlog"), href: "/blog" }
               ].map(item => (
-                <li key={item.name}>
+                <li key={item.href}>
                   <Link href={item.href} className="text-brand-gray-400 hover:text-secondary text-sm font-bold transition-colors flex items-center gap-2 group">
                     <span className="w-1.5 h-1.5 rounded-full bg-secondary/0 group-hover:bg-secondary transition-all" />
                     {item.name}
@@ -114,26 +117,26 @@ export function Footer() {
 
           {/* For Partners */}
           <div>
-            <h3 className="font-black text-white uppercase tracking-widest text-xs mb-4 md:mb-8">For Partners</h3>
+            <h3 className="font-black text-white uppercase tracking-widest text-xs mb-4 md:mb-8">{t("footer.forPartners")}</h3>
             <ul className="space-y-4">
               <li>
                 <Link href="/signup?role=seller" className="text-brand-gray-400 hover:text-secondary text-sm font-bold transition-colors">
-                  Register your Parlour
+                  {t("footer.registerParlour")}
                 </Link>
               </li>
               <li>
                 <Link href="/login" className="text-brand-gray-400 hover:text-secondary text-sm font-bold transition-colors">
-                  Seller Login
+                  {t("footer.sellerLogin")}
                 </Link>
               </li>
               <li>
                 <Link href="/seller/pricing" className="text-brand-gray-400 hover:text-secondary text-sm font-bold transition-colors">
-                  Pricing Plans
+                  {t("footer.pricingPlans")}
                 </Link>
               </li>
               <li>
                 <Link href="/seller/resources" className="text-brand-gray-400 hover:text-secondary text-sm font-bold transition-colors">
-                  Partner Resources
+                  {t("footer.partnerResources")}
                 </Link>
               </li>
             </ul>
@@ -141,7 +144,7 @@ export function Footer() {
 
           {/* Contact Info */}
           <div>
-            <h3 className="font-black text-white uppercase tracking-widest text-xs mb-4 md:mb-8">Contact Us</h3>
+            <h3 className="font-black text-white uppercase tracking-widest text-xs mb-4 md:mb-8">{t("footer.contactUs")}</h3>
             <ul className="space-y-5">
               <li className="flex items-start gap-4 text-sm text-brand-gray-400 font-medium">
                 <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
@@ -169,43 +172,50 @@ export function Footer() {
         <div className="pt-8 pb-6 border-t border-white/10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
             <span className="text-xs font-bold uppercase tracking-wider text-[#E2A9A9]">
-              Popular Locations in Bangladesh:
+              {t("footer.popularLocations")}
             </span>
             <Link href="/locations" className="text-xs font-bold text-white/70 hover:text-white underline">
-              View All 64 Districts &rarr;
+              {t("footer.viewAllDistricts")}
             </Link>
           </div>
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-white/60 font-medium">
             {[
-              { name: "Moulvibazar", href: "/locations/moulvibazar" },
-              { name: "Sylhet", href: "/locations/sylhet" },
-              { name: "Dhaka", href: "/locations/dhaka" },
-              { name: "Chattogram", href: "/locations/chattogram" },
-              { name: "Cox's Bazar", href: "/locations/coxs-bazar" },
-              { name: "Cumilla", href: "/locations/cumilla" },
-              { name: "Gazipur", href: "/locations/gazipur" },
-              { name: "Rajshahi", href: "/locations/rajshahi" },
-              { name: "Bogura", href: "/locations/bogura" },
-              { name: "Khulna", href: "/locations/khulna" },
-              { name: "Rangpur", href: "/locations/rangpur" },
-              { name: "Mymensingh", href: "/locations/mymensingh" },
-              { name: "Barishal", href: "/locations/barishal" },
+              { en: "Moulvibazar", bn: "মৌলভীবাজার", href: "/locations/moulvibazar" },
+              { en: "Sylhet", bn: "সিলেট", href: "/locations/sylhet" },
+              { en: "Dhaka", bn: "ঢাকা", href: "/locations/dhaka" },
+              { en: "Chattogram", bn: "চট্টগ্রাম", href: "/locations/chattogram" },
+              { en: "Cox's Bazar", bn: "কক্সবাজার", href: "/locations/coxs-bazar" },
+              { en: "Cumilla", bn: "কুমিল্লা", href: "/locations/cumilla" },
+              { en: "Gazipur", bn: "গাজীপুর", href: "/locations/gazipur" },
+              { en: "Rajshahi", bn: "রাজশাহী", href: "/locations/rajshahi" },
+              { en: "Bogura", bn: "বগুড়া", href: "/locations/bogura" },
+              { en: "Khulna", bn: "খুলনা", href: "/locations/khulna" },
+              { en: "Rangpur", bn: "রংপুর", href: "/locations/rangpur" },
+              { en: "Mymensingh", bn: "ময়মনসিংহ", href: "/locations/mymensingh" },
+              { en: "Barishal", bn: "বরিশাল", href: "/locations/barishal" },
             ].map((loc) => (
               <Link key={loc.href} href={loc.href} className="hover:text-white transition-colors">
-                {loc.name}
+                {currentLang.code === "bn" ? loc.bn : loc.en}
               </Link>
             ))}
           </div>
         </div>
 
         <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
-          <p className="text-xs text-brand-gray-500 font-bold uppercase tracking-widest text-center md:text-left">
-            &copy; {currentYear} Parloora Platform. Engineered for Beauty.
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-xs text-brand-gray-500 font-bold uppercase tracking-widest text-center md:text-left">
+              &copy; {currentYear} Parloora Platform. Engineered for Beauty.
+            </p>
+            <LanguageSwitcher variant="dark" />
+          </div>
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8">
-            {["Privacy Policy", "Terms of Service", "Cookie Policy"].map(item => (
-              <Link key={item} href={`/${item.toLowerCase().replace(/\s+/g, "-")}`} className="text-[10px] font-black uppercase tracking-widest text-brand-gray-500 hover:text-white transition-colors">
-                {item}
+            {[
+              { name: t("footer.privacyPolicy"), href: "/privacy" },
+              { name: t("footer.termsOfService"), href: "/terms" },
+              { name: t("footer.cookiePolicy"), href: "/cookies" },
+            ].map(item => (
+              <Link key={item.href} href={item.href} className="text-[10px] font-black uppercase tracking-widest text-brand-gray-500 hover:text-white transition-colors">
+                {item.name}
               </Link>
             ))}
           </div>

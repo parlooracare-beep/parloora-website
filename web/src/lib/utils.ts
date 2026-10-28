@@ -7,49 +7,50 @@ export function cn(...inputs: ClassValue[]) {
 
 import { useI18n } from "./store/useI18n"
 
-export function formatCurrency(amount: number | string, currency?: string, locale?: string) {
+export function formatCurrency(amount: number | string, currency: string = "BDT", locale?: string) {
   const numericAmount = typeof amount === "string" ? parseFloat(amount) : amount;
   if (isNaN(numericAmount)) return "";
-  
-  let selectedCurrency = currency;
-  let selectedLocale = locale;
-  let rate = 1.0;
-  
+
+  let activeLocale = locale;
   try {
     const state = useI18n.getState();
-    if (state && state.currentLang) {
-      if (!selectedCurrency) selectedCurrency = state.currentLang.currency;
-      if (!selectedLocale) selectedLocale = state.currentLang.locale;
-      if (!currency) {
-        rate = state.currentLang.rate;
-      }
+    if (state && !activeLocale) {
+      activeLocale = state.currentLang.code === "bn" ? "bn-BD" : "en-BD";
     }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (e) {
+  } catch {
     // SSR fallback
   }
 
-  if (!selectedCurrency) selectedCurrency = "BDT";
-  if (!selectedLocale) selectedLocale = "en-BD";
+  if (!activeLocale) activeLocale = "en-BD";
 
-  const convertedAmount = numericAmount * rate;
-  const formattedAmount = new Intl.NumberFormat(selectedLocale, {
+  const formattedAmount = new Intl.NumberFormat(activeLocale, {
     style: "currency",
-    currency: selectedCurrency,
+    currency: currency,
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(convertedAmount);
+  }).format(numericAmount);
 
-  // In en-BD locale, Intl.NumberFormat might output "BDT 1,234". 
-  // We explicitly replace "BDT" with the Taka symbol "৳" for a better UX.
-  return formattedAmount.replace("BDT", "৳");
+  // Normalize BDT to standard ৳
+  return formattedAmount.replace("BDT", "৳").trim();
 }
 
-export function formatDate(date: string | Date, locale: string = "en-US") {
-  return new Intl.DateTimeFormat(locale, {
+export function formatDate(date: string | Date, locale?: string, options?: Intl.DateTimeFormatOptions) {
+  let activeLocale = locale;
+  try {
+    const state = useI18n.getState();
+    if (state && !activeLocale) {
+      activeLocale = state.currentLang.code === "bn" ? "bn-BD" : "en-US";
+    }
+  } catch {
+    // SSR fallback
+  }
+  if (!activeLocale) activeLocale = "en-US";
+
+  return new Intl.DateTimeFormat(activeLocale, {
     day: "numeric",
     month: "long",
     year: "numeric",
+    ...options,
   }).format(new Date(date))
 }
 

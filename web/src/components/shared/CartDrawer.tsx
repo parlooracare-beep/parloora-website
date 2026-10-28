@@ -5,6 +5,7 @@ import { createPortal } from "react-dom"
 import { ShoppingBag, X, Plus, Minus, Trash2, ArrowRight } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useCart } from "@/lib/store/useCart"
+import { useI18n } from "@/lib/store/useI18n"
 import { Button } from "@/components/ui/button"
 import { formatCurrency } from "@/lib/utils"
 import Link from "next/link"
@@ -16,6 +17,7 @@ interface CartDrawerProps {
 
 export function CartDrawer(props: CartDrawerProps) {
   const store = useCart()
+  const { t } = useI18n()
   const isControlled = props.isOpen !== undefined
   const isOpen = isControlled ? props.isOpen : store.isOpen
   const onClose = props.onClose || store.closeCart
@@ -78,9 +80,9 @@ export function CartDrawer(props: CartDrawerProps) {
                   <ShoppingBag className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-brand-gray-900 leading-tight">Your Cart</h2>
+                  <h2 className="text-lg font-bold text-brand-gray-900 leading-tight">{t("shop.yourCart")}</h2>
                   <p className="text-xs text-brand-gray-500 font-medium">
-                    {totalItems()} {totalItems() === 1 ? "item" : "items"}
+                    {totalItems()} {totalItems() === 1 ? t("shop.item") : t("shop.items")}
                   </p>
                 </div>
               </div>
@@ -101,13 +103,13 @@ export function CartDrawer(props: CartDrawerProps) {
                     <ShoppingBag className="w-10 h-10 text-brand-gray-300" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-brand-gray-900">Your cart is empty</h3>
+                    <h3 className="text-lg font-bold text-brand-gray-900">{t("shop.cartEmpty")}</h3>
                     <p className="text-sm text-brand-gray-500 max-w-[220px] mx-auto mt-1">
-                      Explore our products and find premium beauty essentials.
+                      {t("shop.cartEmptySub")}
                     </p>
                   </div>
                   <Button asChild onClick={onClose} variant="outline" className="rounded-xl mt-2">
-                    <Link href="/shop">Start Shopping</Link>
+                    <Link href="/shop">{t("shop.startShopping")}</Link>
                   </Button>
                 </div>
               ) : (
@@ -193,13 +195,13 @@ export function CartDrawer(props: CartDrawerProps) {
             {items.length > 0 && (
               <div className="p-5 sm:p-6 border-t bg-brand-gray-50/70 shrink-0 mt-auto space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-brand-gray-500 font-semibold text-sm">Subtotal</span>
+                  <span className="text-brand-gray-500 font-semibold text-sm">{t("shop.subtotal")}</span>
                   <span className="text-xl font-black text-brand-gray-900">
                     {formatCurrency(totalPrice())}
                   </span>
                 </div>
                 <p className="text-[10px] text-brand-gray-400 text-center uppercase font-bold tracking-wider">
-                  Shipping and taxes calculated at checkout
+                  {t("shop.shippingCalculated")}
                 </p>
                 <div className="grid gap-2.5">
                   <Button
@@ -207,7 +209,7 @@ export function CartDrawer(props: CartDrawerProps) {
                     className="w-full h-13 py-3.5 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-bold text-base shadow-lg shadow-primary/20 hover:opacity-95 active:scale-[0.99] transition-all"
                   >
                     <Link href="/checkout" onClick={onClose}>
-                      Proceed to Checkout <ArrowRight className="w-4 h-4 ml-2 inline" />
+                      {t("shop.proceedToCheckout")} <ArrowRight className="w-4 h-4 ml-2 inline" />
                     </Link>
                   </Button>
                   <Button
@@ -215,7 +217,7 @@ export function CartDrawer(props: CartDrawerProps) {
                     onClick={onClose}
                     className="w-full text-brand-gray-500 hover:text-brand-gray-900 rounded-xl"
                   >
-                    Continue Shopping
+                    {t("shop.continueShopping")}
                   </Button>
                 </div>
               </div>

@@ -8,6 +8,7 @@ import {
   getAllDistricts,
   getAllServiceCategoriesSEO,
 } from "@/lib/locations/data"
+import { getAllDistrictSEOArticles } from "@/lib/locations/content"
 import { getLocationDirectoryMetrics } from "@/lib/actions/locations"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -81,18 +82,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }))
 
-  // 5. Active District & Category URLs (Districts that have active listings)
+  // 5. Active & Published District & Category URLs
   const allDistricts = getAllDistricts()
   const allCategories = getAllServiceCategoriesSEO()
+  const allArticles = getAllDistrictSEOArticles()
+  const articleMap = new Map<string, (typeof allArticles)[0]>()
+  allArticles.forEach((art) => articleMap.set(art.slug.toLowerCase(), art))
+
   const activeDistrictUrls: MetadataRoute.Sitemap = []
 
   for (const d of allDistricts) {
     const hasParlours = (districtCounts[d.id] || 0) > 0
-    if (hasParlours) {
+    const article = articleMap.get(d.slug.toLowerCase())
+    const isEligible = (article?.status === "published" && (hasParlours || article.indexStatus)) || hasParlours
+
+    if (isEligible) {
       // Main district page
       activeDistrictUrls.push({
         url: `${baseUrl}/locations/${d.slug}`,
-        lastModified: new Date(),
+        lastModified: article?.lastUpdated ? new Date(article.lastUpdated) : new Date(),
         changeFrequency: "daily" as const,
         priority: 0.8,
       })

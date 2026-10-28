@@ -68,7 +68,26 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const { pathname } = request.nextUrl
+  const rawPathname = request.nextUrl.pathname
+
+  // ── 0. BILINGUAL ROUTING: Detect /en/... and /bn/... URL prefixes ─────────
+  const localeMatch = rawPathname.match(/^\/(en|bn)(\/.*)?$/)
+  const isLocalePrefixed = !!localeMatch
+  const detectedLocale = localeMatch ? (localeMatch[1] as 'en' | 'bn') : null
+  const pathname = localeMatch ? (localeMatch[2] || '/') : rawPathname
+
+  // If locale prefix is present, set response cookie and rewrite internally
+  if (isLocalePrefixed && detectedLocale) {
+    const rewriteUrl = request.nextUrl.clone()
+    rewriteUrl.pathname = pathname
+    response = NextResponse.rewrite(rewriteUrl, { request })
+    response.cookies.set('NEXT_LOCALE', detectedLocale, {
+      path: '/',
+      maxAge: 31536000,
+      sameSite: 'lax',
+    })
+    response.headers.set('x-locale', detectedLocale)
+  }
 
   // ── 1. AUTH ROUTES: Redirect authenticated users to their dashboard ──────
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname === route)
@@ -81,7 +100,8 @@ export async function proxy(request: NextRequest) {
     ).toLowerCase()
 
     const redirectUrl = request.nextUrl.clone()
-    redirectUrl.pathname = ROLE_DASHBOARDS[role] ?? '/dashboard'
+    const targetDashboard = ROLE_DASHBOARDS[role] ?? '/dashboard'
+    redirectUrl.pathname = detectedLocale ? `/${detectedLocale}${targetDashboard}` : targetDashboard
     redirectUrl.search = ''
     return NextResponse.redirect(redirectUrl)
   }
@@ -101,8 +121,8 @@ export async function proxy(request: NextRequest) {
   if (pathname === '/seller/pending' || pathname.startsWith('/seller/pending/')) {
     if (!user) {
       const loginUrl = request.nextUrl.clone()
-      loginUrl.pathname = '/login'
-      loginUrl.searchParams.set('redirectedFrom', pathname)
+      loginUrl.pathname = detectedLocale ? `/${detectedLocale}/login` : '/login'
+      loginUrl.searchParams.set('redirectedFrom', rawPathname)
       return NextResponse.redirect(loginUrl)
     }
     return response
@@ -117,8 +137,8 @@ export async function proxy(request: NextRequest) {
     // No session → redirect to login, preserving destination for post-auth redirect
     if (!user) {
       const loginUrl = request.nextUrl.clone()
-      loginUrl.pathname = '/login'
-      loginUrl.searchParams.set('redirectedFrom', pathname)
+      loginUrl.pathname = detectedLocale ? `/${detectedLocale}/login` : '/login'
+      loginUrl.searchParams.set('redirectedFrom', rawPathname)
       return NextResponse.redirect(loginUrl)
     }
 
@@ -136,7 +156,8 @@ export async function proxy(request: NextRequest) {
     if (!allowedRoles.includes(role)) {
       // Authenticated but wrong role → redirect to appropriate home
       const homeUrl = request.nextUrl.clone()
-      homeUrl.pathname = ROLE_DASHBOARDS[role] ?? '/'
+      const targetHome = ROLE_DASHBOARDS[role] ?? '/'
+      homeUrl.pathname = detectedLocale ? `/${detectedLocale}${targetHome}` : targetHome
       homeUrl.search = ''
       return NextResponse.redirect(homeUrl)
     }

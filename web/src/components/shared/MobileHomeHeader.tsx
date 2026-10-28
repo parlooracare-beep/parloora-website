@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 import { Search, MapPin, Sparkles, ChevronRight, ArrowRight, ShieldCheck } from "lucide-react"
 import { BANGLADESH_DISTRICTS } from "@/lib/constants"
 import { cn } from "@/lib/utils"
+import { useI18n } from "@/lib/store/useI18n"
 
 interface MobileHomeHeaderProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -46,6 +47,7 @@ const PROMO_BANNERS = [
 
 export function MobileHomeHeader({ categories, pillText }: MobileHomeHeaderProps) {
   const router = useRouter()
+  const { t, currentLang } = useI18n()
   const [searchQuery, setSearchQuery] = React.useState("")
   const [selectedCity, setSelectedCity] = React.useState("Dhaka")
   const [isCityModalOpen, setIsCityModalOpen] = React.useState(false)
@@ -83,7 +85,7 @@ export function MobileHomeHeader({ categories, pillText }: MobileHomeHeaderProps
 
         <div className="flex items-center gap-1.5">
           <span className="flex items-center gap-1 text-[10px] font-bold tracking-wider uppercase text-rose-200 bg-white/10 px-2.5 py-1 rounded-full border border-white/10">
-            <Sparkles className="w-3 h-3 text-amber-300" /> {pillText || "Instant Booking"}
+            <Sparkles className="w-3 h-3 text-amber-300" /> {pillText || t("home.instantBooking")}
           </span>
         </div>
       </div>
@@ -91,9 +93,9 @@ export function MobileHomeHeader({ categories, pillText }: MobileHomeHeaderProps
       {/* 2. Headline & Search Bar */}
       <div className="px-4 pt-2 pb-3">
         <h1 className="text-xl font-black text-white tracking-tight leading-tight mb-3">
-          Book Self Care Services <br />
+          {t("home.heroTitle")} <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-200 via-rose-300 to-amber-200">
-            In Seconds
+            {t("home.heroTitleGradient")}
           </span>
         </h1>
 
@@ -104,14 +106,14 @@ export function MobileHomeHeader({ categories, pillText }: MobileHomeHeaderProps
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search parlours, facials, haircuts..."
+              placeholder={t("common.searchPlaceholder")}
               className="w-full bg-transparent text-brand-charcoal text-xs sm:text-sm pl-2.5 pr-3 py-2.5 outline-none placeholder:text-brand-coolgray font-medium"
             />
             <button
               type="submit"
               className="bg-gradient-to-r from-primary to-secondary text-white font-bold text-xs px-4 py-2 rounded-xl shrink-0 shadow-md active:scale-95 transition-transform"
             >
-              Search
+              {t("common.search")}
             </button>
           </div>
         </form>
@@ -120,9 +122,9 @@ export function MobileHomeHeader({ categories, pillText }: MobileHomeHeaderProps
       {/* 3. Horizontal Category Story Avatars */}
       <div className="pt-2 pb-3">
         <div className="px-4 flex items-center justify-between mb-2">
-          <span className="text-xs font-black uppercase tracking-wider text-white/90">Categories</span>
+          <span className="text-xs font-black uppercase tracking-wider text-white/90">{t("common.categories")}</span>
           <Link href="/parlours" className="text-[11px] font-bold text-rose-200 flex items-center gap-0.5">
-            See all <ChevronRight className="w-3 h-3" />
+            {t("common.seeAll")} <ChevronRight className="w-3 h-3" />
           </Link>
         </div>
 
@@ -146,7 +148,7 @@ export function MobileHomeHeader({ categories, pillText }: MobileHomeHeaderProps
                 </div>
               </div>
               <span className="text-[11px] font-semibold text-center text-white/95 leading-tight line-clamp-1 group-hover:text-rose-200 transition-colors">
-                {cat.name.split(" ")[0]}
+                {currentLang.code === "bn" && cat.bnName ? cat.bnName : cat.name.split(" ")[0]}
               </span>
             </Link>
           ))}
@@ -174,14 +176,20 @@ export function MobileHomeHeader({ categories, pillText }: MobileHomeHeaderProps
                   </span>
                   <div className="flex items-center gap-1">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-300" />
-                    <span className="text-[10px] text-white/80 font-medium">Verified</span>
+                    <span className="text-[10px] text-white/80 font-medium">{t("common.verified")}</span>
                   </div>
                 </div>
 
                 <div className="my-1">
-                  <p className="text-xs text-white/90 font-medium">{banner.title}</p>
-                  <h3 className="text-base font-black tracking-tight text-white">{banner.highlight}</h3>
-                  <p className="text-[10px] text-white/80 line-clamp-1">{banner.subtext}</p>
+                  <p className="text-xs text-white/90 font-medium">
+                    {banner.id === 1 ? t("home.glowUpSeason") : banner.id === 2 ? t("home.bridalGlam") : t("home.zeroAdvance")}
+                  </p>
+                  <h3 className="text-base font-black tracking-tight text-white">
+                    {banner.id === 1 ? t("home.upTo30Off") : banner.id === 2 ? t("home.expertArtists") : t("home.cashOnService")}
+                  </h3>
+                  <p className="text-[10px] text-white/80 line-clamp-1">
+                    {banner.id === 1 ? t("home.topSalonsDhakaCtg") : banner.id === 2 ? t("home.bookVerifiedSpecialists") : t("booking.payAtParlourDesc")}
+                  </p>
                 </div>
 
                 <div className="flex items-center justify-between pt-1">
@@ -189,7 +197,7 @@ export function MobileHomeHeader({ categories, pillText }: MobileHomeHeaderProps
                     href={banner.link}
                     className="inline-flex items-center gap-1 bg-white text-brand-charcoal text-[11px] font-black px-3 py-1 rounded-xl shadow-md active:scale-95 transition-transform"
                   >
-                    Explore Now <ArrowRight className="w-3 h-3 text-primary" />
+                    {t("common.explore")} <ArrowRight className="w-3 h-3 text-primary" />
                   </Link>
                   <div className="flex gap-1">
                     {PROMO_BANNERS.map((_, i) => (
@@ -216,13 +224,13 @@ export function MobileHomeHeader({ categories, pillText }: MobileHomeHeaderProps
             <div className="p-4 border-b border-brand-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-primary" />
-                <h3 className="font-bold text-base">Select Your City</h3>
+                <h3 className="font-bold text-base">{t("auth.selectDistrict")}</h3>
               </div>
               <button
                 onClick={() => setIsCityModalOpen(false)}
                 className="text-brand-coolgray hover:text-brand-charcoal p-1 text-sm font-bold"
               >
-                Close
+                {t("common.close")}
               </button>
             </div>
 

@@ -31,6 +31,14 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  alternates: {
+    canonical: "https://parloora.com",
+    languages: {
+      "en": "https://parloora.com/en",
+      "bn": "https://parloora.com/bn",
+      "x-default": "https://parloora.com",
+    },
+  },
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
@@ -85,6 +93,7 @@ export const viewport = {
   viewportFit: 'cover',
 };
 
+import { cookies } from "next/headers";
 import { getThemeSettings } from "@/lib/actions/site";
 import { PwaRegistrar } from "@/components/shared/PwaRegistrar";
 import { NetworkStatusBanner } from "@/components/shared/NetworkStatusBanner";
@@ -104,11 +113,15 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const rawLocale = cookieStore.get("NEXT_LOCALE")?.value;
+  const locale = rawLocale === "bn" ? "bn" : "en";
   const theme = await getThemeSettings();
   
   return (
     <html
-      lang="en"
+      lang={locale}
+      dir="ltr"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>

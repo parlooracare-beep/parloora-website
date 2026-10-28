@@ -26,10 +26,12 @@ import {
   getDivisionSEOData,
   getLocationDirectoryMetrics,
 } from "@/lib/actions/locations"
+import { getDistrictArticleData } from "@/lib/actions/district-seo"
 import { LocationBreadcrumbs } from "@/components/locations/LocationBreadcrumbs"
 import { LocationSchema } from "@/components/locations/LocationSchema"
 import { DistrictPageClient } from "@/components/locations/DistrictPageClient"
 import { DistrictParlourCard } from "@/components/locations/DistrictParlourCard"
+import { DistrictSEOArticleView } from "@/components/locations/DistrictSEOArticleView"
 import { getSiteUrl } from "@/lib/site-url"
 
 interface PageProps {
@@ -75,34 +77,45 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const data = await getDistrictSEOData(slug)
   const hasActiveParlours = !!data?.hasActiveParlours
+  const article = await getDistrictArticleData(slug)
+
+  const seoTitle = article?.seoTitle || `Beauty Parlours & Salons in ${district.name} (${district.bnName}) | Parloora`
+  const metaDescription =
+    article?.metaDescription ||
+    `Discover verified beauty parlours, hair salons, and self-care services in ${district.name}. Compare available services, explore provider profiles, and book appointments online with Parloora.`
+  const primaryKw = article?.primaryKeyword || `beauty parlour in ${district.name}`
+  const keywords = article?.secondaryKeywords && article.secondaryKeywords.length > 0
+    ? [primaryKw, ...article.secondaryKeywords, ...article.longTailKeywords]
+    : [
+        `beauty parlour in ${district.name}`,
+        `salon in ${district.name}`,
+        `makeup artist ${district.name}`,
+        `hair salon ${district.name}`,
+        `parlour booking ${district.name}`,
+        `${district.name} beauty parlour`,
+        district.bnName,
+      ]
+
+  // Index eligible pages: either district has active parlours or is explicitly marked published & indexed
+  const shouldIndex = article ? (article.status === "published" && (hasActiveParlours || article.indexStatus)) : hasActiveParlours
 
   return {
-    title: `Beauty Parlours & Salons in ${district.name} (${district.bnName}) | Parloora`,
-    description: `Discover verified beauty parlours, hair salons, and self-care services in ${district.name}. Compare available services, explore provider profiles, and book appointments online with Parloora.`,
-    keywords: [
-      `beauty parlour in ${district.name}`,
-      `salon in ${district.name}`,
-      `makeup artist ${district.name}`,
-      `hair salon ${district.name}`,
-      `parlour booking ${district.name}`,
-      `${district.name} beauty parlour`,
-      district.bnName,
-    ],
+    title: seoTitle,
+    description: metaDescription,
+    keywords,
     alternates: {
       canonical: `${siteUrl}/locations/${district.slug}`,
     },
     openGraph: {
-      title: `Beauty Parlours & Salons in ${district.name} | Parloora`,
-      description: `Looking for beauty parlours in ${district.name}? Explore providers on Parloora, compare real prices, and book appointments online.`,
+      title: article?.ogTitle || seoTitle,
+      description: article?.ogDescription || metaDescription,
       url: `${siteUrl}/locations/${district.slug}`,
       siteName: "Parloora",
       locale: "en_BD",
       type: "website",
     },
-    // Only index districts that have real verified providers or curated listings.
-    // Unpopulated districts render a helpful page with noindex, follow to preserve site quality.
     robots: {
-      index: hasActiveParlours,
+      index: shouldIndex,
       follow: true,
     },
   }
@@ -300,27 +313,30 @@ export default async function LocationSlugPage({ params }: PageProps) {
   if (!data) notFound()
 
   const { district, parlours, totalParlours, hasActiveParlours } = data
+  const article = await getDistrictArticleData(slug)
   const categories = getAllServiceCategoriesSEO()
   const nearbyDistricts = getNearbyDistricts(district.id, 4)
 
-  const districtFaqs = [
-    {
-      q: `How do I book a beauty parlour in ${district.name}?`,
-      a: `Browse verified parlour listings in ${district.name} on this page. Click on any parlour to view their services, real prices, and customer reviews. Select your preferred date, time, and service to reserve your appointment online with instant confirmation.`,
-    },
-    {
-      q: `Which areas of ${district.name} have parlours listed?`,
-      a: `Parloora covers parlours and salons across ${district.popularAreas.join(", ")} and surrounding areas in ${district.name}. You can filter parlours by locality directly on this page.`,
-    },
-    {
-      q: `Can I pay cash at the parlour in ${district.name}?`,
-      a: `Yes! All bookings on Parloora support Pay at Parlour (Cash on Delivery), allowing you to confirm your reservation and pay after enjoying your service.`,
-    },
-    {
-      q: `How can local parlour owners in ${district.name} join Parloora?`,
-      a: `Beauty professionals and parlour owners in ${district.name} can sign up for free at parloora.com/seller/register to manage bookings, attract new local clients, and accept digital appointments.`,
-    },
-  ]
+  const districtFaqs = article?.section8_faqs && article.section8_faqs.length > 0
+    ? article.section8_faqs
+    : [
+        {
+          q: `How do I book a beauty parlour in ${district.name}?`,
+          a: `Browse verified parlour listings in ${district.name} on this page. Click on any parlour to view their services, real prices, and customer reviews. Select your preferred date, time, and service to reserve your appointment online with instant confirmation.`,
+        },
+        {
+          q: `Which areas of ${district.name} have parlours listed?`,
+          a: `Parloora covers parlours and salons across ${district.popularAreas.join(", ")} and surrounding areas in ${district.name}. You can filter parlours by locality directly on this page.`,
+        },
+        {
+          q: `Can I pay cash at the parlour in ${district.name}?`,
+          a: `Yes! All bookings on Parloora support Pay at Parlour (Cash on Delivery), allowing you to confirm your reservation and pay after enjoying your service.`,
+        },
+        {
+          q: `How can local parlour owners in ${district.name} join Parloora?`,
+          a: `Beauty professionals and parlour owners in ${district.name} can sign up for free at parloora.com/seller/register to manage bookings, attract new local clients, and accept digital appointments.`,
+        },
+      ]
 
   const breadcrumbs = [
     { name: `${district.divisionName} Division`, href: `/locations/${district.divisionSlug}` },
@@ -370,7 +386,7 @@ export default async function LocationSlugPage({ params }: PageProps) {
         </div>
 
         {/* Client Interactive Filter & Parlours Grid */}
-        <div className="mb-16">
+        <div id="parlours-list" className="mb-16">
           <DistrictPageClient
             district={district}
             categories={categories}
@@ -380,38 +396,33 @@ export default async function LocationSlugPage({ params }: PageProps) {
 
         {/* District SEO Content & FAQs */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-          {/* Left Column: Local Guide */}
-          <div className="lg:col-span-2 bg-white rounded-3xl p-6 md:p-8 border border-brand-gray-100 shadow-sm">
-            <h2 className="text-xl sm:text-2xl font-black text-brand-gray-900 mb-4 tracking-tight">
-              Self-Care and Grooming Services in {district.name}
-            </h2>
-            <div className="prose prose-sm text-brand-gray-600 leading-relaxed space-y-3">
-              <p>
-                Whether you need a quick haircut, a bridal makeover, facial rejuvenation, or regular grooming,
-                Parloora helps you discover available salons and parlours in {district.name}.
-              </p>
-              <p>
-                Our platform connects you directly with local service specialists across popular localities
-                including {district.popularAreas.join(", ")}. All listed services feature transparent pricing,
-                clearly defined durations, and verified operating hours.
-              </p>
-            </div>
-
-            {/* Local FAQs */}
-            <div className="mt-8 pt-8 border-t border-brand-gray-100">
-              <h3 className="text-lg font-bold text-brand-gray-900 mb-4 flex items-center gap-2">
-                <HelpCircle className="w-4 h-4 text-primary" />
-                <span>Frequently Asked Questions — {district.name}</span>
-              </h3>
-              <div className="space-y-3">
-                {districtFaqs.map((faq, i) => (
-                  <div key={i} className="p-4 bg-brand-gray-50 rounded-2xl border border-brand-gray-100">
-                    <h4 className="font-bold text-xs sm:text-sm text-brand-gray-900 mb-1">{faq.q}</h4>
-                    <p className="text-xs text-brand-gray-600 leading-relaxed">{faq.a}</p>
-                  </div>
-                ))}
+          {/* Left Column: Full Comprehensive 9-Section SEO Article */}
+          <div className="lg:col-span-2">
+            {article ? (
+              <DistrictSEOArticleView
+                article={article}
+                categories={categories}
+                hasActiveParlours={hasActiveParlours}
+                totalParlours={totalParlours}
+              />
+            ) : (
+              <div className="bg-white rounded-3xl p-6 md:p-8 border border-brand-gray-100 shadow-sm">
+                <h2 className="text-xl sm:text-2xl font-black text-brand-gray-900 mb-4 tracking-tight">
+                  Self-Care and Grooming Services in {district.name}
+                </h2>
+                <div className="prose prose-sm text-brand-gray-600 leading-relaxed space-y-3">
+                  <p>
+                    Whether you need a quick haircut, a bridal makeover, facial rejuvenation, or regular grooming,
+                    Parloora helps you discover available salons and parlours in {district.name}.
+                  </p>
+                  <p>
+                    Our platform connects you directly with local service specialists across popular localities
+                    including {district.popularAreas.join(", ")}. All listed services feature transparent pricing,
+                    clearly defined durations, and verified operating hours.
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Right Column: Nearby Districts & Quick Links */}

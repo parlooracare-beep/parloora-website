@@ -10,7 +10,7 @@ import {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Settings, LogOut, Menu, ShieldCheck, Bell, ChevronDown,
   Scissors, Package, Calendar, ShoppingBag, Loader2,
-  BookOpen, Image as ImageIcon, LayoutTemplate, Terminal, Wallet, Ticket
+  BookOpen, Image as ImageIcon, LayoutTemplate, Terminal, Wallet, Ticket, MapPin
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { createClient } from "@/lib/supabase/client"
@@ -49,6 +49,7 @@ const NAV_ITEMS = [
   { label: "Blog CMS", href: "/admin/blog", icon: BookOpen },
   { label: "Media Library", href: "/admin/media", icon: ImageIcon },
   { label: "Page Builder", href: "/admin/page-builder", icon: LayoutTemplate },
+  { label: "District SEO (64)", href: "/admin/locations", icon: MapPin },
   { label: "Audit Logs", href: "/admin/activity-logs", icon: Terminal },
   { label: "Reports", href: "/admin/reports", icon: AlertTriangle },
   { label: "Settings", href: "/admin/settings", icon: Settings },

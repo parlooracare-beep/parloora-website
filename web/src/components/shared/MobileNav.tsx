@@ -6,8 +6,10 @@ import { usePathname } from "next/navigation"
 import { Home, Compass, Calendar, Heart, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { createClient } from "@/lib/supabase/client"
+import { useI18n } from "@/lib/store/useI18n"
 
 export function MobileNav() {
+  const { t } = useI18n()
   const pathname = usePathname()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = React.useState<any>(null)
@@ -29,31 +31,31 @@ export function MobileNav() {
 
   const navItems = [
     {
-      name: "Home",
+      name: t("nav.home"),
       href: "/",
       icon: Home,
       isActive: pathname === "/",
     },
     {
-      name: "Explore",
+      name: t("nav.explore"),
       href: "/parlours",
       icon: Compass,
       isActive: pathname === "/parlours" || pathname.startsWith("/parlours/"),
     },
     {
-      name: "Bookings",
+      name: t("nav.bookings"),
       href: "/bookings",
       icon: Calendar,
       isActive: pathname === "/bookings" || pathname.startsWith("/bookings/"),
     },
     {
-      name: "Favorites",
+      name: t("nav.favorites"),
       href: "/wishlist",
       icon: Heart,
       isActive: pathname === "/wishlist",
     },
     {
-      name: "Profile",
+      name: t("nav.profile"),
       href: user ? "/dashboard" : "/login",
       icon: User,
       isActive: pathname === "/dashboard" || pathname === "/profile" || pathname === "/login" || pathname === "/signup",
