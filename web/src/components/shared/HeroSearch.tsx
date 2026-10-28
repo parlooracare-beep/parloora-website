@@ -2,42 +2,67 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { Search } from "lucide-react"
+import { Search, MapPin, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
+
+const BANGLADESH_CITIES = [
+  "All Cities", "Dhaka", "Chittagong", "Sylhet", "Rajshahi", "Khulna", "Moulvibazar", "Barisal"
+]
 
 export function HeroSearch() {
   const [query, setQuery] = React.useState("")
+  const [city, setCity] = React.useState("All Cities")
   const router = useRouter()
 
   const handleSearch = (e?: React.FormEvent) => {
     e?.preventDefault()
-    if (!query.trim()) return
+    const params = new URLSearchParams()
+    if (query.trim()) params.set("search", query.trim())
+    if (city && city !== "All Cities") params.set("city", city)
     
-    // Default search goes to parlours, as it's the primary marketplace focus
-    router.push(`/parlours?search=${encodeURIComponent(query.trim())}`)
+    router.push(`/parlours?${params.toString()}`)
   }
 
   return (
     <form 
       onSubmit={handleSearch}
-      className="flex flex-row gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-1.5 max-w-xl mx-auto mb-6"
+      className="flex flex-col sm:flex-row items-stretch gap-2.5 bg-white/15 backdrop-blur-2xl border border-white/30 rounded-2xl p-2.5 max-w-2xl mx-auto shadow-[0_12px_40px_rgba(28,8,37,0.4)] transition-all hover:border-[#E2A9A9]/50"
     >
-      <div className="flex items-center gap-2 flex-1 px-3 py-1">
-        <Search className="w-4 h-4 text-white/50 shrink-0" />
+      {/* Service Query Input */}
+      <div className="flex items-center gap-2.5 flex-1 px-3.5 py-2.5 bg-white/10 hover:bg-white/15 rounded-xl border border-white/15 transition-all focus-within:border-[#E2A9A9]/80 focus-within:bg-white/20">
+        <Sparkles className="w-4 h-4 text-[#E2A9A9] shrink-0 animate-pulse" />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search services..."
-          className="bg-transparent text-white placeholder:text-white/40 outline-none w-full text-xs md:text-sm"
+          placeholder="Service, parlour, haircut, facial..."
+          className="bg-transparent text-white placeholder:text-white/70 outline-none w-full text-xs sm:text-sm font-medium"
         />
       </div>
+
+      {/* City Selector */}
+      <div className="flex items-center gap-2 px-3 py-2.5 bg-white/10 hover:bg-white/15 rounded-xl border border-white/15 sm:w-44 shrink-0 transition-all focus-within:border-[#E2A9A9]/80">
+        <MapPin className="w-4 h-4 text-[#E2A9A9] shrink-0" />
+        <select
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          className="bg-transparent text-white outline-none w-full text-xs sm:text-sm font-medium cursor-pointer [&>option]:text-brand-gray-900 [&>option]:bg-white"
+        >
+          {BANGLADESH_CITIES.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Submit Button */}
       <Button
         type="submit"
-        size="sm"
-        className="bg-gradient-to-r from-rose-400 to-rose-600 hover:opacity-90 text-white rounded-xl px-5 h-9 shadow-lg shadow-rose-700/20 shrink-0 text-xs font-bold"
+        variant="rosegold"
+        size="default"
+        className="rounded-xl px-7 h-11 font-black shrink-0 text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#E2A9A9]/35 hover:scale-[1.02] active:scale-[0.98] transition-all"
       >
-        Search
+        <Search className="w-4 h-4" />
+        <span>Find Services</span>
       </Button>
     </form>
   )

@@ -13,39 +13,43 @@ export default function CustomerLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
-  const [loading, setLoading] = React.useState(true)
+  const isAccountRoute = React.useMemo(() => {
+    const accountPages = ["/dashboard", "/bookings", "/wishlist", "/profile"]
+    return accountPages.some(page => pathname === page || pathname.startsWith(page + "/"))
+  }, [pathname])
+  const [loading, setLoading] = React.useState(isAccountRoute)
 
   React.useEffect(() => {
+    if (!isAccountRoute) {
+      setLoading(false)
+      return
+    }
+
     const checkAccess = async () => {
-      const accountPages = ["/dashboard", "/bookings", "/wishlist", "/profile"]
-      const isAccountPage = accountPages.some(page => pathname === page || pathname.startsWith(page + "/"))
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
 
-      if (isAccountPage) {
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: profile } = await supabase
+          .from("users")
+          .select("role")
+          .eq("id", user.id)
+          .single()
 
-        if (user) {
-          const { data: profile } = await supabase
-            .from("users")
-            .select("role")
-            .eq("id", user.id)
-            .single()
-
-          if (profile?.role?.toLowerCase() === "seller") {
-            window.location.href = "/seller/dashboard"
-            return
-          }
-          if (profile?.role?.toLowerCase() === "admin") {
-            window.location.href = "/admin/dashboard"
-            return
-          }
+        if (profile?.role?.toLowerCase() === "seller") {
+          window.location.href = "/seller/dashboard"
+          return
+        }
+        if (profile?.role?.toLowerCase() === "admin") {
+          window.location.href = "/admin/dashboard"
+          return
         }
       }
       setLoading(false)
     }
 
     checkAccess()
-  }, [pathname])
+  }, [pathname, isAccountRoute])
 
   if (loading && ["/dashboard", "/bookings", "/wishlist", "/profile"].some(p => pathname.startsWith(p))) {
     return (

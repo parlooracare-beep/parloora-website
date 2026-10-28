@@ -17,6 +17,8 @@ const badgeVariants = cva(
         outline: "text-foreground border-border",
         success: "border-transparent bg-emerald-500 text-white hover:bg-emerald-600",
         accent: "border-transparent bg-accent text-accent-foreground hover:bg-accent/80",
+        rosegold: "border border-white/40 bg-gradient-to-r from-[#F3D5D5] to-[#E2A9A9] text-[#341045] font-bold shadow-xs",
+        luxury: "border border-[#E2A9A9]/30 bg-[#4B1D5F]/8 text-[#4B1D5F] font-bold backdrop-blur-md",
       },
     },
     defaultVariants: {

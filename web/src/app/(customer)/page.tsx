@@ -46,14 +46,14 @@ const RECOMMENDED_IMAGES = [
 ]
 
 const serviceCategories = [
-  { name: "Hair & Styling", image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=400&q=80", count: "Browse" },
-  { name: "Makeup & Beauty", image: "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?auto=format&fit=crop&w=400&q=80", count: "Browse" },
-  { name: "Skincare & Facials", image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=400&q=80", count: "Browse" },
-  { name: "Nail Art", image: "https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=400&q=80", count: "Browse" },
-  { name: "Waxing & Threading", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=400&q=80", count: "Browse" },
-  { name: "Massage & Spa", image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=400&q=80", count: "Browse" },
-  { name: "Bridal Package", image: "https://images.unsplash.com/photo-1595085816353-d1f5e2239fc4?auto=format&fit=crop&w=400&q=80", count: "Browse" },
-  { name: "All Services", image: "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?auto=format&fit=crop&w=400&q=80", count: "Browse" },
+  { name: "Beauty Parlours", image: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=400&q=80", count: "Explore" },
+  { name: "Men's & Women's Salons", image: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=400&q=80", count: "Explore" },
+  { name: "Hair Care & Styling", image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=400&q=80", count: "Explore" },
+  { name: "Makeup & Beauty", image: "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?auto=format&fit=crop&w=400&q=80", count: "Explore" },
+  { name: "Nails & Manicure", image: "https://images.unsplash.com/photo-1522337660859-02fbefca4702?auto=format&fit=crop&w=400&q=80", count: "Explore" },
+  { name: "Spa & Wellness", image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=400&q=80", count: "Explore" },
+  { name: "Grooming & Shaving", image: "https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=400&q=80", count: "Explore" },
+  { name: "All Self-Care Services", image: "https://images.unsplash.com/photo-1527799820374-dcf8d9d4a388?auto=format&fit=crop&w=400&q=80", count: "Explore" },
 ]
 
 const steps = [
@@ -79,27 +79,26 @@ const steps = [
 
 // --- PAGE ---
 
-// Force dynamic rendering (uses cookies via Supabase auth)
-export const dynamic = 'force-dynamic'
+// ISR: Revalidate homepage cache every 60 seconds for near-instant TTFB
+export const revalidate = 60
 
 export default async function HomePage() {
-  // Fetch all homepage data in parallel with a 10s safety timeout
+  // Fetch all homepage data in parallel with an 8s safety fallback
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [featuredParlours, dynamicContent, dbCategories, recommendedParloursData]: any =
+  const [featuredParlours, dynamicContent, dbCategories, recommendedParloursData, pageSections]: any =
     await Promise.race([
       Promise.all([
         getFeaturedParlours(),
         getHomepageContent() as Promise<HomepageContent | null>,
         getServiceCategories(),
-        getParlours({ sortBy: "Highest Rated" })
+        getParlours({ sortBy: "Highest Rated" }),
+        getHomepageSections()
       ]),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       new Promise<any[]>((resolve) =>
-        setTimeout(() => resolve([[], null, [], []]), 10000)
+        setTimeout(() => resolve([[], null, [], [], []]), 8000)
       )
     ])
-
-  const pageSections = await getHomepageSections()
 
   const recommendedParlours = (
     Array.isArray(recommendedParloursData) 
@@ -159,59 +158,87 @@ export default async function HomePage() {
                 <MobileHomeHeader categories={displayCategories} pillText={content.hero_pill_text} />
 
                 {/* Desktop Website Hero */}
-                <section className="hidden md:flex relative min-h-[60vh] items-center overflow-hidden">
-                  {/* Deep Purple & Rose Gold Gradient Background */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#2D0072] via-[#4A148C] to-[#E6B7A9]/40" />
+                <section className="hidden md:flex relative min-h-[68vh] items-center overflow-hidden">
+                  {/* Signature Deep Purple & Ambient Rose Gold Background */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#1C0825] via-[#4B1D5F] to-[#2E0F3E]" />
                   
-                  {/* Animated Decorative Blobs */}
-                  <div className="absolute top-1/4 right-1/4 w-96 h-96 rounded-full bg-rose-400/20 blur-[100px] animate-pulse" />
-                  <div className="absolute bottom-1/4 left-1/4 w-72 h-72 rounded-full bg-purple-400/20 blur-[80px]" />
+                  {/* Ambient Rose Gold & Lavender Luxury Orbs */}
+                  <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-[#E2A9A9]/18 blur-[120px] pointer-events-none" />
+                  <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-[#C8A2D6]/15 blur-[100px] pointer-events-none" />
                   
-                  {/* Dot pattern overlay */}
+                  {/* Subtle geometric dot grid overlay */}
                   <div
-                    className="absolute inset-0 opacity-5"
-                    style={{ backgroundImage: "radial-gradient(circle, #fff 1px, transparent 1px)", backgroundSize: "32px 32px" }}
+                    className="absolute inset-0 opacity-10 pointer-events-none"
+                    style={{ backgroundImage: "radial-gradient(circle, #E2A9A9 1px, transparent 1px)", backgroundSize: "32px 32px" }}
                   />
 
-                  <div className="container mx-auto px-4 md:px-6 relative z-10 py-10 md:py-24">
+                  <div className="container mx-auto px-4 md:px-6 relative z-10 py-12 md:py-20">
                     <div className="max-w-4xl mx-auto text-center">
-                      {/* Pill Badge */}
-                      <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-3 sm:px-5 py-2 sm:py-2.5 mb-6 sm:mb-8 backdrop-blur-md shadow-2xl">
-                        <Sparkles className="w-4 h-4 text-[#E6B7A9]" />
-                        <span className="text-white/90 text-xs font-bold uppercase tracking-widest">{content.hero_pill_text || defaultContent.hero_pill_text}</span>
+                      {/* Pill Tagline Badge */}
+                      <div className="inline-flex items-center gap-2 bg-white/10 border border-[#E2A9A9]/30 rounded-full px-4 py-2 mb-6 backdrop-blur-xl shadow-lg shadow-purple-950/40">
+                        <Sparkles className="w-4 h-4 text-[#E2A9A9]" />
+                        <span className="text-[#E2A9A9] text-xs font-bold uppercase tracking-widest">
+                          Book Your Self Care Services In Seconds
+                        </span>
                       </div>
 
                       {/* Headline */}
-                      <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-white mb-6 leading-[1.1] tracking-tighter">
-                        {(content.hero_title || defaultContent.hero_title).split(' ').map((word, i) => (
-                          <span key={i} className={i > 3 ? "text-[#E6B7A9]" : ""}>{word} </span>
-                        ))}
+                      <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white mb-6 leading-[1.08] tracking-tight">
+                        Experience Next-Gen <br className="hidden sm:inline" />
+                        <span className="bg-gradient-to-r from-[#E2A9A9] via-[#F3D5D5] to-[#E2A9A9] bg-clip-text text-transparent">
+                          Beauty & Luxury Self-Care
+                        </span>
                       </h1>
 
-                      <p className="text-white/80 text-sm sm:text-base md:text-lg max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed font-medium">
-                        {content.hero_subtitle || defaultContent.hero_subtitle}
+                      <p className="text-white/85 text-sm sm:text-base md:text-lg max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed font-medium">
+                        Connect with Bangladesh&apos;s premier beauty parlours, luxury salons, and certified wellness specialists. Real-time availability, verified professionals, guaranteed satisfaction.
                       </p>
 
-                      {/* Search Bar */}
-                      <div className="max-w-2xl mx-auto mb-10 sm:mb-12">
+                      {/* Location-Aware Search Bar */}
+                      <div className="max-w-2xl mx-auto mb-8">
                         <HeroSearch />
                       </div>
 
-                      {/* Quick Stats */}
-                      <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 md:gap-10 text-white/70 text-[10px] sm:text-xs font-bold uppercase tracking-widest">
-                        <span className="flex items-center gap-2 bg-white/5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/10"><Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" /> 500+ Verified</span>
-                        <span className="flex items-center gap-2 bg-white/5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/10"><Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 fill-current" /> 4.9 Rating</span>
-                        <span className="flex items-center gap-2 bg-white/5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/10"><Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-400" /> Instant Book</span>
+                      {/* Prominent CTA Button Pair */}
+                      <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-10">
+                        <Link href="/parlours" className="w-full sm:w-auto">
+                          <Button
+                            variant="rosegold"
+                            size="lg"
+                            className="w-full sm:w-auto rounded-2xl px-8 h-13 font-black text-sm md:text-base flex items-center justify-center gap-2 shadow-xl shadow-[#E2A9A9]/35 hover:scale-105 active:scale-95 transition-all"
+                          >
+                            <span>Book Now</span>
+                            <ChevronRight className="w-4 h-4" />
+                          </Button>
+                        </Link>
+                        <Link href="/parlours" className="w-full sm:w-auto">
+                          <Button
+                            variant="outline-white"
+                            size="lg"
+                            className="w-full sm:w-auto rounded-2xl px-8 h-13 font-bold text-sm md:text-base hover:bg-white/15 transition-all"
+                          >
+                            <span>Explore Services</span>
+                          </Button>
+                        </Link>
+                      </div>
+
+                      {/* Trust Badges */}
+                      <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 md:gap-8 text-white/80 text-[10px] sm:text-xs font-bold uppercase tracking-wider">
+                        <span className="flex items-center gap-1.5 bg-white/10 px-3.5 py-1.5 rounded-full border border-white/15 backdrop-blur-md">
+                          <Shield className="w-3.5 h-3.5 text-emerald-400" /> 100% Verified Partners
+                        </span>
+                        <span className="flex items-center gap-1.5 bg-white/10 px-3.5 py-1.5 rounded-full border border-white/15 backdrop-blur-md">
+                          <Star className="w-3.5 h-3.5 text-amber-300 fill-amber-300" /> 4.9 Average Rating
+                        </span>
+                        <span className="flex items-center gap-1.5 bg-white/10 px-3.5 py-1.5 rounded-full border border-white/15 backdrop-blur-md">
+                          <Clock className="w-3.5 h-3.5 text-sky-300" /> Instant Confirmation
+                        </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Bottom Wave - Tinted Rose */}
-                  <div className="absolute bottom-0 left-0 right-0">
-                    <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M0 80L60 74.7C120 69.3 240 58.7 360 53.3C480 48 600 48 720 53.3C840 58.7 960 69.3 1080 74.7C1200 80 1320 80 1380 80H1440V80H0V80Z" fill="#fdf4ff" />
-                    </svg>
-                  </div>
+                  {/* Refined Bottom Separator */}
+                  <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-brand-gray-50 to-transparent" />
                 </section>
               </Fragment>
             )
@@ -347,7 +374,7 @@ export default async function HomePage() {
               </Fragment>
             )
           case "near-you":
-            return <NearYouSection key="near-you" />
+            return <NearYouSection key="near-you" initialParlours={recommendedParlours} />
           case "categories":
             return (
               <section key="categories" className="py-20 bg-white">
@@ -505,22 +532,30 @@ export default async function HomePage() {
             )
           case "cta":
             return (
-              <section key="cta" className="py-12 md:py-16 bg-gradient-to-br from-[#2D0072] via-[#4A148C] to-[#880E4F] relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-rose-500/10 blur-3xl -translate-y-1/2 translate-x-1/2" />
-                <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-violet-400/10 blur-3xl translate-y-1/2 -translate-x-1/2" />
+              <section key="cta" className="py-16 md:py-24 bg-gradient-to-br from-[#1C0825] via-[#4B1D5F] to-[#2E0F3E] relative overflow-hidden">
+                {/* Ambient Rose Gold Luxury Orbs */}
+                <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-[#E2A9A9]/15 blur-3xl pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-[#C8A2D6]/12 blur-3xl pointer-events-none" />
 
-                <div className="container mx-auto px-4 md:px-6 relative z-10 text-center">
-                  <h2 className="text-2xl md:text-4xl font-bold text-white mb-4">
+                <div className="container mx-auto px-4 md:px-6 relative z-10 text-center max-w-3xl mx-auto">
+                  <div className="inline-flex items-center gap-2 bg-white/10 border border-[#E2A9A9]/30 rounded-full px-4 py-1.5 mb-6 backdrop-blur-xl">
+                    <Sparkles className="w-4 h-4 text-[#E2A9A9]" />
+                    <span className="text-[#E2A9A9] text-xs font-bold uppercase tracking-widest">Join Parloora Today</span>
+                  </div>
+
+                  <h2 className="text-3xl md:text-5xl font-black text-white mb-4 leading-tight">
                     {content.cta_title || defaultContent.cta_title}
                   </h2>
-                  <p className="text-white/70 text-sm md:text-base mb-8 max-w-lg mx-auto">
+                  <p className="text-white/80 text-sm md:text-base mb-10 max-w-xl mx-auto font-medium leading-relaxed">
                     {content.cta_subtitle || defaultContent.cta_subtitle}
                   </p>
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto">
+                  
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                     <Link href="/signup" className="w-full sm:w-auto">
                       <Button
                         size="lg"
-                        className="w-full bg-white text-primary hover:bg-white/90 shadow-xl shadow-purple-900/30 rounded-full px-8 font-bold text-sm h-12"
+                        variant="rosegold"
+                        className="w-full sm:w-auto rounded-2xl px-9 h-13 font-black text-base shadow-xl shadow-[#E2A9A9]/30 hover:scale-105 active:scale-95 transition-all"
                       >
                         Get Started Free
                       </Button>
@@ -528,8 +563,8 @@ export default async function HomePage() {
                     <Link href="/parlours" className="w-full sm:w-auto">
                       <Button
                         size="lg"
-                        variant="outline"
-                        className="w-full border-white/30 bg-white/5 text-white hover:bg-white/10 rounded-full px-8 text-sm h-12 font-bold backdrop-blur-sm"
+                        variant="outline-white"
+                        className="w-full sm:w-auto rounded-2xl px-9 h-13 text-base font-bold hover:bg-white/15 transition-all"
                       >
                         Browse Parlours <ChevronRight className="w-4 h-4 ml-1" />
                       </Button>

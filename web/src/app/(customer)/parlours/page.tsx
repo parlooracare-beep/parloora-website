@@ -617,8 +617,8 @@ export default function ParloursPage() {
                           <span className="text-xs md:text-sm font-semibold text-brand-gray-800">{parlour.rating || 5.0}</span>
                           <span className="hidden xs:inline text-[9px] text-brand-gray-400">({parlour.total_bookings || 0})</span>
                         </div>
-                        <span className="text-[11px] font-bold bg-primary text-white px-2.5 py-1 rounded-lg group-hover:bg-primary/90 transition-colors shadow-xs">
-                          Book
+                        <span className="text-xs font-black bg-gradient-to-r from-[#E2A9A9] via-[#EBC1C1] to-[#D89898] text-[#341045] px-3.5 py-1.5 rounded-xl shadow-sm shadow-[#E2A9A9]/30 group-hover:shadow-md group-hover:scale-105 active:scale-95 transition-all">
+                          Book Now
                         </span>
                       </div>
 

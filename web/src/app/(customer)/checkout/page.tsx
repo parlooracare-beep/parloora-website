@@ -19,9 +19,20 @@ import { cn, formatCurrency } from "@/lib/utils"
 import { useCart } from "@/lib/store/useCart"
 import { createOrder } from "@/lib/actions/orders"
 import { createClient } from "@/lib/supabase/client"
-import { Elements } from "@stripe/react-stripe-js"
-import { getStripe } from "@/lib/stripe"
-import { StripePaymentForm } from "@/components/shared/StripePaymentForm"
+import dynamic from "next/dynamic"
+
+const StripeBookingPayment = dynamic(
+  () => import("@/components/shared/StripeBookingPayment"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="py-8 flex flex-col items-center justify-center gap-2">
+        <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs text-brand-gray-500 font-medium">Loading secure payment gateway...</p>
+      </div>
+    ),
+  }
+)
 import { X } from "lucide-react"
 import { validatePromoCode, applyPromoCode } from "@/lib/actions/promo"
 
@@ -708,27 +719,12 @@ export default function CheckoutPage() {
                 </button>
               </div>
 
-              <Elements
-                stripe={getStripe()}
-                options={{
-                  clientSecret: stripeClientSecret,
-                  appearance: {
-                    theme: "stripe",
-                    variables: {
-                      colorPrimary: "#2D0072",
-                      colorBackground: "#ffffff",
-                      colorText: "#1F2937",
-                      borderRadius: "12px",
-                    },
-                  },
-                }}
-              >
-                <StripePaymentForm
-                  amount={total}
-                  onCancel={() => setShowStripeModal(false)}
-                  onSuccess={handleStripeSuccess}
-                />
-              </Elements>
+              <StripeBookingPayment
+                clientSecret={stripeClientSecret}
+                amount={total}
+                onCancel={() => setShowStripeModal(false)}
+                onSuccess={handleStripeSuccess}
+              />
             </motion.div>
           </div>
         )}

@@ -4,7 +4,6 @@ import * as React from "react"
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Sparkles, Mail, Phone, MapPin } from "lucide-react"
 import Link from "next/link"
-import Image from "next/image"
 import { ParlooraLogo } from "@/components/shared/Logo"
 import { getFooterSettings, FooterSettings } from "@/lib/actions/site"
 
@@ -55,17 +54,20 @@ export function Footer() {
   } = settings || {}
 
   return (
-    <footer className="bg-brand-gray-900 pt-12 md:pt-24 pb-8 md:pb-12 relative overflow-hidden">
-      {/* Decorative Blobs */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-[120px] -ml-48 -mt-48" />
-      <div className="absolute bottom-0 right-0 w-64 h-64 bg-secondary/10 rounded-full blur-[100px] -mr-32 -mb-32" />
+    <footer className="bg-gradient-to-b from-[#1A0824] via-[#120419] to-[#0A020E] border-t border-white/10 pt-12 md:pt-24 pb-8 md:pb-12 relative overflow-hidden">
+      {/* Decorative Luxury Blobs */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-[#4B1D5F]/20 rounded-full blur-[120px] -ml-48 -mt-48 pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-80 h-80 bg-[#E2A9A9]/10 rounded-full blur-[100px] -mr-32 -mb-32 pointer-events-none" />
 
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mb-10 md:mb-20">
           {/* Brand & Description */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             <ParlooraLogo size="lg" variant="light" href="/" />
-            <p className="text-brand-gray-400 text-sm leading-relaxed font-medium">
+            <p className="text-[#E2A9A9] text-xs font-bold uppercase tracking-wider">
+              Book Your Self Care Services In Seconds
+            </p>
+            <p className="text-white/60 text-sm leading-relaxed font-medium">
               {about_text}
             </p>
             <div className="flex items-center gap-5 pt-2">

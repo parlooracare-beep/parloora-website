@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { createPublicClient } from "@/lib/supabase/public"
 import { revalidatePath } from "next/cache"
 import { Database } from "@/types/supabase"
 
@@ -8,7 +9,7 @@ import { Database } from "@/types/supabase"
 type Product = Database["public"]["Tables"]["products"]["Row"]
 
 export async function getProducts(filters?: { category?: string; search?: string }) {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
 
   let query = supabase.from("products").select("*").eq("is_active", true)
 
@@ -31,7 +32,7 @@ export async function getProducts(filters?: { category?: string; search?: string
 }
 
 export async function getProductById(id: string) {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
 
   const { data, error } = await supabase
     .from("products")

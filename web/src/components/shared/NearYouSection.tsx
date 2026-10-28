@@ -18,18 +18,18 @@ const NEAR_YOU_IMAGES = [
   "1527799820374-dcf8d9d4a388",
 ]
 
-export function NearYouSection() {
+export function NearYouSection({ initialParlours }: { initialParlours?: any[] }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [parlours, setParlours] = React.useState<any[]>([])
+  const [parlours, setParlours] = React.useState<any[]>(initialParlours && initialParlours.length > 0 ? initialParlours : [])
   const [city, setCity] = React.useState<string | null>(null)
-  const [loading, setLoading] = React.useState(true)
+  const [loading, setLoading] = React.useState(!initialParlours || initialParlours.length === 0)
   const [denied, setDenied] = React.useState(false)
 
   const fetchAllParlours = React.useCallback(async () => {
     const supabase = createClient()
     const { data } = await supabase
       .from("parlours")
-      .select("*")
+      .select("id, name, city, address, rating, total_bookings, cover_url, logo_url, type")
       .order("rating", { ascending: false })
       .limit(8)
     setParlours(data || [])
@@ -40,7 +40,7 @@ export function NearYouSection() {
     const supabase = createClient()
     const { data } = await supabase
       .from("parlours")
-      .select("*")
+      .select("id, name, city, address, rating, total_bookings, cover_url, logo_url, type")
       .ilike("city", `%${cityName}%`)
       .order("rating", { ascending: false })
       .limit(8)
@@ -51,7 +51,7 @@ export function NearYouSection() {
       // Fallback: if no parlours in detected city, show all
       const { data: allData } = await supabase
         .from("parlours")
-        .select("*")
+        .select("id, name, city, address, rating, total_bookings, cover_url, logo_url, type")
         .order("rating", { ascending: false })
         .limit(8)
       setParlours(allData || [])
@@ -61,8 +61,10 @@ export function NearYouSection() {
   }, [])
 
   React.useEffect(() => {
-    // 1. Immediately fetch top parlours so UI paints in <100ms
-    fetchAllParlours()
+    // Only fetch if initial data was not provided
+    if (!initialParlours || initialParlours.length === 0) {
+      fetchAllParlours()
+    }
 
     // 2. Non-blocking geolocation check in background (optional enhancement)
     if (typeof window !== "undefined" && navigator.geolocation) {

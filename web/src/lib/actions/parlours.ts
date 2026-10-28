@@ -1,8 +1,9 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { createPublicClient } from "@/lib/supabase/public"
 import { Database } from "@/types/supabase"
-import { revalidatePath } from "next/cache"
+import { revalidatePath, unstable_cache } from "next/cache"
 
 export type Parlour = Database["public"]["Tables"]["parlours"]["Row"]
 export type Service = Database["public"]["Tables"]["services"]["Row"]
@@ -15,22 +16,30 @@ export type ParlourWithDetails = Parlour & {
   reviews: Review[]
 }
 
-export async function getFeaturedParlours() {
-  const supabase = await createClient()
-  
-  const { data, error } = await supabase
-    .from("parlours")
-    .select("*")
-    .eq("featured", true)
-    .limit(4)
+export const getFeaturedParlours = unstable_cache(
+  async () => {
+    try {
+      const supabase = createPublicClient()
+      
+      const { data, error } = await supabase
+        .from("parlours")
+        .select("*")
+        .eq("featured", true)
+        .limit(4)
 
-  if (error) {
-    console.error("Error fetching featured parlours:", error)
-    return []
-  }
+      if (error) {
+        console.error("Error fetching featured parlours:", error)
+        return []
+      }
 
-  return data
-}
+      return data || []
+    } catch {
+      return []
+    }
+  },
+  ["featured_parlours"],
+  { revalidate: 120, tags: ["parlours"] }
+)
 
 export async function getParlours(filters?: { 
   search?: string; 
@@ -43,7 +52,7 @@ export async function getParlours(filters?: {
   page?: number;
   pageSize?: number;
 }) {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
   
   const page = filters?.page || 1
   const pageSize = filters?.pageSize || 12
@@ -113,7 +122,7 @@ export async function getParlourById(idOrIdentifier: string): Promise<ParlourWit
     return cached.data
   }
 
-  const supabase = await createClient()
+  const supabase = createPublicClient()
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrIdentifier)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -161,10 +170,9 @@ export async function getParlourById(idOrIdentifier: string): Promise<ParlourWit
       .select("*")
       .eq("parlour_id", actualId)
       .eq("is_active", true),
-    supabase
-      .from("reviews")
+    (supabase
+      .from("reviews") as any)
       .select("*")
-      // @ts-expect-error - parlour_id column in reviews table
       .eq("parlour_id", actualId)
       .order("created_at", { ascending: false })
   ])

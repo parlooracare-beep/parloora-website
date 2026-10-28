@@ -1,6 +1,8 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { createPublicClient } from "@/lib/supabase/public"
+import { revalidateTag, revalidatePath, unstable_cache } from "next/cache"
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Database } from "@/types/supabase"
 
@@ -110,26 +112,34 @@ export async function updateHomepageContent(data: any) {
     return { success: false, error: error.message }
   }
 
+  revalidateTag("homepage_content", "max")
+  revalidatePath("/")
   return { success: true }
 }
 
-export async function getFooterSettings() {
-  const supabase = await createClient()
-  
-  const { data, error } = await supabase
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .from("footer_settings" as any)
-    .select("*")
-    .eq("id", "default")
-    .single()
+export const getFooterSettings = unstable_cache(
+  async () => {
+    try {
+      const supabase = createPublicClient()
+      const { data, error } = await supabase
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .from("footer_settings" as any)
+        .select("*")
+        .eq("id", "default")
+        .single()
 
-  if (error) {
-    console.error("Error fetching footer settings:", error)
-    return null
-  }
+      if (error) {
+        return null
+      }
 
-  return (data as unknown) as FooterSettings
-}
+      return (data as unknown) as FooterSettings
+    } catch {
+      return null
+    }
+  },
+  ["site_footer_settings"],
+  { revalidate: 3600, tags: ["footer_settings"] }
+)
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function updateFooterSettings(data: any) {
@@ -163,6 +173,8 @@ export async function updateFooterSettings(data: any) {
     return { success: false, error: error.message }
   }
 
+  revalidateTag("footer_settings", "max")
+  revalidatePath("/")
   return { success: true }
 }
 
@@ -190,27 +202,29 @@ const DEFAULT_THEME: ThemeSettings = {
   updated_at: new Date().toISOString()
 }
 
-export async function getThemeSettings(): Promise<ThemeSettings> {
-  try {
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .from("theme_settings" as any)
-      .select("*")
-      .eq("id", "default")
-      .single()
+export const getThemeSettings = unstable_cache(
+  async (): Promise<ThemeSettings> => {
+    try {
+      const supabase = createPublicClient()
+      const { data, error } = await supabase
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .from("theme_settings" as any)
+        .select("*")
+        .eq("id", "default")
+        .single()
 
-    if (error) {
-      console.warn("Table 'theme_settings' might be missing, returning fallback theme settings.", error.message)
+      if (error) {
+        return DEFAULT_THEME
+      }
+
+      return (data as unknown) as ThemeSettings
+    } catch {
       return DEFAULT_THEME
     }
-
-    return (data as unknown) as ThemeSettings
-  } catch (err) {
-    console.error("Error fetching theme settings, using fallback:", err)
-    return DEFAULT_THEME
-  }
-}
+  },
+  ["site_theme_settings"],
+  { revalidate: 3600, tags: ["theme_settings"] }
+)
 
 export async function updateThemeSettings(data: Partial<ThemeSettings>) {
   try {
@@ -243,6 +257,9 @@ export async function updateThemeSettings(data: Partial<ThemeSettings>) {
       console.error("Error updating theme settings:", error)
       return { success: false, error: error.message }
     }
+
+    revalidateTag("theme_settings", "max")
+    revalidatePath("/")
 
     // Proactively log action
     await logActivity("THEME_UPDATE", `Admin customized system appearance: primary_color=${data.primary_color}`)

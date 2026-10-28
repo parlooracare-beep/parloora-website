@@ -1,6 +1,8 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { createPublicClient } from "@/lib/supabase/public"
+import { unstable_cache, revalidateTag, revalidatePath } from "next/cache"
 import { logActivity } from "./site"
 
 export interface PageSection {
@@ -19,31 +21,35 @@ const DEFAULT_SECTIONS: PageSection[] = [
   { id: "cta", name: "CTA Banner", visible: true }
 ]
 
-export async function getHomepageSections(): Promise<PageSection[]> {
-  try {
-    const supabase = await createClient()
-    const { data, error } = (await supabase
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .from("homepage_content" as any)
-      .select("*")
-      .eq("id", "sections_layout")
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .single()) as any
+export const getHomepageSections = unstable_cache(
+  async (): Promise<PageSection[]> => {
+    try {
+      const supabase = createPublicClient()
+      const { data, error } = (await supabase
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .from("homepage_content" as any)
+        .select("*")
+        .eq("id", "sections_layout")
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .single()) as any
 
-    if (error || !data || !data.hero_title) {
+      if (error || !data || !data.hero_title) {
+        return DEFAULT_SECTIONS
+      }
+
+      const parsed = JSON.parse(data.hero_title)
+      if (Array.isArray(parsed)) {
+        return parsed
+      }
+      return DEFAULT_SECTIONS
+    } catch (err) {
+      console.error("Error reading homepage sections layout:", err)
       return DEFAULT_SECTIONS
     }
-
-    const parsed = JSON.parse(data.hero_title)
-    if (Array.isArray(parsed)) {
-      return parsed
-    }
-    return DEFAULT_SECTIONS
-  } catch (err) {
-    console.error("Error reading homepage sections layout:", err)
-    return DEFAULT_SECTIONS
-  }
-}
+  },
+  ["site_homepage_sections"],
+  { revalidate: 300, tags: ["homepage_sections"] }
+)
 
 export async function updateHomepageSections(sections: PageSection[]) {
   try {
@@ -80,6 +86,8 @@ export async function updateHomepageSections(sections: PageSection[]) {
       return { success: false, error: error.message }
     }
 
+    revalidateTag("homepage_sections", "max")
+    revalidatePath("/")
     await logActivity("PAGE_BUILDER_UPDATE", `Updated homepage section sequencing and visibility`)
     return { success: true }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -60,10 +60,10 @@ export function Navbar() {
     <>
       <header
       className={cn(
-        "fixed top-0 w-full z-50 transition-all duration-500",
+        "fixed top-0 w-full z-50 transition-all duration-300",
         isScrolled
-          ? "bg-white/70 backdrop-blur-xl border-b border-white/20 shadow-2xl py-2 md:py-3"
-          : "bg-transparent py-4 md:py-6"
+          ? "bg-white/90 backdrop-blur-2xl border-b border-[#F1EDF5] shadow-[0_4px_25px_rgba(75,29,95,0.06)] py-2.5 md:py-3.5"
+          : "bg-white/50 md:bg-transparent backdrop-blur-md md:backdrop-blur-none py-3 md:py-5"
       )}
     >
       <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
@@ -71,7 +71,7 @@ export function Navbar() {
         <ParlooraLogo size="md" href="/" priority />
 
         {/* Desktop Navigation Buttons */}
-        <nav className="hidden md:flex items-center p-1 bg-white/75 backdrop-blur-md border border-brand-gray-200/70 rounded-full shadow-sm gap-1">
+        <nav aria-label="Main Navigation" className="hidden md:flex items-center p-1 bg-white/80 backdrop-blur-md border border-[#F1EDF5] rounded-full shadow-xs gap-1">
           {navLinks.map((link) => {
             const Icon = link.icon
             const isActive = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href)
@@ -80,7 +80,7 @@ export function Navbar() {
                 key={link.name}
                 href={link.href}
                 className={cn(
-                  "group relative flex items-center gap-1.5 md:gap-2 px-3 md:px-3.5 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-200 select-none",
+                  "group relative flex items-center gap-1.5 md:gap-2 px-3.5 md:px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-200 select-none",
                   isActive
                     ? "bg-gradient-to-r from-primary to-[#6B2D8B] text-white shadow-sm shadow-primary/25 scale-[1.02]"
                     : "text-brand-gray-600 hover:text-primary hover:bg-primary/5 active:scale-95"
@@ -99,16 +99,18 @@ export function Navbar() {
         </nav>
 
         {/* Actions */}
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex items-center gap-3.5">
           {user ? (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3.5">
               <LanguageSwitcher />
               <NotificationBell />
               
               <Button 
                 variant="ghost" 
+                size="icon"
                 onClick={openCart}
-                className="rounded-full relative p-2 h-10 w-10 hover:bg-primary/5"
+                aria-label="View Shopping Cart"
+                className="rounded-full relative hover:bg-primary/5"
               >
                 <ShoppingBag className="w-5 h-5 text-brand-gray-700" />
                 {totalItems() > 0 && (
@@ -121,13 +123,15 @@ export function Navbar() {
               <UserNav user={user} />
             </div>
           ) : (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <LanguageSwitcher />
               
               <Button 
                 variant="ghost" 
+                size="icon"
                 onClick={openCart}
-                className="rounded-full relative p-2 h-10 w-10 hover:bg-primary/5"
+                aria-label="View Shopping Cart"
+                className="rounded-full relative hover:bg-primary/5"
               >
                 <ShoppingBag className="w-5 h-5 text-brand-gray-700" />
                 {totalItems() > 0 && (
@@ -138,13 +142,13 @@ export function Navbar() {
               </Button>
 
               <Link href="/login">
-                <Button variant="outline" className="rounded-full px-6 border-primary/20 hover:bg-primary/5">
+                <Button variant="outline" size="sm" className="rounded-xl px-5 font-bold transition-all">
                   {t("Log in")}
                 </Button>
               </Link>
-              <Link href="/signup">
-                <Button className="rounded-full px-6 bg-gradient-to-r from-primary to-secondary hover:opacity-90 shadow-lg shadow-primary/25">
-                  {t("Sign up")}
+              <Link href="/parlours">
+                <Button variant="rosegold" size="sm" className="rounded-xl px-6 font-bold shadow-md shadow-[#E2A9A9]/30 hover:shadow-lg transition-all">
+                  {t("Book Now")}
                 </Button>
               </Link>
             </div>
@@ -156,18 +160,22 @@ export function Navbar() {
           <LanguageSwitcher />
           <Button 
             variant="ghost" 
+            size="icon-sm"
             onClick={() => setIsSearchOpen(!isSearchOpen)}
-            className="rounded-full p-2 h-9 w-9"
+            aria-label={isSearchOpen ? "Close search bar" : "Open search bar"}
+            className="rounded-full"
           >
-            {isSearchOpen ? <X className="w-5 h-5" /> : <Search className="w-5 h-5" />}
+            {isSearchOpen ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
           </Button>
           <NotificationBell />
           <Button 
             variant="ghost" 
+            size="icon-sm"
             onClick={openCart}
-            className="rounded-full relative p-2 h-9 w-9"
+            aria-label="View Shopping Cart"
+            className="rounded-full relative"
           >
-            <ShoppingBag className="w-5 h-5" />
+            <ShoppingBag className="w-4 h-4" />
             {totalItems() > 0 && (
               <span className="absolute -top-0.5 -right-0.5 bg-primary text-white text-[9px] font-black h-3.5 min-w-3.5 px-0.5 rounded-full flex items-center justify-center border border-white">
                 {totalItems()}

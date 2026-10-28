@@ -24,9 +24,20 @@ import { getStaffForService } from "@/lib/actions/staff"
 import { createClient } from "@/lib/supabase/client"
 import { validatePromoCode, applyPromoCode } from "@/lib/actions/promo"
 import { Database } from "@/types/supabase"
-import { Elements } from "@stripe/react-stripe-js"
-import { getStripe } from "@/lib/stripe"
-import { StripePaymentForm } from "@/components/shared/StripePaymentForm"
+import dynamic from "next/dynamic"
+
+const StripeBookingPayment = dynamic(
+  () => import("@/components/shared/StripeBookingPayment"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="py-8 flex flex-col items-center justify-center gap-2">
+        <Loader2 className="w-6 h-6 text-primary animate-spin" />
+        <p className="text-xs text-brand-gray-500 font-medium">Loading secure payment gateway...</p>
+      </div>
+    ),
+  }
+)
 
 type Service = Database["public"]["Tables"]["services"]["Row"]
 type ParlourWithDetails = NonNullable<Awaited<ReturnType<typeof getParlourById>>>
@@ -949,9 +960,10 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                         <span className="font-bold text-primary text-base sm:text-lg">{formatCurrency(service.price)}</span>
                       </div>
                       <Button
+                        variant="rosegold"
                         size="sm"
                         onClick={() => handleBook(service)}
-                        className="rounded-xl font-bold transition-all shadow-md h-10 w-full sm:w-auto px-6 bg-primary text-white hover:bg-primary/95 hover:scale-105 active:scale-95 cursor-pointer"
+                        className="rounded-xl font-black transition-all shadow-md shadow-[#E2A9A9]/30 h-10 w-full sm:w-auto px-6 hover:scale-105 active:scale-95 cursor-pointer"
                       >
                         Book Now
                       </Button>
@@ -1216,27 +1228,12 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                       Back
                     </Button>
                   </div>
-                  <Elements
-                    stripe={getStripe()}
-                    options={{
-                      clientSecret: bookingStripeClientSecret,
-                      appearance: {
-                        theme: "stripe",
-                        variables: {
-                          colorPrimary: "#2D0072",
-                          colorBackground: "#ffffff",
-                          colorText: "#1F2937",
-                          borderRadius: "12px",
-                        },
-                      },
-                    }}
-                  >
-                    <StripePaymentForm
-                      amount={selectedService?.price || 0}
-                      onCancel={() => setShowStripeBookingForm(false)}
-                      onSuccess={handleStripeBookingSuccess}
-                    />
-                  </Elements>
+                  <StripeBookingPayment
+                    clientSecret={bookingStripeClientSecret}
+                    amount={selectedService?.price || 0}
+                    onCancel={() => setShowStripeBookingForm(false)}
+                    onSuccess={handleStripeBookingSuccess}
+                  />
                 </div>
               ) : bookingStep === 1 ? (
                 /* Step 1: Date Selection */
@@ -1680,13 +1677,14 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                   </div>
                 ) : (
                   <div className="flex gap-3 w-full">
-                    <Button variant="outline" onClick={() => setBookingStep(2)} className="w-20 h-14 rounded-2xl border-brand-gray-200" disabled={isBooking}>
+                    <Button variant="outline" onClick={() => setBookingStep(2)} className="w-20 h-14 rounded-2xl border-brand-purple/20 text-brand-purple hover:bg-brand-purple/5" disabled={isBooking}>
                       <ChevronLeft className="w-5 h-5" />
                     </Button>
                     {!user ? (
                       <Button
                         asChild
-                        className="flex-1 h-14 bg-brand-gray-900 hover:bg-brand-gray-800 text-white rounded-2xl font-bold text-base sm:text-lg shadow-xl shadow-brand-gray-100"
+                        variant="rosegold"
+                        className="flex-1 h-14 rounded-2xl font-bold text-base sm:text-lg shadow-xl shadow-[#E2A9A9]/35"
                       >
                         <Link href={`/login?redirectedFrom=${encodeURIComponent(`/parlours/${id}${selectedService ? `?service=${selectedService.id}` : ''}`)}`}>
                           Log in to Confirm
@@ -1694,12 +1692,13 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                       </Button>
                     ) : (
                       <Button
-                        className="flex-1 h-14 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-bold text-sm sm:text-base md:text-lg shadow-xl shadow-primary/20 disabled:opacity-50 transition-all active:scale-95 px-3"
+                        variant="rosegold"
+                        className="flex-1 h-14 rounded-2xl font-black text-sm sm:text-base md:text-lg shadow-xl shadow-[#E2A9A9]/35 disabled:opacity-50 transition-all active:scale-[0.98] px-3 tracking-wide"
                         disabled={isBooking}
                         onClick={handleConfirmBooking}
                       >
                         {isBooking ? (
-                          <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Confirming...</>
+                          <><Loader2 className="w-5 h-5 mr-2 animate-spin text-brand-purple" /> Confirming...</>
                         ) : bookingPaymentMethod === "cash" ? (
                           <>
                             <span className="sm:hidden">Confirm Booking (Cash)</span>
