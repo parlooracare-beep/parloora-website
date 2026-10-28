@@ -10,6 +10,19 @@ build/
 dist/
 *.tsbuildinfo
 
+# Mobile & Native Build Artifacts
+android/.gradle
+android/app/build
+android/build
+ios/App/build
+ios/App/Pods
+ios/App/App.xcworkspace/xcuserdata
+*.keystore
+*.jks
+key.properties
+Parloora-Mobile-App-Delivery/
+Parloora-Mobile-App-Delivery.zip
+
 # Environment and secrets
 .env*
 !.env.example

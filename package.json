@@ -7,9 +7,23 @@
   ],
   "scripts": {
     "build": "cd web && npm run build",
-    "start": "cd web && npm run start"
+    "start": "cd web && npm run start",
+    "cap:sync": "npx cap sync",
+    "cap:build:android": "powershell -ExecutionPolicy Bypass -File scripts/build-android.ps1"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/app": "^8.1.2",
+    "@capacitor/browser": "^8.0.5",
+    "@capacitor/camera": "^8.2.6",
+    "@capacitor/cli": "^8.5.3",
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/geolocation": "^8.2.4",
+    "@capacitor/ios": "^8.5.3",
+    "@capacitor/network": "^8.0.1",
+    "@capacitor/preferences": "^8.0.1",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.4",
     "next": "16.2.4",
     "react": "19.2.4",
     "react-dom": "19.2.4"

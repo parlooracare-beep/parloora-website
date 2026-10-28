@@ -25,7 +25,9 @@ export function PwaInstallPrompt() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (window.navigator as any).standalone === true
 
-    if (isStandalone) return
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const isCapacitor = typeof window !== "undefined" && Boolean((window as any).Capacitor?.isNativePlatform?.())
+    if (isStandalone || isCapacitor) return
 
     // Check if dismissed recently (7 days)
     const dismissedUntil = localStorage.getItem("parloora_pwa_dismissed")

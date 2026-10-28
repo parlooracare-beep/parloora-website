@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Parloora</string>
+    <string name="title_activity_main">Parloora</string>
+    <string name="package_name">com.parloora.app</string>
+    <string name="custom_url_scheme">com.parloora.app</string>
+</resources>
