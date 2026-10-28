@@ -170,13 +170,14 @@ function LoginForm() {
             )}
 
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-brand-gray-700">{t("auth.emailLabel")}</label>
+              <label htmlFor="email" className="text-sm font-medium text-brand-gray-700">Email or Mobile Number</label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-gray-400" />
                 <Input
                   id="email"
-                  type="email"
-                  placeholder={t("auth.emailPlaceholder")}
+                  type="text"
+                  autoComplete="username"
+                  placeholder="Email or 01xxxxxxxxx"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 h-12 border-brand-gray-200 focus:border-primary focus:ring-primary rounded-xl transition-all duration-200 hover:border-brand-gray-300 shadow-sm"

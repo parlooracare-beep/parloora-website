@@ -99,7 +99,14 @@ DECLARE
   v_business_name TEXT;
   v_district TEXT;
 BEGIN
-  v_role := COALESCE(LOWER(new.raw_user_meta_data->>'role'), 'customer');
+  IF LOWER(COALESCE(new.raw_user_meta_data->>'role', 'Customer')) = 'seller' THEN
+    v_role := 'Seller';
+  ELSIF LOWER(COALESCE(new.raw_user_meta_data->>'role', 'Customer')) = 'admin' THEN
+    v_role := 'Admin';
+  ELSE
+    v_role := 'Customer';
+  END IF;
+
   v_display_name := new.raw_user_meta_data->>'display_name';
   v_phone := new.raw_user_meta_data->>'phone_number';
   
@@ -114,7 +121,7 @@ BEGIN
   );
 
   -- If it's a seller, also insert a stub parlour record
-  IF v_role = 'seller' THEN
+  IF v_role = 'Seller' THEN
     v_business_name := COALESCE(new.raw_user_meta_data->>'business_name', 'My Parlour');
     v_district := COALESCE(new.raw_user_meta_data->>'district', '');
     
@@ -124,7 +131,7 @@ BEGIN
       v_business_name,
       v_district,
       v_phone,
-      'pending',
+      'Pending',
       false -- start as inactive until profile is complete
     );
   END IF;

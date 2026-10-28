@@ -33,6 +33,19 @@ export async function signUpAction(formData: {
     return { success: false, error: "This mobile number is already registered" }
   }
 
+  // Check unique email if provided
+  if (email?.trim()) {
+    const { data: existingEmail } = await supabase
+      .from("users")
+      .select("id")
+      .eq("email", email.trim().toLowerCase())
+      .maybeSingle()
+
+    if (existingEmail) {
+      return { success: false, error: "This email address is already registered" }
+    }
+  }
+
   // If email is not provided (optional for customers), generate a placeholder email
   const finalEmail = email?.trim() || `${cleanPhone}@parloora.com`
 
@@ -40,7 +53,9 @@ export async function signUpAction(formData: {
   const headersList = await headers()
   const origin = headersList.get("origin") || ""
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // Normalize role to TitleCase ("Customer" | "Seller") to strictly match the public.users database check constraint
+  const normalizedRole: "Customer" | "Seller" = role === "Seller" ? "Seller" : "Customer"
+
   const { data, error } = await supabase.auth.signUp({
     email: finalEmail,
     password,
@@ -48,7 +63,7 @@ export async function signUpAction(formData: {
       data: {
         display_name: fullName,
         phone_number: cleanPhone,
-        role: role.toLowerCase(),
+        role: normalizedRole,
         business_name: businessName,
         district: district
       },
@@ -58,7 +73,28 @@ export async function signUpAction(formData: {
 
   if (error) {
     console.error("Signup error:", error)
+    if (error.message.includes("User already registered") || error.message.includes("already registered")) {
+      return { success: false, error: "An account with this email or mobile number already exists" }
+    }
     return { success: false, error: error.message }
+  }
+
+  // If seller signed up, ensure parlour stub details are updated with custom business name/district
+  if (normalizedRole === "Seller" && data?.user?.id && (businessName || district)) {
+    try {
+      const { createAdminClient } = await import("@/lib/supabase/admin")
+      const adminClient = createAdminClient()
+      await adminClient
+        .from("parlours")
+        .update({
+          ...(businessName ? { name: businessName } : {}),
+          ...(district ? { city: district } : {}),
+          phone: cleanPhone
+        })
+        .eq("owner_id", data.user.id)
+    } catch (err) {
+      console.error("Failed to update parlour stub on seller signup:", err)
+    }
   }
 
   // Profile creation & parlour stub creation is handled by the database trigger (sync_users.sql / schema_profile_extension.sql)
@@ -123,5 +159,3 @@ export async function signInAction(formData: any) {
 
   return { success: true, role: "Customer" }
 }
-
-

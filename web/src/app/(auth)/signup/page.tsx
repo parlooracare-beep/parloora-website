@@ -4,8 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { ParlooraLogo } from "@/components/shared/Logo"
 import { useSearchParams } from "next/navigation"
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Sparkles, Mail, Lock, Eye, EyeOff, User, Phone, Loader2, Store, ArrowLeft } from "lucide-react"
+import { Sparkles, Mail, Lock, Eye, EyeOff, User, Phone, Loader2, Store, ArrowLeft, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
@@ -40,8 +39,6 @@ function SignupForm() {
   const [error, setError] = React.useState<string | null>(null)
   const [success, setSuccess] = React.useState(false)
   const [createdEmail, setCreatedEmail] = React.useState("")
-
-
 
   const passwordStrength = React.useMemo(() => {
     let score = 0
@@ -113,23 +110,39 @@ function SignupForm() {
     }
   }
 
-
-
   if (success) {
+    const hasCustomEmail = Boolean(email.trim())
+    const loginLink = redirectTarget ? `/login?redirectedFrom=${encodeURIComponent(redirectTarget)}` : "/login"
+
     return (
       <div className="min-h-screen flex items-center justify-center p-8">
         <div className="text-center max-w-md">
-          <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-3xl flex items-center justify-center mx-auto mb-6">
-            <Mail className="w-10 h-10 text-white" />
+          <div className="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-primary/20">
+            {hasCustomEmail ? (
+              <Mail className="w-10 h-10 text-white" />
+            ) : (
+              <CheckCircle2 className="w-10 h-10 text-white" />
+            )}
           </div>
-          <h1 className="text-3xl font-bold text-brand-gray-900 mb-3">Check your inbox!</h1>
-          <p className="text-brand-gray-500 mb-8">
-            We&apos;ve sent a confirmation link to <strong className="text-brand-gray-700">{createdEmail}</strong>. 
-            Please verify your email to complete your registration.
+          <h1 className="text-3xl font-bold text-brand-gray-900 mb-3">
+            {hasCustomEmail ? "Check your inbox!" : "Account Created!"}
+          </h1>
+          <p className="text-brand-gray-500 mb-8 leading-relaxed">
+            {hasCustomEmail ? (
+              <>
+                We&apos;ve sent a confirmation link to <strong className="text-brand-gray-700">{createdEmail}</strong>. 
+                Please verify your email to complete your registration.
+              </>
+            ) : (
+              <>
+                Your account has been registered successfully with mobile number <strong className="text-brand-gray-700">{phone}</strong>. 
+                You can now log in directly using your mobile number and password.
+              </>
+            )}
           </p>
-          <Link href="/login">
-            <Button className="bg-gradient-to-r from-primary to-secondary rounded-full px-8">
-              Back to Login
+          <Link href={loginLink}>
+            <Button className="bg-gradient-to-r from-primary to-secondary rounded-full px-8 py-3 text-base font-semibold shadow-md hover:shadow-lg transition-all">
+              {hasCustomEmail ? "Back to Login" : "Continue to Login"}
             </Button>
           </Link>
         </div>

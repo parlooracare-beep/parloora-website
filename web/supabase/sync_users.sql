@@ -10,7 +10,11 @@ BEGIN
     new.email,
     new.raw_user_meta_data->>'display_name',
     new.raw_user_meta_data->>'phone_number',
-    COALESCE(LOWER(new.raw_user_meta_data->>'role'), 'customer')
+    CASE 
+      WHEN LOWER(COALESCE(new.raw_user_meta_data->>'role', 'Customer')) = 'seller' THEN 'Seller'
+      WHEN LOWER(COALESCE(new.raw_user_meta_data->>'role', 'Customer')) = 'admin' THEN 'Admin'
+      ELSE 'Customer'
+    END
   );
   RETURN new;
 END;
