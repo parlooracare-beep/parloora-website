@@ -19,10 +19,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20.x
+      - name: Setup Node.js 22.x (LTS)
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
           cache-dependency-path: web/package.json
 
@@ -42,3 +42,5 @@ jobs:
         run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: 1
+          NEXT_PUBLIC_SUPABASE_URL: https://vytjoyvphrqcntdogrng.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_D0QsRPS8zTo1vul9zHYE2g_Z0Hu56lj
