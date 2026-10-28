@@ -5,23 +5,32 @@ import { useRouter } from "next/navigation"
 import { Search, MapPin, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useI18n } from "@/lib/store/useI18n"
+import { useLocationStore } from "@/lib/store/useLocation"
 
 const BANGLADESH_CITIES = [
   { en: "All Cities", bn: "সকল শহর" },
   { en: "Dhaka", bn: "ঢাকা" },
-  { en: "Chittagong", bn: "চট্টগ্রাম" },
+  { en: "Moulvibazar", bn: "মৌলভীবাজার" },
   { en: "Sylhet", bn: "সিলেট" },
+  { en: "Chittagong", bn: "চট্টগ্রাম" },
   { en: "Rajshahi", bn: "রাজশাহী" },
   { en: "Khulna", bn: "খুলনা" },
-  { en: "Moulvibazar", bn: "মৌলভীবাজার" },
   { en: "Barisal", bn: "বরিশাল" }
 ]
 
 export function HeroSearch() {
   const { t, locale } = useI18n()
+  const { selectedDistrict } = useLocationStore()
   const [query, setQuery] = React.useState("")
-  const [city, setCity] = React.useState("All Cities")
+  const [city, setCity] = React.useState(selectedDistrict || "All Cities")
   const router = useRouter()
+
+  // Keep in sync with user's selected/detected location
+  React.useEffect(() => {
+    if (selectedDistrict) {
+      setCity(selectedDistrict)
+    }
+  }, [selectedDistrict])
 
   const handleSearch = (e?: React.FormEvent) => {
     e?.preventDefault()

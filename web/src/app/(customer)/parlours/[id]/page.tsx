@@ -91,6 +91,8 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
   const router = useRouter()
   const searchParams = useSearchParams()
   const serviceParam = searchParams.get("service")
+  const dateParam = searchParams.get("date")
+  const timeParam = searchParams.get("time")
   const { t } = useI18n()
 
   const [parlour, setParlour] = React.useState<ParlourWithDetails | null>(null)
@@ -489,17 +491,24 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
     }
   }, [id])
 
-  // Book service handler
-  const handleBook = React.useCallback(async (service: Service) => {
-    if (!user) {
-      router.push(`/login?redirectedFrom=${encodeURIComponent(`/parlours/${id}?service=${service.id}`)}`)
-      return
+  // Lock background scroll when booking sheet or lightbox is active
+  React.useEffect(() => {
+    if (showBooking || showLightbox) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = ""
     }
+    return () => {
+      document.body.style.overflow = ""
+    }
+  }, [showBooking, showLightbox])
 
+  // Book service handler — opens booking sheet seamlessly for all users (guests & authenticated)
+  const handleBook = React.useCallback(async (service: Service) => {
     setSelectedService(service)
     setShowBooking(true)
     setBookingStep(1)
-    setSelectedDate("")
+    setSelectedDate((prev) => prev || (bookingDates.length > 0 ? bookingDates[0].label : ""))
     setSelectedTime("")
     setSelectedStaff(null)
     setBookingSuccess(false)
@@ -518,18 +527,28 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
     } finally {
       setLoadingStaff(false)
     }
-  }, [id, router, user])
+  }, [bookingDates])
 
-  // Auto-open booking modal if service query param is present
+  // Auto-open booking modal if service query param is present (and restore date/time if returning from login)
   React.useEffect(() => {
-    if (parlour?.services && serviceParam && user && !selectedService) {
+    if (parlour?.services && serviceParam && !selectedService) {
       const targetService = parlour.services.find((s) => s.id === serviceParam)
       if (targetService) {
-        const timer = setTimeout(() => handleBook(targetService), 50)
+        const timer = setTimeout(() => {
+          handleBook(targetService).then(() => {
+            if (dateParam) {
+              setSelectedDate(decodeURIComponent(dateParam))
+            }
+            if (timeParam) {
+              setSelectedTime(decodeURIComponent(timeParam))
+              setBookingStep(3)
+            }
+          })
+        }, 50)
         return () => clearTimeout(timer)
       }
     }
-  }, [parlour, serviceParam, user, selectedService, handleBook])
+  }, [parlour, serviceParam, dateParam, timeParam, selectedService, handleBook])
 
   const handleStripeBookingSuccess = async (piId: string) => {
     if (activeBookingId) {
@@ -599,7 +618,24 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
 
   // Booking confirmation
   const handleConfirmBooking = async () => {
-    if (!user || !parlour || !selectedService || !selectedDate || !selectedTime) return
+    if (!user) {
+      router.push(`/login?redirectedFrom=${encodeURIComponent(`/parlours/${id}?service=${selectedService?.id || ""}&date=${encodeURIComponent(selectedDate)}&time=${encodeURIComponent(selectedTime)}`)}`)
+      return
+    }
+    if (!parlour || !selectedService) {
+      alert("Please select a service to book.")
+      return
+    }
+    if (!selectedDate) {
+      alert("Please select an appointment date.")
+      setBookingStep(1)
+      return
+    }
+    if (!selectedTime) {
+      alert("Please select an available time slot.")
+      setBookingStep(2)
+      return
+    }
 
     setIsBooking(true)
     const res = await createBooking({
@@ -1241,7 +1277,8 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                       return (
                         <Card
                           key={service.id}
-                          className="border border-brand-gray-100 hover:border-[#4B1D5F]/35 hover:shadow-lg transition-all duration-300 rounded-2xl overflow-hidden bg-white group"
+                          onClick={() => handleBook(service)}
+                          className="border border-brand-gray-100 hover:border-[#4B1D5F]/35 hover:shadow-lg transition-all duration-300 rounded-2xl overflow-hidden bg-white group cursor-pointer active:scale-[0.99] touch-manipulation"
                         >
                           <CardContent className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             {/* Service Media & Info */}
@@ -1306,8 +1343,11 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                               <Button
                                 variant="rosegold"
                                 size="sm"
-                                onClick={() => handleBook(service)}
-                                className="h-10 px-6 rounded-xl font-black text-xs shadow-md shadow-[#E2A9A9]/25 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleBook(service)
+                                }}
+                                className="min-h-[44px] h-11 px-6 rounded-xl font-black text-xs shadow-md shadow-[#E2A9A9]/25 hover:scale-105 active:scale-95 transition-all cursor-pointer touch-manipulation"
                               >
                                 {t("Book Now")}
                               </Button>
@@ -1580,10 +1620,15 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
 
       {/* ══════════ 4. BOOKING MODAL (PRESERVED & ENHANCED) ══════════ */}
       {showBooking && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white w-full sm:max-w-lg sm:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
+        <div 
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowBooking(false)
+          }}
+          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200"
+        >
+          <div className="bg-white w-full sm:max-w-lg sm:rounded-3xl rounded-t-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col relative z-[101]">
             {/* Modal Header */}
-            <div className="relative p-5 sm:p-6 border-b border-brand-gray-100">
+            <div className="relative p-5 sm:p-6 border-b border-brand-gray-100 shrink-0">
               {/* Progress Bar */}
               <div className="absolute bottom-0 left-0 h-1 bg-brand-gray-100 w-full overflow-hidden">
                 <motion.div
@@ -1614,9 +1659,10 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                   )}
                 </div>
                 <button
+                  type="button"
                   onClick={() => setShowBooking(false)}
                   aria-label="Close booking modal"
-                  className="w-9 h-9 rounded-full flex items-center justify-center bg-brand-gray-100 hover:bg-brand-gray-200 text-brand-gray-700 transition-all hover:rotate-90 duration-300 cursor-pointer"
+                  className="w-10 h-10 rounded-full flex items-center justify-center bg-brand-gray-100 hover:bg-brand-gray-200 active:scale-95 text-brand-gray-700 transition-all hover:rotate-90 duration-300 cursor-pointer touch-manipulation"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -1624,7 +1670,7 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
             </div>
 
             {/* Modal Body */}
-            <div className="flex-1 overflow-y-auto p-5 sm:p-6">
+            <div className="flex-1 overflow-y-auto p-5 sm:p-6 overscroll-contain">
               {bookingSuccess ? (
                 /* Success Ticket View */
                 <div className="text-center py-4">
@@ -2019,10 +2065,11 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
 
             {/* Modal Bottom Controls */}
             {!bookingSuccess && !showStripeBookingForm && (
-              <div className="p-4 sm:p-5 border-t border-brand-gray-100 bg-white flex gap-3">
+              <div className="p-4 pb-8 sm:p-5 border-t border-brand-gray-100 bg-white flex gap-3 shrink-0 relative z-10 shadow-[0_-4px_16px_rgba(0,0,0,0.04)]">
                 {bookingStep === 1 ? (
                   <Button
-                    className="flex-1 h-12 rounded-2xl bg-[#4B1D5F] hover:bg-[#3B154B] font-black text-sm text-white shadow-md shadow-[#4B1D5F]/20 cursor-pointer"
+                    type="button"
+                    className="flex-1 min-h-[48px] h-12 rounded-2xl bg-[#4B1D5F] hover:bg-[#3B154B] active:scale-[0.98] font-black text-sm text-white shadow-md shadow-[#4B1D5F]/20 cursor-pointer touch-manipulation"
                     disabled={!selectedDate}
                     onClick={() => setBookingStep(2)}
                   >
@@ -2031,14 +2078,16 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                 ) : bookingStep === 2 ? (
                   <div className="flex gap-2.5 w-full">
                     <Button
+                      type="button"
                       variant="outline"
                       onClick={() => setBookingStep(1)}
-                      className="w-16 h-12 rounded-2xl border-brand-gray-200 cursor-pointer"
+                      className="w-16 min-h-[48px] h-12 rounded-2xl border-brand-gray-200 cursor-pointer touch-manipulation active:scale-[0.98]"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </Button>
                     <Button
-                      className="flex-1 h-12 rounded-2xl bg-[#4B1D5F] hover:bg-[#3B154B] font-black text-sm text-white shadow-md shadow-[#4B1D5F]/20 cursor-pointer"
+                      type="button"
+                      className="flex-1 min-h-[48px] h-12 rounded-2xl bg-[#4B1D5F] hover:bg-[#3B154B] active:scale-[0.98] font-black text-sm text-white shadow-md shadow-[#4B1D5F]/20 cursor-pointer touch-manipulation"
                       disabled={!selectedTime || loadingSlots}
                       onClick={() => setBookingStep(3)}
                     >
@@ -2048,27 +2097,30 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                 ) : (
                   <div className="flex gap-2.5 w-full">
                     <Button
+                      type="button"
                       variant="outline"
                       onClick={() => setBookingStep(2)}
-                      className="w-16 h-12 rounded-2xl border-brand-gray-200 cursor-pointer"
+                      className="w-16 min-h-[48px] h-12 rounded-2xl border-brand-gray-200 cursor-pointer touch-manipulation active:scale-[0.98]"
                       disabled={isBooking}
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </Button>
                     {!user ? (
                       <Button
+                        type="button"
                         asChild
                         variant="rosegold"
-                        className="flex-1 h-12 rounded-2xl font-bold text-sm shadow-md shadow-[#E2A9A9]/30"
+                        className="flex-1 min-h-[48px] h-12 rounded-2xl font-bold text-sm shadow-md shadow-[#E2A9A9]/30 touch-manipulation active:scale-[0.98]"
                       >
-                        <Link href={`/login?redirectedFrom=${encodeURIComponent(`/parlours/${id}${selectedService ? `?service=${selectedService.id}` : ""}`)}`}>
+                        <Link href={`/login?redirectedFrom=${encodeURIComponent(`/parlours/${id}?service=${selectedService?.id || ""}&date=${encodeURIComponent(selectedDate)}&time=${encodeURIComponent(selectedTime)}`)}`}>
                           Log in to Confirm
                         </Link>
                       </Button>
                     ) : (
                       <Button
+                        type="button"
                         variant="rosegold"
-                        className="flex-1 h-12 rounded-2xl font-black text-sm shadow-md shadow-[#E2A9A9]/30 disabled:opacity-50 cursor-pointer"
+                        className="flex-1 min-h-[48px] h-12 rounded-2xl font-black text-sm shadow-md shadow-[#E2A9A9]/30 disabled:opacity-50 cursor-pointer touch-manipulation active:scale-[0.98]"
                         disabled={isBooking}
                         onClick={handleConfirmBooking}
                       >
@@ -2091,7 +2143,7 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
 
       {/* ══════════ 5. LIGHTBOX MODAL ══════════ */}
       {showLightbox && galleryUrls.length > 0 && (
-        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-4">
+        <div className="fixed inset-0 z-[110] bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-4">
           <div className="absolute top-6 right-6 flex items-center gap-3 z-50">
             {user && parlour && (parlour.owner_id === user.id || userRole === "admin") && (
               <button

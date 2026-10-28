@@ -5,9 +5,9 @@ import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { Search, MapPin, Sparkles, ChevronRight, ArrowRight, ShieldCheck } from "lucide-react"
-import { BANGLADESH_DISTRICTS } from "@/lib/constants"
 import { cn } from "@/lib/utils"
 import { useI18n } from "@/lib/store/useI18n"
+import { useLocationStore } from "@/lib/store/useLocation"
 
 interface MobileHomeHeaderProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -20,7 +20,7 @@ const PROMO_BANNERS = [
     id: 1,
     title: "Glow Up Season ✨",
     highlight: "Up to 30% OFF",
-    subtext: "Top-rated salons in Dhaka & Chittagong",
+    subtext: "Top-rated salons in Dhaka & Moulvibazar",
     tag: "Limited Offer",
     bg: "from-[#4B1D5F] via-[#6A1B9A] to-[#E2A9A9]",
     link: "/parlours?sort=Highest+Rated",
@@ -48,9 +48,8 @@ const PROMO_BANNERS = [
 export function MobileHomeHeader({ categories, pillText }: MobileHomeHeaderProps) {
   const router = useRouter()
   const { t, currentLang } = useI18n()
+  const { selectedDistrict, openModal } = useLocationStore()
   const [searchQuery, setSearchQuery] = React.useState("")
-  const [selectedCity, setSelectedCity] = React.useState("Dhaka")
-  const [isCityModalOpen, setIsCityModalOpen] = React.useState(false)
   const [activeBannerIndex, setActiveBannerIndex] = React.useState(0)
 
   // Auto scroll promo banners
@@ -64,22 +63,23 @@ export function MobileHomeHeader({ categories, pillText }: MobileHomeHeaderProps
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      router.push(`/parlours?search=${encodeURIComponent(searchQuery.trim())}&city=${encodeURIComponent(selectedCity)}`)
+      router.push(`/parlours?search=${encodeURIComponent(searchQuery.trim())}&city=${encodeURIComponent(selectedDistrict)}`)
     } else {
-      router.push(`/parlours?city=${encodeURIComponent(selectedCity)}`)
+      router.push(`/parlours?city=${encodeURIComponent(selectedDistrict)}`)
     }
   }
 
   return (
     <div className="md:hidden bg-gradient-to-b from-[#4B1D5F] via-[#5C236D] to-white pb-4 text-white">
-      {/* 1. App Header: Location Chip + Tagline */}
+      {/* 1. App Subheader: Market Focus & Tagline Indicator */}
       <div className="px-4 pt-3 pb-2 flex items-center justify-between">
         <button
-          onClick={() => setIsCityModalOpen(true)}
-          className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 active:scale-95 transition-all px-3 py-1.5 rounded-full border border-white/15 backdrop-blur-md"
+          type="button"
+          onClick={openModal}
+          className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 active:scale-95 transition-all px-3 py-1 rounded-full border border-white/15 backdrop-blur-md"
         >
           <MapPin className="w-3.5 h-3.5 text-rose-300" />
-          <span className="text-xs font-bold tracking-tight text-white">{selectedCity}, BD</span>
+          <span className="text-xs font-bold tracking-tight text-white">{selectedDistrict}, BD</span>
           <ChevronRight className="w-3 h-3 text-white/60" />
         </button>
 
@@ -132,7 +132,7 @@ export function MobileHomeHeader({ categories, pillText }: MobileHomeHeaderProps
           {categories.map((cat, idx) => (
             <Link
               key={cat.id || idx}
-              href={`/parlours?category=${encodeURIComponent(cat.name)}`}
+              href={`/parlours?category=${encodeURIComponent(cat.name)}&city=${encodeURIComponent(selectedDistrict)}`}
               className="flex flex-col items-center gap-1.5 shrink-0 w-[68px] snap-start group"
             >
               <div className="w-15 h-15 rounded-2xl p-0.5 bg-gradient-to-br from-rose-300 via-white/80 to-purple-400 shadow-md group-active:scale-95 transition-transform">
@@ -216,46 +216,6 @@ export function MobileHomeHeader({ categories, pillText }: MobileHomeHeaderProps
           </div>
         </div>
       </div>
-
-      {/* 5. City Selector Bottom Sheet Modal */}
-      {isCityModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end justify-center p-0 animate-in fade-in duration-200">
-          <div className="bg-white text-brand-charcoal w-full rounded-t-3xl max-h-[80vh] flex flex-col shadow-2xl animate-in slide-in-from-bottom duration-300">
-            <div className="p-4 border-b border-brand-gray-100 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-primary" />
-                <h3 className="font-bold text-base">{t("auth.selectDistrict")}</h3>
-              </div>
-              <button
-                onClick={() => setIsCityModalOpen(false)}
-                className="text-brand-coolgray hover:text-brand-charcoal p-1 text-sm font-bold"
-              >
-                {t("common.close")}
-              </button>
-            </div>
-
-            <div className="p-4 overflow-y-auto max-h-[60vh] grid grid-cols-2 gap-2">
-              {BANGLADESH_DISTRICTS.map((dist) => (
-                <button
-                  key={dist}
-                  onClick={() => {
-                    setSelectedCity(dist)
-                    setIsCityModalOpen(false)
-                  }}
-                  className={cn(
-                    "text-left p-3 rounded-xl border text-xs font-semibold transition-all",
-                    selectedCity === dist
-                      ? "border-primary bg-primary/10 text-primary font-bold shadow-sm"
-                      : "border-brand-gray-100 hover:bg-brand-gray-50 text-brand-charcoal"
-                  )}
-                >
-                  {dist}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

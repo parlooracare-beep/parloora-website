@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { ParlooraLogo } from "@/components/shared/Logo"
-import { Home, Sparkles, ShoppingBag, Heart, Calendar, Search, X } from "lucide-react"
+import { Home, Sparkles, ShoppingBag, Heart, Calendar, Search, X, MapPin, ChevronRight } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 import { createClient } from "@/lib/supabase/client"
@@ -14,12 +14,15 @@ import { NotificationBell } from "./NotificationBell"
 import { LanguageSwitcher } from "./LanguageSwitcher"
 import { CartDrawer } from "./CartDrawer"
 import { UserNav } from "./UserNav"
+import { LocationModal } from "./LocationModal"
 import { useCart } from "@/lib/store/useCart"
 import { useI18n } from "@/lib/store/useI18n"
+import { useLocationStore } from "@/lib/store/useLocation"
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = React.useState(false)
   const { totalItems, isOpen: isCartOpen, openCart, closeCart } = useCart()
+  const { selectedDistrict, openModal } = useLocationStore()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = React.useState<any>(null)
   const pathname = usePathname()
@@ -59,160 +62,195 @@ export function Navbar() {
   return (
     <>
       <header
-      className={cn(
-        "fixed top-0 w-full z-50 transition-all duration-300",
-        isScrolled
-          ? "bg-white/90 backdrop-blur-2xl border-b border-[#F1EDF5] shadow-[0_4px_25px_rgba(75,29,95,0.06)] py-2.5 md:py-3.5"
-          : "bg-white/50 md:bg-transparent backdrop-blur-md md:backdrop-blur-none py-3 md:py-5"
-      )}
-    >
-      <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
-        {/* Official Parloora Logo */}
-        <ParlooraLogo size="md" href="/" priority />
+        className={cn(
+          "fixed top-0 w-full z-50 transition-all duration-300",
+          isScrolled
+            ? "bg-white/90 backdrop-blur-2xl border-b border-[#F1EDF5] shadow-[0_4px_25px_rgba(75,29,95,0.06)] py-2.5 md:py-3.5"
+            : "bg-white/50 md:bg-transparent backdrop-blur-md md:backdrop-blur-none py-2.5 md:py-4"
+        )}
+      >
+        <div className="container mx-auto px-3 sm:px-4 md:px-6 flex items-center justify-between">
+          {/* Desktop Left: Logo & Location Pill */}
+          <div className="hidden md:flex items-center gap-3">
+            <ParlooraLogo size="md" href="/" priority />
 
-        {/* Desktop Navigation Buttons */}
-        <nav aria-label="Main Navigation" className="hidden md:flex items-center p-1 bg-white/80 backdrop-blur-md border border-[#F1EDF5] rounded-full shadow-xs gap-1">
-          {navLinks.map((link) => {
-            const Icon = link.icon
-            const isActive = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href)
-            return (
-              <Link
-                key={link.name}
-                href={link.href}
-                className={cn(
-                  "group relative flex items-center gap-1.5 md:gap-2 px-3.5 md:px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-200 select-none",
-                  isActive
-                    ? "bg-gradient-to-r from-primary to-[#6B2D8B] text-white shadow-sm shadow-primary/25 scale-[1.02]"
-                    : "text-brand-gray-600 hover:text-primary hover:bg-primary/5 active:scale-95"
-                )}
-              >
-                <Icon
+            {/* Desktop Location Selector Pill */}
+            <button
+              type="button"
+              onClick={openModal}
+              aria-label="Change location"
+              className="flex items-center gap-1.5 bg-[#4B1D5F]/5 hover:bg-[#4B1D5F]/10 active:scale-95 transition-all px-3 py-1.5 rounded-full border border-[#4B1D5F]/15 text-[#4B1D5F] text-xs font-bold"
+            >
+              <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+              <span>{selectedDistrict}, BD</span>
+              <ChevronRight className="w-3 h-3 text-[#4B1D5F]/60 shrink-0" />
+            </button>
+          </div>
+
+          {/* Mobile Left: Logo & Location Pill in Mobile Topbar */}
+          <div className="flex md:hidden items-center gap-1.5 sm:gap-2 min-w-0">
+            <ParlooraLogo size="sm" href="/" priority className="shrink-0" />
+
+            {/* Mobile Topbar Location Pill */}
+            <button
+              type="button"
+              onClick={openModal}
+              aria-label="Change location"
+              className="flex items-center gap-1 bg-[#4B1D5F]/10 hover:bg-[#4B1D5F]/15 active:scale-95 transition-all px-2.5 py-1 rounded-full border border-[#4B1D5F]/20 text-[#4B1D5F] text-[11px] sm:text-xs font-bold max-w-[130px] sm:max-w-[160px] truncate shrink-0"
+            >
+              <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+              <span className="truncate">{selectedDistrict}, BD</span>
+              <ChevronRight className="w-3 h-3 text-[#4B1D5F]/60 shrink-0" />
+            </button>
+          </div>
+
+          {/* Desktop Navigation Buttons */}
+          <nav aria-label="Main Navigation" className="hidden md:flex items-center p-1 bg-white/80 backdrop-blur-md border border-[#F1EDF5] rounded-full shadow-xs gap-1">
+            {navLinks.map((link) => {
+              const Icon = link.icon
+              const isActive = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href)
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
                   className={cn(
-                    "w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-200 group-hover:scale-110",
-                    isActive ? "text-white" : "text-brand-gray-400 group-hover:text-primary"
+                    "group relative flex items-center gap-1.5 md:gap-2 px-3.5 md:px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold transition-all duration-200 select-none",
+                    isActive
+                      ? "bg-gradient-to-r from-primary to-[#6B2D8B] text-white shadow-sm shadow-primary/25 scale-[1.02]"
+                      : "text-brand-gray-600 hover:text-primary hover:bg-primary/5 active:scale-95"
                   )}
-                />
-                <span>{link.name}</span>
-              </Link>
-            )
-          })}
-        </nav>
+                >
+                  <Icon
+                    className={cn(
+                      "w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-200 group-hover:scale-110",
+                      isActive ? "text-white" : "text-brand-gray-400 group-hover:text-primary"
+                    )}
+                  />
+                  <span>{link.name}</span>
+                </Link>
+              )
+            })}
+          </nav>
 
-        {/* Actions */}
-        <div className="hidden md:flex items-center gap-3.5">
-          {user ? (
-            <div className="flex items-center gap-3.5">
-              <LanguageSwitcher />
-              <NotificationBell />
-              
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={openCart}
-                aria-label="View Shopping Cart"
-                className="rounded-full relative hover:bg-primary/5"
-              >
-                <ShoppingBag className="w-5 h-5 text-brand-gray-700" />
-                {totalItems() > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-black h-4 min-w-4 px-1 rounded-full flex items-center justify-center border-2 border-white">
-                    {totalItems()}
-                  </span>
-                )}
-              </Button>
-
-              <UserNav user={user} />
-            </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <LanguageSwitcher />
-              
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={openCart}
-                aria-label="View Shopping Cart"
-                className="rounded-full relative hover:bg-primary/5"
-              >
-                <ShoppingBag className="w-5 h-5 text-brand-gray-700" />
-                {totalItems() > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-black h-4 min-w-4 px-1 rounded-full flex items-center justify-center border-2 border-white">
-                    {totalItems()}
-                  </span>
-                )}
-              </Button>
-
-              <Link href="/login">
-                <Button variant="outline" size="sm" className="rounded-xl px-5 font-bold transition-all">
-                  {t("Log in")}
+          {/* Desktop Actions */}
+          <div className="hidden md:flex items-center gap-3.5">
+            {user ? (
+              <div className="flex items-center gap-3.5">
+                <LanguageSwitcher />
+                <NotificationBell />
+                
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={openCart}
+                  aria-label="View Shopping Cart"
+                  className="rounded-full relative hover:bg-primary/5"
+                >
+                  <ShoppingBag className="w-5 h-5 text-brand-gray-700" />
+                  {totalItems() > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-black h-4 min-w-4 px-1 rounded-full flex items-center justify-center border-2 border-white">
+                      {totalItems()}
+                    </span>
+                  )}
                 </Button>
-              </Link>
-              <Link href="/parlours">
-                <Button variant="rosegold" size="sm" className="rounded-xl px-6 font-bold shadow-md shadow-[#E2A9A9]/30 hover:shadow-lg transition-all">
-                  {t("Book Now")}
-                </Button>
-              </Link>
-            </div>
-          )}
-        </div>
 
-        {/* Mobile Actions */}
-        <div className="flex md:hidden items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="icon-sm"
-            onClick={() => setIsSearchOpen(!isSearchOpen)}
-            aria-label={isSearchOpen ? "Close search bar" : "Open search bar"}
-            className="rounded-full"
-          >
-            {isSearchOpen ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
-          </Button>
-          <NotificationBell />
-          <Button 
-            variant="ghost" 
-            size="icon-sm"
-            onClick={openCart}
-            aria-label="View Shopping Cart"
-            className="rounded-full relative"
-          >
-            <ShoppingBag className="w-4 h-4" />
-            {totalItems() > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 bg-primary text-white text-[9px] font-black h-3.5 min-w-3.5 px-0.5 rounded-full flex items-center justify-center border border-white">
-                {totalItems()}
-              </span>
+                <UserNav user={user} />
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <LanguageSwitcher />
+                
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={openCart}
+                  aria-label="View Shopping Cart"
+                  className="rounded-full relative hover:bg-primary/5"
+                >
+                  <ShoppingBag className="w-5 h-5 text-brand-gray-700" />
+                  {totalItems() > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-primary text-white text-[10px] font-black h-4 min-w-4 px-1 rounded-full flex items-center justify-center border-2 border-white">
+                      {totalItems()}
+                    </span>
+                  )}
+                </Button>
+
+                <Link href="/login">
+                  <Button variant="outline" size="sm" className="rounded-xl px-5 font-bold transition-all">
+                    {t("Log in")}
+                  </Button>
+                </Link>
+                <Link href="/parlours">
+                  <Button variant="rosegold" size="sm" className="rounded-xl px-6 font-bold shadow-md shadow-[#E2A9A9]/30 hover:shadow-lg transition-all">
+                    {t("Book Now")}
+                  </Button>
+                </Link>
+              </div>
             )}
-          </Button>
-        </div>
-      </div>
+          </div>
 
-      {/* Mobile Search Overlay */}
-      {isSearchOpen && (
-        <div className="md:hidden px-4 pb-4 animate-in slide-in-from-top-2 duration-200">
-          <form 
-            onSubmit={(e) => {
-              e.preventDefault()
-              if (searchQuery.trim()) {
-                router.push(`/parlours?search=${encodeURIComponent(searchQuery)}`)
-                setIsSearchOpen(false)
-              }
-            }}
-            className="relative"
-          >
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-gray-400" />
-            <input
-              autoFocus
-              type="text"
-              placeholder={t("Search parlours or services...")}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-10 pl-10 pr-4 bg-brand-gray-50 border border-brand-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-            />
-          </form>
+          {/* Mobile Actions */}
+          <div className="flex md:hidden items-center gap-1 sm:gap-1.5 shrink-0">
+            <LanguageSwitcher />
+            <Button 
+              variant="ghost" 
+              size="icon-sm"
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              aria-label={isSearchOpen ? "Close search bar" : "Open search bar"}
+              className="rounded-full"
+            >
+              {isSearchOpen ? <X className="w-4 h-4" /> : <Search className="w-4 h-4" />}
+            </Button>
+            <NotificationBell />
+            <Button 
+              variant="ghost" 
+              size="icon-sm"
+              onClick={openCart}
+              aria-label="View Shopping Cart"
+              className="rounded-full relative"
+            >
+              <ShoppingBag className="w-4 h-4" />
+              {totalItems() > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-primary text-white text-[9px] font-black h-3.5 min-w-3.5 px-0.5 rounded-full flex items-center justify-center border border-white">
+                  {totalItems()}
+                </span>
+              )}
+            </Button>
+          </div>
         </div>
-      )}
-    </header>
 
-    {/* Cart Drawer rendered via Portal outside header containing block */}
-    <CartDrawer isOpen={isCartOpen} onClose={closeCart} />
-  </>
+        {/* Mobile Search Overlay */}
+        {isSearchOpen && (
+          <div className="md:hidden px-4 pb-4 animate-in slide-in-from-top-2 duration-200">
+            <form 
+              onSubmit={(e) => {
+                e.preventDefault()
+                if (searchQuery.trim()) {
+                  router.push(`/parlours?search=${encodeURIComponent(searchQuery)}&city=${encodeURIComponent(selectedDistrict)}`)
+                  setIsSearchOpen(false)
+                }
+              }}
+              className="relative"
+            >
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-gray-400" />
+              <input
+                autoFocus
+                type="text"
+                placeholder={t("Search parlours or services...")}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-10 pl-10 pr-4 bg-brand-gray-50 border border-brand-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+              />
+            </form>
+          </div>
+        )}
+      </header>
+
+      {/* Global Location Selection Modal / Bottom Sheet */}
+      <LocationModal />
+
+      {/* Cart Drawer rendered via Portal outside header containing block */}
+      <CartDrawer isOpen={isCartOpen} onClose={closeCart} />
+    </>
   )
 }

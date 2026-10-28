@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node scripts/test-i18n.mjs && node --test scripts/test-launch-readiness.mjs && node --experimental-strip-types --test scripts/test-seo-districts.mjs && node --test scripts/test-parlour-details.mjs && node --test scripts/test-contact-info.mjs"
+    "test": "node scripts/test-i18n.mjs && node --test scripts/test-launch-readiness.mjs && node --experimental-strip-types --test scripts/test-seo-districts.mjs && node --test scripts/test-parlour-details.mjs && node --test scripts/test-contact-info.mjs && node --experimental-strip-types scripts/test-geolocation-system.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",

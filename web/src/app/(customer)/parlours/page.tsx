@@ -286,7 +286,7 @@ export default function ParloursPage() {
 
           {/* Quick Filter Horizontal Scroll Chips */}
           <div className="flex overflow-x-auto gap-2 pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            {["All", "Dhaka", "Chittagong", "Sylhet"].map((cName) => {
+            {["All", "Moulvibazar", "Dhaka", "Sylhet", "Chittagong"].map((cName) => {
               const active = (cName === "All" && city === "All Cities") || city === cName
               return (
                 <button

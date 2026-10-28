@@ -7,6 +7,7 @@ import { MapPin, Star, Navigation, Loader2, ChevronRight } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { formatParlourName } from "@/lib/utils"
 import { useI18n } from "@/lib/store/useI18n"
+import { useLocationStore } from "@/lib/store/useLocation"
 
 const NEAR_YOU_IMAGES = [
   "1560066984-138dadb4c035",
@@ -19,93 +20,50 @@ const NEAR_YOU_IMAGES = [
   "1527799820374-dcf8d9d4a388",
 ]
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function NearYouSection({ initialParlours }: { initialParlours?: any[] }) {
   const { t } = useI18n()
+  const { selectedDistrict, openModal } = useLocationStore()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [parlours, setParlours] = React.useState<any[]>(initialParlours && initialParlours.length > 0 ? initialParlours : [])
-  const [city, setCity] = React.useState<string | null>(null)
-  const [loading, setLoading] = React.useState(!initialParlours || initialParlours.length === 0)
-  const [denied, setDenied] = React.useState(false)
+  const [activeDistrictName, setActiveDistrictName] = React.useState<string>(selectedDistrict)
+  const [hasDirectDistrictMatches, setHasDirectDistrictMatches] = React.useState(true)
+  const [loading, setLoading] = React.useState(false)
 
-  const fetchAllParlours = React.useCallback(async () => {
+  const fetchParloursForDistrict = React.useCallback(async (districtName: string) => {
+    setLoading(true)
     const supabase = createClient()
     const { data } = await supabase
       .from("parlours")
       .select("id, name, city, address, rating, total_bookings, cover_url, logo_url, type")
-      .order("rating", { ascending: false })
-      .limit(8)
-    setParlours(data || [])
-    setLoading(false)
-  }, [])
-
-  const fetchParloursByCity = React.useCallback(async (cityName: string) => {
-    const supabase = createClient()
-    const { data } = await supabase
-      .from("parlours")
-      .select("id, name, city, address, rating, total_bookings, cover_url, logo_url, type")
-      .ilike("city", `%${cityName}%`)
+      .ilike("city", `%${districtName}%`)
       .order("rating", { ascending: false })
       .limit(8)
 
     if (data && data.length > 0) {
       setParlours(data)
+      setActiveDistrictName(districtName)
+      setHasDirectDistrictMatches(true)
     } else {
-      // Fallback: if no parlours in detected city, show all
+      // Fallback: if no parlours in detected district, show top-rated across Bangladesh
       const { data: allData } = await supabase
         .from("parlours")
         .select("id, name, city, address, rating, total_bookings, cover_url, logo_url, type")
         .order("rating", { ascending: false })
         .limit(8)
       setParlours(allData || [])
-      setCity(null)
+      setActiveDistrictName(districtName)
+      setHasDirectDistrictMatches(false)
     }
     setLoading(false)
   }, [])
 
+  // Sync with user's selected/detected district from global location store
   React.useEffect(() => {
-    // Only fetch if initial data was not provided
-    if (!initialParlours || initialParlours.length === 0) {
-      fetchAllParlours()
-    }
+    fetchParloursForDistrict(selectedDistrict)
+  }, [selectedDistrict, fetchParloursForDistrict])
 
-    // 2. Non-blocking geolocation check in background (optional enhancement)
-    if (typeof window !== "undefined" && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          try {
-            const { latitude, longitude } = position.coords
-            const controller = new AbortController()
-            const timer = setTimeout(() => controller.abort(), 2500)
-            const res = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=en`,
-              { signal: controller.signal }
-            )
-            clearTimeout(timer)
-            const geo = await res.json()
-            const detectedCity =
-              geo?.address?.city ||
-              geo?.address?.town ||
-              geo?.address?.village ||
-              geo?.address?.county ||
-              null
-
-            if (detectedCity) {
-              setCity(detectedCity)
-              fetchParloursByCity(detectedCity)
-            }
-          } catch {
-            // Silently maintain already displayed parlours
-          }
-        },
-        () => {
-          setDenied(true)
-        },
-        { timeout: 3000 }
-      )
-    }
-  }, [fetchAllParlours, fetchParloursByCity])
-
-  if (loading) {
+  if (loading && parlours.length === 0) {
     return (
       <section className="py-10 bg-white">
         <div className="container mx-auto px-4 md:px-6">
@@ -139,72 +97,84 @@ export function NearYouSection({ initialParlours }: { initialParlours?: any[] })
               <h2 className="text-xl md:text-2xl font-bold text-brand-gray-900 leading-tight">
                 {t("home.nearYou", "Near You")}
               </h2>
-              {city && (
-                <p className="text-xs text-brand-gray-500 flex items-center gap-1 mt-0.5">
-                  <Navigation className="w-3 h-3" /> {t("home.showingResultsIn", { city })}
-                </p>
-              )}
-              {!city && !denied && (
-                <p className="text-xs text-brand-gray-400 mt-0.5">
-                  {t("home.nearYouSub", "Top-rated parlours near your area")}
-                </p>
-              )}
-              {denied && (
-                <p className="text-xs text-brand-gray-400 mt-0.5">
-                  {t("home.enableLocation", "Enable location for personalized results")}
-                </p>
-              )}
+              <button
+                type="button"
+                onClick={openModal}
+                className="text-xs text-brand-gray-500 hover:text-primary flex items-center gap-1 mt-0.5 group transition-colors"
+              >
+                <Navigation className="w-3 h-3 text-primary group-hover:rotate-45 transition-transform" />
+                {hasDirectDistrictMatches ? (
+                  <span>
+                    {t("home.showingResultsIn", { city: activeDistrictName }) || `Showing parlours in ${activeDistrictName}, BD`}
+                  </span>
+                ) : (
+                  <span>
+                    Top-rated parlours across BD (expanding to {activeDistrictName})
+                  </span>
+                )}
+                <span className="text-[10px] text-primary font-bold underline ml-1">Change</span>
+              </button>
             </div>
           </div>
           <Link
-            href="/parlours"
-            className="text-xs font-semibold text-primary hover:text-primary/80 flex items-center gap-0.5 transition-colors"
+            href={`/parlours?city=${encodeURIComponent(activeDistrictName)}`}
+            className="text-sm font-semibold text-primary hover:text-secondary flex items-center gap-1 transition-colors"
           >
-            {t("common.viewAll", "View All")} <ChevronRight className="w-3.5 h-3.5" />
+            {t("common.seeAll")}
+            <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
 
-        <div className="flex overflow-x-auto gap-3 md:gap-4 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] -mx-4 px-4 md:mx-0 md:px-0 snap-x">
-          {parlours.map((parlour, idx) => (
-            <Link
-              key={parlour.id}
-              href={`/parlours/${parlour.id}`}
-              className="w-[168px] md:w-[192px] shrink-0 snap-start group"
-            >
-              <div className="flex flex-col gap-2 h-full">
-                <div className="aspect-[4/3] rounded-xl overflow-hidden bg-brand-gray-200 relative shadow-sm">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {parlours.map((parlour, index) => {
+            const fallbackImage = `https://images.unsplash.com/photo-${NEAR_YOU_IMAGES[index % NEAR_YOU_IMAGES.length]}?auto=format&fit=crop&w=600&q=80`
+            const imageUrl = parlour.cover_url || fallbackImage
+
+            return (
+              <Link
+                key={parlour.id}
+                href={`/parlours/${parlour.id}`}
+                className="group bg-white rounded-2xl border border-brand-gray-100 overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col"
+              >
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-brand-gray-100">
                   <Image
-                    src={parlour.image || `https://images.unsplash.com/photo-${NEAR_YOU_IMAGES[idx % NEAR_YOU_IMAGES.length]}?auto=format&fit=crop&w=400&q=80`}
-                    alt={parlour.name}
+                    src={imageUrl}
+                    alt={formatParlourName(parlour.name)}
                     fill
+                    sizes="(max-width: 768px) 50vw, 25vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-0.5 flex items-center gap-1 shadow-sm">
-                    <MapPin className="w-2.5 h-2.5 text-emerald-600" />
-                    <span className="text-[9px] font-bold text-brand-gray-700">{parlour.city || "Nearby"}</span>
-                  </div>
-                </div>
-                <div className="px-0.5">
-                  <div className="flex items-start justify-between gap-1 mb-0.5">
-                    <h3 className="font-bold text-brand-gray-900 leading-tight text-xs md:text-sm line-clamp-1 group-hover:text-primary transition-colors">
-                      {formatParlourName(parlour.name)}
-                    </h3>
-                    <div className="flex items-center gap-0.5 shrink-0">
-                      <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                      <span className="font-bold text-xs text-brand-gray-900">{parlour.rating || 5.0}</span>
-                    </div>
-                  </div>
-                  <p className="text-[10px] text-brand-gray-500 line-clamp-1">{parlour.address || parlour.city}</p>
-                  <div className="flex items-center justify-between mt-1 pt-1 border-t border-brand-gray-100/60">
-                    <span className="text-[9px] md:text-[10px] text-brand-gray-400 truncate max-w-[100px]">{parlour.type || t("common.beautySalon", "Beauty Salon")}</span>
-                    <span className="text-[10px] font-bold bg-primary text-white px-2 py-0.5 rounded-md group-hover:bg-primary/90 transition-colors shadow-xs">
-                      {t("common.bookNow", "Book")}
+                  {parlour.type && (
+                    <span className="absolute top-2 left-2 bg-white/90 backdrop-blur-xs text-[10px] font-bold text-brand-gray-800 px-2 py-0.5 rounded-full capitalize">
+                      {parlour.type}
                     </span>
+                  )}
+                  {parlour.rating > 0 && (
+                    <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-xs px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs">
+                      <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                      <span className="text-[10px] font-bold text-brand-gray-800">
+                        {parlour.rating.toFixed(1)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-3 flex flex-col flex-1">
+                  <h3 className="font-bold text-sm text-brand-gray-900 group-hover:text-primary transition-colors line-clamp-1">
+                    {formatParlourName(parlour.name)}
+                  </h3>
+                  <p className="text-xs text-brand-gray-500 mt-1 flex items-center gap-1 line-clamp-1">
+                    <MapPin className="w-3 h-3 text-brand-gray-400 shrink-0" />
+                    {parlour.address || parlour.city || "Bangladesh"}
+                  </p>
+                  <div className="mt-auto pt-2 flex items-center justify-between text-[11px] text-brand-gray-400">
+                    <span>{parlour.total_bookings || 0} bookings</span>
+                    <span className="font-medium text-primary">Book Now</span>
                   </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            )
+          })}
         </div>
       </div>
     </section>

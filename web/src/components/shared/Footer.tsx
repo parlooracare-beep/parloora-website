@@ -59,7 +59,7 @@ export function Footer() {
   const tagline = currentLang.code === "bn" ? contactInfo.taglineBn : contactInfo.tagline
 
   return (
-    <footer className="bg-gradient-to-b from-[#1A0824] via-[#120419] to-[#0A020E] border-t border-white/10 pt-12 md:pt-20 pb-8 md:pb-12 relative overflow-hidden">
+    <footer className="bg-gradient-to-b from-[#1A0824] via-[#120419] to-[#0A020E] border-t border-white/10 pt-12 md:pt-20 pb-36 sm:pb-32 md:pb-12 pb-safe-offset-8 relative overflow-hidden">
       {/* Decorative Brand Glow Blobs */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-[#4B1D5F]/20 rounded-full blur-[120px] -ml-48 -mt-48 pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-80 h-80 bg-[#E2A9A9]/10 rounded-full blur-[100px] -mr-32 -mb-32 pointer-events-none" />
@@ -250,8 +250,8 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar: Copyright, Developer Credit & Legal */}
-        <div className="pt-6 border-t border-white/10 flex flex-col lg:flex-row items-center justify-between gap-4 lg:gap-6">
-          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 text-center sm:text-left flex-wrap">
+        <div className="pt-6 border-t border-white/10 flex flex-col lg:flex-row items-center justify-between gap-5 lg:gap-6">
+          <div className="order-2 lg:order-1 flex flex-col sm:flex-row items-center gap-2 sm:gap-3 text-center sm:text-left flex-wrap">
             <p className="text-xs text-brand-gray-400 font-medium tracking-wide">
               &copy; {currentYear} Parloora. {tagline}.
             </p>
@@ -270,7 +270,8 @@ export function Footer() {
             <span className="hidden sm:inline text-white/20">•</span>
             <LanguageSwitcher variant="dark" />
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+          {/* Legal Links - Prioritized on mobile for instant visibility & touch accessibility */}
+          <div className="order-1 lg:order-2 flex flex-wrap items-center justify-center gap-2 sm:gap-4 md:gap-6 py-1">
             {[
               { name: t("footer.privacyPolicy"), href: "/privacy" },
               { name: t("footer.termsOfService"), href: "/terms" },
@@ -280,7 +281,7 @@ export function Footer() {
               <Link 
                 key={item.href} 
                 href={item.href} 
-                className="text-[11px] font-bold uppercase tracking-wider text-brand-gray-400 hover:text-[#E2A9A9] transition-colors"
+                className="text-xs sm:text-[11px] font-bold uppercase tracking-wider text-white/80 hover:text-[#E2A9A9] transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/5 active:bg-white/10 focus:outline-none focus:ring-1 focus:ring-[#E2A9A9]"
               >
                 {item.name}
               </Link>
