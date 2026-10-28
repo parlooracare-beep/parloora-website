@@ -1,4 +1,6 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
   "installCommand": "if [ -d \"web\" ]; then (cd web && npm install); else npm install; fi",
-  "buildCommand": "if [ -d \"web\" ]; then (cd web && npm run build && cp -r .next ../.next); else npm run build; fi"
+  "buildCommand": "if [ -d \"web\" ]; then (cd web && npm run build && cp -r .next ../.next && cp -r public ../public); else npm run build; fi"
 }
