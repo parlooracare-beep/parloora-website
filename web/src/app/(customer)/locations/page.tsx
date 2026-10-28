@@ -39,6 +39,11 @@ export const metadata: Metadata = {
   ],
   alternates: {
     canonical: `${siteUrl}/locations`,
+    languages: {
+      en: `${siteUrl}/en/locations`,
+      bn: `${siteUrl}/bn/locations`,
+      "x-default": `${siteUrl}/locations`,
+    },
   },
   openGraph: {
     title: "Beauty Parlours & Salons Across Bangladesh — All 64 Districts | Parloora",
