@@ -1,13 +1,14 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { createPublicClient } from "@/lib/supabase/public"
 import { logActivity } from "./site"
 
 // ─── Public read-only actions (no auth required) ──────────────────────────────
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getPublishedBlogPosts(limit = 20): Promise<any[]> {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
   const { data, error } = await supabase
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .from("blog_posts" as any)
@@ -29,7 +30,7 @@ export async function getPublishedBlogPosts(limit = 20): Promise<any[]> {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getBlogPostBySlug(slug: string): Promise<any | null> {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
   const { data, error } = await supabase
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .from("blog_posts" as any)

@@ -133,49 +133,66 @@ export async function createBooking(bookingData: BookingInsert) {
 
   if (error) {
     console.error("Error creating booking:", error)
+    if (
+      (error as any).code === "23505" ||
+      error.message?.includes("duplicate key") ||
+      error.message?.includes("unique_parlour_slot") ||
+      error.message?.includes("unique_active_parlour_slot")
+    ) {
+      return {
+        success: false,
+        error: "This time slot was just booked by another customer. Please choose a different date or time."
+      }
+    }
     return { success: false, error: error.message }
   }
 
   if (data) {
+    const finalSellerId = data.seller_id || verifiedBookingData.seller_id
+    const finalServiceName = data.service_name || service.name
+    const finalParlourName = data.parlour_name || parlour.name
+    const finalCustomerName = data.customer_name || customerName || "Valued Customer"
+    const finalCustId = data.customer_id || verifiedBookingData.customer_id
+
     // 1. In-app notification → Seller
-    if (bookingData.seller_id) {
+    if (finalSellerId) {
       await createNotification({
-        user_id: bookingData.seller_id,
+        user_id: finalSellerId,
         title: "New Booking Request",
-        message: `You have a new booking request for ${bookingData.service_name} from ${bookingData.customer_name || 'a customer'}.`,
+        message: `You have a new booking request for ${finalServiceName} from ${finalCustomerName}.`,
         type: "booking",
         link: "/seller/bookings"
       })
     }
 
     // 2. External email + SMS → Customer (fire-and-forget)
-    if (bookingData.customer_id) {
+    if (finalCustId) {
       const supabaseFetch = await createClient()
       const { data: profile } = await supabaseFetch
         .from("users")
         .select("email, phone, email_notifications, sms_notifications")
-        .eq("id", bookingData.customer_id)
+        .eq("id", finalCustId)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .single() as any
 
       if (profile) {
         if (profile.email_notifications !== false && profile.email) {
           sendBookingConfirmation(profile.email, {
-            service_name:  bookingData.service_name,
-            parlour_name:  bookingData.parlour_name,
-            date:          bookingData.date as string | null,
-            time:          bookingData.time as string | null,
-            amount:        bookingData.amount as number | null,
-            customer_name: bookingData.customer_name,
+            service_name:  finalServiceName,
+            parlour_name:  finalParlourName,
+            date:          data.date as string | null,
+            time:          data.time as string | null,
+            amount:        data.amount as number | null,
+            customer_name: finalCustomerName,
           }).catch(console.error)
         }
         if (profile.sms_notifications !== false && profile.phone) {
           sendBookingConfirmationSMS(profile.phone, {
-            service_name:  bookingData.service_name,
-            parlour_name:  bookingData.parlour_name,
-            date:          bookingData.date as string | null,
-            time:          bookingData.time as string | null,
-            customer_name: bookingData.customer_name,
+            service_name:  finalServiceName,
+            parlour_name:  finalParlourName,
+            date:          data.date as string | null,
+            time:          data.time as string | null,
+            customer_name: finalCustomerName,
           }).catch(console.error)
         }
       }

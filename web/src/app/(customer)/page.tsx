@@ -245,26 +245,29 @@ export default async function HomePage() {
           case "recommended":
             return (
               <Fragment key="recommended">
-                <section className="py-8 bg-gradient-to-br from-[#fdf4ff] to-[#fce7f3] relative overflow-hidden">
+                <section className="py-8 bg-gradient-to-br from-[#fdf6ff] via-white to-[#fdf2f2] relative overflow-hidden">
                   <div className="container mx-auto px-4 md:px-6">
                     <div className="flex items-center justify-between mb-5">
-                      <h2 className="text-xl md:text-2xl font-bold text-brand-gray-900 tracking-tight">Recommended</h2>
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-primary" />
+                        <h2 className="text-xl md:text-2xl font-black text-brand-gray-900 tracking-tight">Recommended For You</h2>
+                      </div>
                       <div className="hidden md:flex items-center gap-1.5">
-                        <button className="w-8 h-8 rounded-full bg-white shadow-sm border flex items-center justify-center hover:bg-brand-gray-50 transition-colors">
-                          <ChevronLeft className="w-4 h-4 text-brand-gray-660" />
+                        <button aria-label="Previous recommended" className="w-8 h-8 rounded-full bg-white shadow-xs border border-[#F1EDF5] flex items-center justify-center hover:bg-brand-gray-50 transition-colors">
+                          <ChevronLeft className="w-4 h-4 text-brand-gray-600" />
                         </button>
-                        <button className="w-8 h-8 rounded-full bg-white shadow-sm border flex items-center justify-center hover:bg-brand-gray-50 transition-colors">
+                        <button aria-label="Next recommended" className="w-8 h-8 rounded-full bg-white shadow-xs border border-[#F1EDF5] flex items-center justify-center hover:bg-brand-gray-50 transition-colors">
                           <ChevronRight className="w-4 h-4 text-brand-gray-600" />
                         </button>
                       </div>
                     </div>
 
-                    <div className="flex overflow-x-auto gap-3 md:gap-4 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] -mx-4 px-4 md:mx-0 md:px-0 snap-x">
+                    <div className="flex overflow-x-auto gap-3.5 md:gap-5 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] -mx-4 px-4 md:mx-0 md:px-0 snap-x">
                       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                       {recommendedParlours.map((parlour: any, idx: number) => (
-                        <Link key={parlour.id} href={`/parlours/${parlour.id}`} className="w-[168px] md:w-[192px] shrink-0 snap-start group">
-                          <div className="flex flex-col gap-2 h-full">
-                            <div className="aspect-[4/3] rounded-xl overflow-hidden bg-brand-gray-200 relative shadow-sm">
+                        <Link key={parlour.id} href={`/parlours/${parlour.id}`} className="w-[172px] md:w-[204px] shrink-0 snap-start group">
+                          <div className="flex flex-col gap-2.5 h-full bg-white p-2 rounded-2xl border border-[#F1EDF5] shadow-xs group-hover:shadow-md group-hover:border-[#E2A9A9]/50 group-hover:-translate-y-1 transition-all duration-300">
+                            <div className="aspect-[4/3] rounded-xl overflow-hidden bg-brand-gray-200 relative shadow-xs">
                               <Image 
                                 src={`https://images.unsplash.com/photo-${RECOMMENDED_IMAGES[idx % RECOMMENDED_IMAGES.length]}?auto=format&fit=crop&w=400&q=80`} 
                                 alt={parlour.name}
@@ -273,7 +276,7 @@ export default async function HomePage() {
                               />
                               <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors" />
                             </div>
-                            <div className="px-0.5">
+                            <div className="px-1 pb-1">
                               <div className="flex items-start justify-between gap-1 mb-0.5">
                                 <h3 className="font-bold text-brand-gray-900 leading-tight text-xs md:text-sm line-clamp-1 group-hover:text-primary transition-colors">
                                   {formatParlourName(parlour.name)}
@@ -281,14 +284,13 @@ export default async function HomePage() {
                                 <div className="flex items-center gap-0.5 shrink-0">
                                   <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
                                   <span className="font-bold text-xs text-brand-gray-900">{parlour.rating || 5.0}</span>
-                                  <span className="text-[10px] text-brand-gray-500">({parlour.total_bookings || 0})</span>
                                 </div>
                               </div>
                               <p className="text-[10px] text-brand-gray-500 line-clamp-1">{parlour.address || parlour.city}</p>
-                              <div className="flex items-center justify-between mt-1">
-                                <span className="text-[9px] md:text-[10px] text-brand-gray-400 truncate max-w-[100px]">{parlour.type || "Beauty Salon"}</span>
-                                <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md">
-                                  Book
+                              <div className="flex items-center justify-between mt-2 pt-1.5 border-t border-[#F1EDF5]">
+                                <span className="text-[9px] md:text-[10px] font-medium text-brand-gray-500 truncate max-w-[100px]">{parlour.type || "Beauty Salon"}</span>
+                                <span className="text-[10px] font-black bg-gradient-to-r from-[#F3D5D5] via-[#E2A9A9] to-[#D89898] text-[#341045] px-2.5 py-0.5 rounded-lg group-hover:brightness-105 transition-all shadow-xs">
+                                  Book Now
                                 </span>
                               </div>
                             </div>
@@ -299,30 +301,34 @@ export default async function HomePage() {
                   </div>
                 </section>
 
-                <section className="py-12 md:py-20 bg-brand-gray-50">
+                <section className="py-12 md:py-20 bg-[#FBF9FC]">
                   <div className="container mx-auto px-4 md:px-6">
                     <div className="flex items-end justify-between mb-8 md:mb-12">
                       <div>
-                        <Badge className="mb-2 md:mb-4 bg-secondary/10 text-secondary border-secondary/20 hover:bg-secondary/10">Hand-picked for you</Badge>
-                        <h2 className="text-2xl md:text-4xl font-bold text-brand-gray-900">
-                          Featured Parlours
+                        <div className="inline-flex items-center gap-1.5 bg-[#4B1D5F]/8 border border-[#E2A9A9]/30 rounded-full px-3 py-1 mb-3">
+                          <Sparkles className="w-3.5 h-3.5 text-primary" />
+                          <span className="text-primary text-[11px] font-bold uppercase tracking-wider">Hand-picked for you</span>
+                        </div>
+                        <h2 className="text-2xl md:text-4xl font-black text-brand-gray-900 tracking-tight">
+                          Featured Parlours & Salons
                         </h2>
                       </div>
-                      <Link href="/parlours" className="hidden md:flex items-center gap-1 text-primary hover:text-primary/80 font-medium text-sm transition-colors">
-                        View All <ChevronRight className="w-4 h-4" />
+                      <Link href="/parlours" className="hidden md:flex items-center gap-1 text-primary hover:text-primary/80 font-bold text-sm transition-colors group">
+                        <span>View All Parlours</span>
+                        <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                       </Link>
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 md:gap-6">
                       {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                       {featuredParlours.length > 0 ? featuredParlours.map((parlour: any, idx: number) => {
                         const coverSrc = parlour.cover_url || parlour.image || parlour.logo_url || 
                           `https://images.unsplash.com/photo-${RECOMMENDED_IMAGES[idx % RECOMMENDED_IMAGES.length]}?auto=format&fit=crop&w=600&q=80`
 
                         return (
-                          <Link key={parlour.id} href={`/parlours/${parlour.id}`}>
-                            <Card className="group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden border-brand-gray-100 h-full">
-                              <div className="relative aspect-square bg-brand-gray-100 overflow-hidden">
+                          <Link key={parlour.id} href={`/parlours/${parlour.id}`} className="group h-full">
+                            <Card className="hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 overflow-hidden border-[#F1EDF5] hover:border-[#E2A9A9]/50 h-full flex flex-col rounded-2xl bg-white">
+                              <div className="relative aspect-[4/3] bg-brand-gray-100 overflow-hidden">
                                 <Image
                                   src={coverSrc}
                                   alt={parlour.name}
@@ -330,26 +336,26 @@ export default async function HomePage() {
                                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 300px"
                                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                <div className="absolute top-2 left-2">
-                                  <Badge className="bg-primary text-white border-0 text-[8px] md:text-xs px-2 py-0.5 shadow-xs font-bold">
-                                    Featured
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                <div className="absolute top-2.5 left-2.5">
+                                  <Badge className="bg-[#4B1D5F] text-white border-0 text-[9px] md:text-xs px-2.5 py-0.5 shadow-sm font-bold">
+                                    Verified
                                   </Badge>
                                 </div>
                               </div>
-                              <CardContent className="p-2.5 md:p-4 flex-1 flex flex-col">
+                              <CardContent className="p-3.5 md:p-4 flex-1 flex flex-col">
                                 <h3 className="font-bold text-brand-gray-900 group-hover:text-primary transition-colors text-sm md:text-base line-clamp-1">
                                   {formatParlourName(parlour.name)}
                                 </h3>
                                 <p className="text-[10px] md:text-xs text-brand-gray-500 mt-0.5 line-clamp-1">{parlour.type || "Parlour"} · {parlour.city}</p>
-                                <div className="mt-auto flex items-center justify-between pt-2 md:pt-3 border-t border-brand-gray-100">
+                                <div className="mt-auto flex items-center justify-between pt-2.5 md:pt-3 border-t border-[#F1EDF5]">
                                   <div className="flex items-center gap-1">
-                                    <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                                    <span className="text-xs md:text-sm font-semibold text-brand-gray-800">{parlour.rating || 5.0}</span>
+                                    <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                                    <span className="text-xs md:text-sm font-bold text-brand-gray-800">{parlour.rating || 5.0}</span>
                                     <span className="hidden xs:inline text-[9px] text-brand-gray-400 font-medium">({parlour.total_bookings || 0})</span>
                                   </div>
-                                  <span className="text-[10px] font-bold bg-primary text-white px-2.5 py-1 rounded-lg group-hover:bg-primary/90 transition-colors shadow-xs">
-                                    Book
+                                  <span className="text-[11px] font-black bg-gradient-to-r from-[#F3D5D5] via-[#E2A9A9] to-[#D89898] text-[#341045] px-3 py-1 rounded-xl group-hover:brightness-105 transition-all shadow-xs">
+                                    Book Now
                                   </span>
                                 </div>
                               </CardContent>
@@ -357,14 +363,13 @@ export default async function HomePage() {
                           </Link>
                         )
                       }) : (
-                        <p className="text-brand-gray-500">No featured parlours found.</p>
+                        <p className="text-brand-gray-500 col-span-full">No featured parlours found.</p>
                       )}
                     </div>
 
-
                     <div className="text-center mt-10 md:hidden">
                       <Link href="/parlours">
-                        <Button variant="outline" className="border-primary text-primary">
+                        <Button variant="outline" className="border-2 border-primary text-primary font-bold">
                           View All Parlours <ChevronRight className="w-4 h-4 ml-1" />
                         </Button>
                       </Link>
@@ -377,19 +382,22 @@ export default async function HomePage() {
             return <NearYouSection key="near-you" initialParlours={recommendedParlours} />
           case "categories":
             return (
-              <section key="categories" className="py-20 bg-white">
+              <section key="categories" className="py-16 md:py-24 bg-white">
                 <div className="container mx-auto px-4 md:px-6">
                   <div className="text-center mb-12">
-                    <Badge className="mb-4 bg-primary/10 text-primary border-primary/20 hover:bg-primary/10">Our Services</Badge>
-                    <h2 className="text-3xl md:text-4xl font-bold text-brand-gray-900 mb-4">
+                    <div className="inline-flex items-center gap-1.5 bg-[#4B1D5F]/8 border border-[#E2A9A9]/30 rounded-full px-3 py-1 mb-3">
+                      <Sparkles className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-primary text-[11px] font-bold uppercase tracking-wider">Top Service Categories</span>
+                    </div>
+                    <h2 className="text-3xl md:text-4xl font-black text-brand-gray-900 mb-3 tracking-tight">
                       What Are You Looking For?
                     </h2>
-                    <p className="text-brand-gray-500 max-w-lg mx-auto">
-                      From everyday grooming to special occasion glam, we have every beauty service you need.
+                    <p className="text-brand-gray-500 max-w-lg mx-auto text-sm md:text-base font-medium">
+                      From everyday grooming to luxury bridal glam, discover verified experts for every self-care treatment.
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                     {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                     {displayCategories.map((cat: any) => {
                       return (
@@ -398,9 +406,9 @@ export default async function HomePage() {
                           href={`/parlours?category=${encodeURIComponent(cat.name)}`}
                           className="group"
                         >
-                          <Card className="hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer border-brand-gray-100 h-full">
-                            <CardContent className="p-5 flex flex-col items-center text-center gap-3">
-                              <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-sm group-hover:scale-110 transition-transform duration-300 border-2 border-white group-hover:shadow-md bg-brand-gray-100 relative">
+                          <Card className="hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 cursor-pointer border-[#F1EDF5] hover:border-[#E2A9A9]/60 rounded-2xl bg-white shadow-xs h-full">
+                            <CardContent className="p-5 md:p-6 flex flex-col items-center text-center gap-3.5">
+                              <div className="w-20 h-20 rounded-2xl overflow-hidden shadow-xs group-hover:scale-105 transition-transform duration-300 border-2 border-white group-hover:border-[#E2A9A9]/40 bg-brand-gray-100 relative">
                                 <Image 
                                   src={cat.image} 
                                   alt={cat.name} 
@@ -409,8 +417,8 @@ export default async function HomePage() {
                                 />
                               </div>
                               <div>
-                                <p className="font-semibold text-brand-gray-800 text-sm">{cat.name}</p>
-                                <p className="text-xs text-brand-gray-400 mt-0.5">{cat.count}</p>
+                                <p className="font-bold text-brand-gray-900 group-hover:text-primary transition-colors text-sm md:text-base">{cat.name}</p>
+                                <p className="text-xs text-brand-gray-500 mt-0.5 font-medium">{cat.count}</p>
                               </div>
                             </CardContent>
                           </Card>
@@ -423,15 +431,18 @@ export default async function HomePage() {
             )
           case "steps":
             return (
-              <section key="steps" className="py-10 md:py-20 bg-white overflow-hidden">
+              <section key="steps" className="py-14 md:py-24 bg-[#FBF9FC] overflow-hidden">
                 <div className="container mx-auto px-4 md:px-6">
                   <div className="text-center mb-16">
-                    <Badge className="mb-4 bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-50">Simple & Fast</Badge>
-                    <h2 className="text-3xl md:text-4xl font-bold text-brand-gray-900 mb-4">
+                    <div className="inline-flex items-center gap-1.5 bg-[#4B1D5F]/8 border border-[#E2A9A9]/30 rounded-full px-3 py-1 mb-3">
+                      <Sparkles className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-primary text-[11px] font-bold uppercase tracking-wider">Fast & Effortless</span>
+                    </div>
+                    <h2 className="text-3xl md:text-4xl font-black text-brand-gray-900 mb-3 tracking-tight">
                       Book in 3 Easy Steps
                     </h2>
-                    <p className="text-brand-gray-500 max-w-md mx-auto">
-                      Getting your beauty appointment has never been easier. No calls, no waiting.
+                    <p className="text-brand-gray-500 max-w-md mx-auto text-sm md:text-base font-medium">
+                      Book your beauty and grooming appointments seamlessly in seconds.
                     </p>
                   </div>
 
@@ -440,12 +451,12 @@ export default async function HomePage() {
                     <div className="hidden md:block absolute top-14 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-violet-300 via-rose-300 to-amber-300" />
 
                     {steps.map((s) => (
-                      <div key={s.step} className="flex flex-col items-center text-center">
-                        <div className={`w-28 h-28 rounded-3xl bg-gradient-to-br ${s.color} flex items-center justify-center mb-6 shadow-xl relative z-10`}>
-                          <span className="text-4xl font-black text-white/30">{s.step}</span>
+                      <div key={s.step} className="flex flex-col items-center text-center p-4">
+                        <div className={`w-24 h-24 rounded-3xl bg-gradient-to-br ${s.color} flex items-center justify-center mb-6 shadow-xl shadow-purple-950/10 relative z-10 hover:scale-105 transition-transform`}>
+                          <span className="text-3xl font-black text-white">{s.step}</span>
                         </div>
-                        <h3 className="text-xl font-bold text-brand-gray-900 mb-3">{s.title}</h3>
-                        <p className="text-brand-gray-500 leading-relaxed text-sm">{s.description}</p>
+                        <h3 className="text-lg md:text-xl font-bold text-brand-gray-900 mb-2">{s.title}</h3>
+                        <p className="text-brand-gray-500 leading-relaxed text-sm font-medium">{s.description}</p>
                       </div>
                     ))}
                   </div>
@@ -454,36 +465,36 @@ export default async function HomePage() {
             )
           case "shop":
             return (
-              <section key="shop" className="py-10 md:py-12 bg-brand-gray-900 relative overflow-hidden">
+              <section key="shop" className="py-12 md:py-16 bg-[#180621] relative overflow-hidden">
                 {/* Decorative elements */}
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] -mr-64 -mt-64" />
-                <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-secondary/10 rounded-full blur-[80px] -ml-32 -mb-32" />
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#E2A9A9]/10 rounded-full blur-[140px] pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#4B1D5F]/30 rounded-full blur-[120px] pointer-events-none" />
                 
                 <div className="container mx-auto px-4 md:px-6 relative z-10">
                   <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                     <div className="space-y-4 text-center lg:text-left">
-                      <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-2">
-                        <ShoppingBag className="w-4 h-4 text-primary" />
-                        <span className="text-white/80 text-xs font-bold uppercase tracking-widest">New Feature</span>
+                      <div className="inline-flex items-center gap-2 bg-white/10 border border-white/15 rounded-full px-4 py-1.5 backdrop-blur-md">
+                        <ShoppingBag className="w-4 h-4 text-[#E2A9A9]" />
+                        <span className="text-[#E2A9A9] text-xs font-bold uppercase tracking-widest">Parloora Marketplace</span>
                       </div>
                       
                       <h2 className="text-2xl md:text-3xl lg:text-4xl font-black text-white leading-tight">
                         {content.shop_title || defaultContent.shop_title}
                       </h2>
                       
-                      <p className="text-brand-gray-400 text-sm max-w-md mx-auto lg:mx-0 leading-relaxed">
+                      <p className="text-white/70 text-sm md:text-base max-w-md mx-auto lg:mx-0 leading-relaxed font-medium">
                         {content.shop_subtitle || defaultContent.shop_subtitle}
                       </p>
                       
-                      <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
+                      <div className="flex flex-col sm:flex-row items-center gap-3.5 pt-2">
                         <Link href="/shop" className="w-full sm:w-auto">
-                          <Button size="sm" className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white rounded-xl h-10 px-6 text-sm font-black shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95">
-                            Visit Shop <ChevronRight className="w-4 h-4 ml-2" />
+                          <Button size="default" variant="rosegold" className="w-full sm:w-auto rounded-xl px-7 font-black shadow-xl shadow-[#E2A9A9]/30 transition-all hover:scale-105 active:scale-95">
+                            Visit Shop <ChevronRight className="w-4 h-4 ml-1.5" />
                           </Button>
                         </Link>
-                        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white/90 text-xs font-semibold">
+                        <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-white/90 text-xs font-semibold">
                           <Shield className="w-4 h-4 text-emerald-400 shrink-0" />
-                          <span>100% Verified Quality & Direct Delivery</span>
+                          <span>100% Genuine Products & Direct Delivery</span>
                         </div>
                       </div>
                     </div>

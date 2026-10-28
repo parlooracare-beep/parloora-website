@@ -86,6 +86,28 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(redirectUrl)
   }
 
+  // Seller routes that are public marketing/registration pages
+  const PUBLIC_SELLER_ROUTES = ['/seller/register', '/seller/pricing', '/seller/resources']
+
+  // Allow public seller marketing and onboarding routes without role restriction
+  const isPublicSeller = PUBLIC_SELLER_ROUTES.some((route) =>
+    pathname === route || pathname.startsWith(route + '/')
+  )
+  if (isPublicSeller) {
+    return response
+  }
+
+  // Allow /seller/pending for any authenticated user checking their application status
+  if (pathname === '/seller/pending' || pathname.startsWith('/seller/pending/')) {
+    if (!user) {
+      const loginUrl = request.nextUrl.clone()
+      loginUrl.pathname = '/login'
+      loginUrl.searchParams.set('redirectedFrom', pathname)
+      return NextResponse.redirect(loginUrl)
+    }
+    return response
+  }
+
   // ── 2. PROTECTED ROUTES: Validate role from JWT app_metadata ────────────
   const matchedRoute = PROTECTED_ROUTES.find(({ prefix }) =>
     pathname.startsWith(prefix)

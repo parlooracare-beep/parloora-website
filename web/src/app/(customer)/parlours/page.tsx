@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Search, SlidersHorizontal, Star, MapPin, Clock, ChevronDown, X, ChevronLeft, ChevronRight } from "lucide-react"
+import { Search, SlidersHorizontal, Star, MapPin, Clock, ChevronDown, X, ChevronLeft, ChevronRight, Sparkles } from "lucide-react"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -164,42 +164,55 @@ export default function ParloursPage() {
   return (
     <div className="min-h-screen bg-brand-gray-50">
       {/* Page Header */}
-      <div className="bg-gradient-to-br from-[#2D0072] via-[#4A148C] to-[#880E4F] pt-16 pb-24 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle, #fff 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+      <div className="bg-gradient-to-br from-[#1C0825] via-[#4B1D5F] to-[#2E0F3E] pt-20 pb-24 relative overflow-hidden">
+        {/* Ambient luxury glows */}
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#E2A9A9]/15 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-[#C8A2D6]/10 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: "radial-gradient(circle, #E2A9A9 1px, transparent 1px)", backgroundSize: "32px 32px" }} />
+        
         <div className="container mx-auto px-4 md:px-6 relative z-10 text-center">
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-3">Find a Parlour</h1>
-          <p className="text-white/60 text-sm sm:text-lg mb-6 sm:mb-8 max-w-lg mx-auto">
-            Browse hundreds of verified beauty parlours across Bangladesh
+          <div className="inline-flex items-center gap-2 bg-white/10 border border-[#E2A9A9]/30 rounded-full px-4 py-1.5 mb-4 backdrop-blur-xl">
+            <Sparkles className="w-4 h-4 text-[#E2A9A9]" />
+            <span className="text-[#E2A9A9] text-xs font-bold uppercase tracking-widest">
+              Verified Salons & Parlours
+            </span>
+          </div>
+
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-3 tracking-tight">
+            Find Your Perfect Parlour
+          </h1>
+          <p className="text-white/80 text-sm sm:text-base mb-6 sm:mb-8 max-w-lg mx-auto font-medium">
+            Browse hundreds of verified beauty parlours, salons, and spas across Bangladesh
           </p>
           {/* Search */}
-          <div className="flex gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-1.5 max-w-2xl mx-auto">
-            <div className="flex items-center gap-2 flex-1 px-2 sm:px-4">
-              <Search className="w-4 h-4 sm:w-5 sm:h-5 text-white/50 shrink-0" />
+          <div className="flex gap-2 bg-white/15 backdrop-blur-2xl border border-white/25 rounded-2xl p-1.5 max-w-2xl mx-auto shadow-2xl shadow-purple-950/40">
+            <div className="flex items-center gap-2 flex-1 px-3 sm:px-4">
+              <Search className="w-4 h-4 sm:w-5 sm:h-5 text-[#E2A9A9] shrink-0" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-                placeholder={isSemantic ? "Describe what you want..." : "Search by name or type..."}
-                className="bg-transparent text-white placeholder:text-white/40 outline-none w-full text-xs sm:text-sm"
+                placeholder={isSemantic ? "Describe what you want (e.g. bridal glow, haircut)..." : "Search by parlour name or service type..."}
+                className="bg-transparent text-white placeholder:text-white/60 outline-none w-full text-xs sm:text-sm font-medium"
               />
               {search && (
-                <button onClick={() => { setSearch(""); setCurrentPage(1); }} className="text-white/50 hover:text-white shrink-0">
-                  <X className="w-3.5 h-3.5" />
+                <button onClick={() => { setSearch(""); setCurrentPage(1); }} className="text-white/60 hover:text-white shrink-0">
+                  <X className="w-4 h-4" />
                 </button>
               )}
             </div>
-            <Button className="bg-white text-primary hover:bg-white/90 rounded-xl px-4 sm:px-6 shrink-0 font-semibold text-xs sm:text-sm h-9 sm:h-10">
+            <Button variant="rosegold" size="sm" className="rounded-xl px-5 sm:px-6 shrink-0 font-black text-xs sm:text-sm h-10 shadow-lg shadow-[#E2A9A9]/30">
               Search
             </Button>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mt-4 sm:mt-5">
-            <span className="hidden xs:inline text-[10px] sm:text-xs text-white/50 font-bold uppercase tracking-wider">Search mode:</span>
+            <span className="hidden xs:inline text-[10px] sm:text-xs text-white/70 font-bold uppercase tracking-wider">Search mode:</span>
             <button
               onClick={() => { setIsSemantic(false); setCurrentPage(1); }}
               className={cn(
-                "px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-black transition-all uppercase tracking-wider",
+                "px-3.5 sm:px-4 py-1.5 rounded-xl text-[10px] sm:text-xs font-black transition-all uppercase tracking-wider",
                 !isSemantic 
-                  ? "bg-white text-brand-gray-900 shadow-xl" 
+                  ? "bg-white text-brand-gray-900 shadow-md" 
                   : "bg-white/10 text-white/80 hover:bg-white/20"
               )}
             >
@@ -208,9 +221,9 @@ export default function ParloursPage() {
             <button
               onClick={() => { setIsSemantic(true); setCurrentPage(1); }}
               className={cn(
-                "px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-black transition-all flex items-center gap-1.5 border border-white/10 uppercase tracking-wider",
+                "px-3.5 sm:px-4 py-1.5 rounded-xl text-[10px] sm:text-xs font-black transition-all flex items-center gap-1.5 uppercase tracking-wider",
                 isSemantic 
-                  ? "bg-gradient-to-r from-primary to-secondary text-white shadow-xl shadow-primary/30 ring-2 ring-white/20" 
+                  ? "bg-gradient-to-r from-[#F3D5D5] via-[#E2A9A9] to-[#D89898] text-[#341045] font-black shadow-md shadow-[#E2A9A9]/30" 
                   : "bg-white/10 text-white/80 hover:bg-white/20"
               )}
             >

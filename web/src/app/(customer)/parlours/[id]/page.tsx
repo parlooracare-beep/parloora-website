@@ -1079,13 +1079,13 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                 <motion.div 
                   initial={{ width: 0 }}
                   animate={{ width: bookingSuccess ? "100%" : `${(bookingStep / 3) * 100}%` }}
-                  className="h-full bg-primary"
+                  className="h-full bg-gradient-to-r from-[#4B1D5F] via-[#7B2E9F] to-[#E2A9A9] transition-all duration-300"
                 />
               </div>
 
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-brand-gray-900 leading-tight">
+                  <h3 className="text-xl font-black text-brand-gray-900 leading-tight">
                     {bookingSuccess ? "Booking Confirmed! 🎉" : `Book: ${selectedService?.name}`}
                   </h3>
                   {!bookingSuccess && (
@@ -1095,19 +1095,20 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                       </span>
                       <p className="text-xs text-brand-gray-500 font-medium">
                         {bookingStep === 1 
-                          ? "Choose your preferred date" 
+                          ? "Step 1 of 3: Choose your preferred date & specialist" 
                           : bookingStep === 2 
-                          ? "Select an available time slot" 
-                          : "Choose payment method"}
+                          ? "Step 2 of 3: Select an available time slot" 
+                          : "Step 3 of 3: Review details & confirm payment"}
                       </p>
                     </div>
                   )}
                 </div>
                 <button 
                   onClick={() => setShowBooking(false)} 
-                  className="p-2 hover:bg-brand-gray-100 rounded-full transition-all hover:rotate-90 duration-300"
+                  aria-label="Close booking modal"
+                  className="w-9 h-9 rounded-full flex items-center justify-center bg-brand-gray-100 hover:bg-brand-gray-200 text-brand-gray-700 transition-all hover:rotate-90 duration-300"
                 >
-                  <X className="w-5 h-5 text-brand-gray-500" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -1656,7 +1657,8 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
               <div className="p-6 border-t bg-white flex gap-4">
                 {bookingStep === 1 ? (
                   <Button
-                    className="flex-1 h-14 bg-brand-gray-900 hover:bg-brand-gray-800 text-white rounded-2xl font-bold text-lg shadow-xl shadow-brand-gray-100 disabled:opacity-50 transition-all active:scale-95"
+                    variant="default"
+                    className="flex-1 h-13 rounded-2xl font-black text-base shadow-lg shadow-[#4B1D5F]/25 disabled:opacity-50 transition-all active:scale-[0.98]"
                     disabled={!selectedDate}
                     onClick={() => setBookingStep(2)}
                   >
@@ -1664,15 +1666,16 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
                   </Button>
                 ) : bookingStep === 2 ? (
                   <div className="flex gap-3 w-full">
-                    <Button variant="outline" onClick={() => setBookingStep(1)} className="w-20 h-14 rounded-2xl border-brand-gray-200">
+                    <Button variant="outline" onClick={() => setBookingStep(1)} className="w-20 h-13 rounded-2xl border-brand-purple/20 text-brand-purple hover:bg-brand-purple/5">
                       <ChevronLeft className="w-5 h-5" />
                     </Button>
                     <Button
-                      className="flex-1 h-14 bg-brand-gray-900 hover:bg-brand-gray-800 text-white rounded-2xl font-bold text-lg shadow-xl shadow-brand-gray-100 disabled:opacity-50 transition-all active:scale-95"
+                      variant="default"
+                      className="flex-1 h-13 rounded-2xl font-black text-base shadow-lg shadow-[#4B1D5F]/25 disabled:opacity-50 transition-all active:scale-[0.98]"
                       disabled={!selectedTime || loadingSlots}
                       onClick={() => setBookingStep(3)}
                     >
-                      Select Payment <ChevronRight className="w-5 h-5 ml-2" />
+                      Continue to Payment <ChevronRight className="w-5 h-5 ml-2" />
                     </Button>
                   </div>
                 ) : (

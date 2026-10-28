@@ -13,9 +13,14 @@ WHERE status != 'cancelled'
 GROUP BY parlour_id, date, time
 HAVING count(*) > 1;
 
--- 2. Apply unique slot constraint on bookings table
--- Note: This matches the current 1-to-1 slot reservation design where a booked slot is disabled.
--- If you transition to a staff-allocated model in the future, update this constraint to (parlour_id, staff_id, date, time).
-ALTER TABLE public.bookings 
-ADD CONSTRAINT unique_parlour_slot 
-UNIQUE (parlour_id, date, time);
+-- 2. Apply unique slot index on bookings table
+-- Note: A partial unique index ensures only ACTIVE bookings block a slot.
+-- If a previous booking was cancelled or rejected, customers can re-book that slot.
+DROP INDEX IF EXISTS unique_active_parlour_slot;
+CREATE UNIQUE INDEX IF NOT EXISTS unique_active_parlour_slot 
+ON public.bookings (parlour_id, date, time) 
+WHERE status NOT IN ('cancelled', 'rejected');
+
+-- Optional strict constraint (if not using partial index):
+-- ALTER TABLE public.bookings ADD CONSTRAINT unique_parlour_slot UNIQUE (parlour_id, date, time);
+
