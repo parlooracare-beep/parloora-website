@@ -249,12 +249,25 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Bottom Bar: Copyright & Legal */}
-        <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
-          <div className="flex items-center gap-4">
-            <p className="text-xs text-brand-gray-400 font-bold uppercase tracking-widest text-center md:text-left">
+        {/* Bottom Bar: Copyright, Developer Credit & Legal */}
+        <div className="pt-6 border-t border-white/10 flex flex-col lg:flex-row items-center justify-between gap-4 lg:gap-6">
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 text-center sm:text-left flex-wrap">
+            <p className="text-xs text-brand-gray-400 font-medium tracking-wide">
               &copy; {currentYear} Parloora. {tagline}.
             </p>
+            <span className="hidden sm:inline text-white/20">•</span>
+            <p className="text-xs text-brand-gray-300 font-medium">
+              Software Developed By{" "}
+              <a
+                href="https://amdadsgroup.netlify.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#E2A9A9] hover:text-white font-semibold transition-colors underline underline-offset-4 decoration-[#E2A9A9]/50 hover:decoration-white"
+              >
+                Amdads Group
+              </a>
+            </p>
+            <span className="hidden sm:inline text-white/20">•</span>
             <LanguageSwitcher variant="dark" />
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">

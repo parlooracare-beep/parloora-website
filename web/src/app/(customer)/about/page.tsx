@@ -310,7 +310,14 @@ export default function AboutPage() {
                 <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2 text-xs text-[#2B2B2B]/70 font-semibold">
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-[#E0AFA0]/40 shadow-xs">
                     <Building className="w-3.5 h-3.5 text-[#5A189A]" />
-                    A Concern of Amdads Group
+                    <a
+                      href="https://amdadsgroup.netlify.app/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-[#5A189A] transition-colors"
+                    >
+                      A Concern of Amdads Group
+                    </a>
                   </span>
                   <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-[#E0AFA0]/40 shadow-xs">
                     <MapPin className="w-3.5 h-3.5 text-[#5A189A]" />

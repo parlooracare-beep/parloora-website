@@ -2,7 +2,7 @@
 
 Parloora is a Bangladesh-based beauty and self-care marketplace and a concern of Amdads Group. It connects customers with beauty parlours, salons, spas, and independent beauty professionals through a modern, mobile-first web application.
 
-- **Tagline**: Book Your self care services in seconds.
+- **Tagline**: Book Your Self Care Services In Seconds
 - **Website**: [https://parloora.com](https://parloora.com)
 - **Initial Target Market**: Moulvibazar, Bangladesh
 
