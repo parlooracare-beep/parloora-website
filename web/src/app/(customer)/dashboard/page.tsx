@@ -180,10 +180,10 @@ export default function CustomerDashboard() {
               </div>
 
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="rounded-xl border-brand-gray-200 text-xs h-9" asChild>
+                <Button variant="outline" size="sm" className="rounded-xl border-[#4B1D5F]/20 text-[#4B1D5F] hover:bg-[#4B1D5F]/5 text-xs h-9 font-semibold" asChild>
                   <Link href="/profile"><Settings className="w-3.5 h-3.5 mr-1" />Settings</Link>
                 </Button>
-                <Button size="sm" className="bg-brand-gray-900 hover:bg-brand-gray-800 text-white rounded-xl text-xs h-9" asChild>
+                <Button variant="default" size="sm" className="rounded-xl text-xs h-9 font-bold shadow-md shadow-[#4B1D5F]/20" asChild>
                   <Link href="/profile">Edit Profile</Link>
                 </Button>
               </div>
