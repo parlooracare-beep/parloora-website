@@ -91,7 +91,7 @@ export default function MyBookingsPage() {
               Your scheduled appointments will appear here. Ready to pamper yourself?
             </p>
             <Link href="/parlours">
-              <Button size="lg" className="bg-primary hover:bg-primary/90 rounded-2xl px-8 h-14 font-semibold">
+              <Button size="lg" variant="rosegold" className="rounded-2xl px-8 h-13 font-black shadow-lg shadow-[#E2A9A9]/30">
                 Find a Parlour <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
@@ -164,11 +164,11 @@ export default function MyBookingsPage() {
                       {/* Right: Actions */}
                       <div className="bg-brand-gray-50 p-6 flex flex-row md:flex-col items-center justify-center gap-3 border-t md:border-t-0 md:border-l border-brand-gray-100 min-w-[180px]">
                         <Link href={`/parlours/${booking.parlour_id}`} className="w-full">
-                          <Button variant="outline" className="w-full rounded-xl bg-white border-brand-gray-200">
+                          <Button variant="outline" className="w-full rounded-xl bg-white border-[#4B1D5F]/20 text-[#4B1D5F] hover:bg-[#4B1D5F]/5 font-semibold">
                             View Parlour
                           </Button>
                         </Link>
-                        <Button className="w-full rounded-xl bg-brand-gray-900 hover:bg-brand-gray-800 text-white font-semibold">
+                        <Button variant="default" className="w-full rounded-xl text-white font-bold shadow-sm shadow-[#4B1D5F]/20">
                           Get Support
                         </Button>
                         {(booking.status === 'pending' || booking.status === 'confirmed') && (
