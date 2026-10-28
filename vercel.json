@@ -1,5 +1,4 @@
 {
-  "installCommand": "cd web && npm install",
-  "buildCommand": "cd web && npm run build",
-  "outputDirectory": "web/.next"
+  "installCommand": "if [ -d \"web\" ]; then (cd web && npm install); else npm install; fi",
+  "buildCommand": "if [ -d \"web\" ]; then (cd web && npm run build && cp -r .next ../.next); else npm run build; fi"
 }
