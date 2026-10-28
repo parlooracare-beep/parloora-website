@@ -16,7 +16,7 @@ import type { Locale } from "@/lib/i18n"
 
 interface LanguageSwitcherProps {
   className?: string
-  variant?: "default" | "minimal" | "dark"
+  variant?: "default" | "minimal" | "dark" | "light"
 }
 
 export function LanguageSwitcher({ className, variant = "default" }: LanguageSwitcherProps) {

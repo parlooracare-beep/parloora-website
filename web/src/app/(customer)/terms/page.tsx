@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Scale, ShieldCheck, AlertCircle, HelpCircle, FileText, Globe } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 
@@ -57,11 +58,11 @@ export default function TermsPage() {
 
               <div className="mt-16 p-8 bg-brand-gray-900 rounded-3xl text-center text-white relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-2xl -mr-16 -mt-16" />
-                <h3 className="text-xl font-bold mb-2 relative z-10">Need legal assistance?</h3>
-                <p className="text-brand-gray-400 mb-6 text-sm relative z-10">Our legal team is available for any clarifications regarding our global terms.</p>
-                <button className="bg-white text-brand-gray-900 px-8 py-3 rounded-xl font-bold hover:bg-brand-gray-100 transition-all relative z-10">
-                  Email Legal Team
-                </button>
+                <h3 className="text-xl font-bold mb-2 relative z-10">Need assistance?</h3>
+                <p className="text-brand-gray-400 mb-6 text-sm relative z-10">Our support team is available for any clarifications regarding our terms and service policies.</p>
+                <Link href="/contact" className="inline-block bg-white text-brand-gray-900 px-8 py-3 rounded-xl font-bold hover:bg-brand-gray-100 transition-all relative z-10">
+                  Contact Support Team
+                </Link>
               </div>
             </CardContent>
           </Card>

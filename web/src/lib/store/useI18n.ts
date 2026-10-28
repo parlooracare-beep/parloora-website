@@ -20,7 +20,7 @@ interface I18nStore {
   currentLang: LanguageConfig
   locale: Locale
   setLanguage: (code: Locale) => void
-  t: (key: string, params?: Record<string, string | number>) => string
+  t: (key: string, paramsOrFallback?: Record<string, string | number> | string, fallbackText?: string) => string
   formatCurrency: (amount: number | string, currency?: string) => string
   formatDate: (date: string | Date, options?: Intl.DateTimeFormatOptions) => string
   formatTime: (timeStr: string) => string
@@ -65,9 +65,9 @@ export const useI18n = create<I18nStore>()(
         }
       },
 
-      t: (key, params) => {
+      t: (key, paramsOrFallback, fallbackText) => {
         const langCode = get().currentLang.code || DEFAULT_LOCALE
-        return translate(langCode, key, params)
+        return translate(langCode, key, paramsOrFallback, fallbackText)
       },
 
       formatCurrency: (amount, currency = "BDT") => {

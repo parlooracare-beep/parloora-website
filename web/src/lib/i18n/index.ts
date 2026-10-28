@@ -99,8 +99,12 @@ function resolveKey(obj: any, path: string): string | undefined {
 export function translate(
   locale: Locale,
   key: string,
-  params?: Record<string, string | number>
+  paramsOrFallback?: Record<string, string | number> | string,
+  fallbackText?: string
 ): string {
+  const params = typeof paramsOrFallback === "object" && paramsOrFallback !== null ? paramsOrFallback : undefined
+  const defaultFallback = typeof paramsOrFallback === "string" ? paramsOrFallback : fallbackText
+
   // 1. Try dot-path in target locale
   let result = resolveKey(dictionaries[locale], key)
 
@@ -114,9 +118,9 @@ export function translate(
     result = legacyKeyMap[key][locale] || legacyKeyMap[key].en
   }
 
-  // 4. Ultimate fallback to the key itself
+  // 4. Fallback to provided default text, or key itself
   if (!result) {
-    result = key
+    result = defaultFallback || key
   }
 
   // 5. Interpolate {param} variables

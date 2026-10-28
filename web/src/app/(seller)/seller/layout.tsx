@@ -17,17 +17,19 @@ import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 import { SellerMobileNav } from "@/components/seller/SellerMobileNav"
 import { NotificationBell } from "@/components/shared/NotificationBell"
+import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher"
+import { useI18n } from "@/lib/store/useI18n"
 
 const NAV_ITEMS = [
-  { label: "Dashboard", href: "/seller/dashboard", icon: LayoutDashboard },
-  { label: "Bookings", href: "/seller/bookings", icon: Calendar },
-  { label: "Orders", href: "/seller/orders", icon: Package },
-  { label: "Services", href: "/seller/services", icon: Scissors },
-  { label: "Staff", href: "/seller/staff", icon: Users },
-  { label: "Products", href: "/seller/products", icon: ShoppingBag },
-  { label: "Analytics", href: "/seller/analytics", icon: BarChart2 },
-  { label: "Payouts", href: "/seller/payouts", icon: Wallet },
-  { label: "Settings", href: "/seller/settings", icon: Settings },
+  { key: "dashboard", label: "Dashboard", href: "/seller/dashboard", icon: LayoutDashboard },
+  { key: "bookings", label: "Bookings", href: "/seller/bookings", icon: Calendar },
+  { key: "orders", label: "Orders", href: "/seller/orders", icon: Package },
+  { key: "services", label: "Services", href: "/seller/services", icon: Scissors },
+  { key: "staff", label: "Staff", href: "/seller/staff", icon: Users },
+  { key: "products", label: "Products", href: "/seller/products", icon: ShoppingBag },
+  { key: "analytics", label: "Analytics", href: "/seller/analytics", icon: BarChart2 },
+  { key: "payouts", label: "Payouts", href: "/seller/payouts", icon: Wallet },
+  { key: "settings", label: "Settings", href: "/seller/settings", icon: Settings },
 ]
 
 interface SidebarContentProps {
@@ -37,6 +39,8 @@ interface SidebarContentProps {
 }
 
 function SidebarContent({ pathname, onClose, onLogout }: SidebarContentProps) {
+  const { t } = useI18n()
+
   return (
     <div className="flex flex-col h-full">
       {/* Logo */}
@@ -45,15 +49,16 @@ function SidebarContent({ pathname, onClose, onLogout }: SidebarContentProps) {
           size="md"
           variant="light"
           href="/seller/dashboard"
-          subtext="Seller Portal"
+          subtext={t("seller.portalTitle", "Seller Portal")}
           subtextClassName="text-white/60 text-[10px] leading-none mt-0.5"
         />
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
-        {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
+        {NAV_ITEMS.map(({ key, label, href, icon: Icon }) => {
           const active = pathname === href || pathname.startsWith(href + "/")
+          const translatedLabel = t(`seller.${key}`, label)
           return (
             <Link
               key={href}
@@ -67,7 +72,7 @@ function SidebarContent({ pathname, onClose, onLogout }: SidebarContentProps) {
               )}
             >
               <Icon className="w-4.5 h-4.5 shrink-0" strokeWidth={active ? 2.5 : 2} />
-              {label}
+              {translatedLabel}
               {active && <span className="ml-auto w-2 h-2 bg-[#E2A9A9] rounded-full shadow-[0_0_10px_#E2A9A9]" />}
             </Link>
           )
@@ -78,10 +83,10 @@ function SidebarContent({ pathname, onClose, onLogout }: SidebarContentProps) {
       <div className="px-3 py-4 border-t border-white/10">
         <button
           onClick={onLogout}
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white/50 hover:bg-white/10 hover:text-white transition-all w-full"
+          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white/50 hover:bg-white/10 hover:text-white transition-all w-full cursor-pointer"
         >
           <LogOut className="w-4 h-4" />
-          Sign Out
+          {t("seller.signOut", "Sign Out")}
         </button>
       </div>
     </div>
@@ -89,6 +94,7 @@ function SidebarContent({ pathname, onClose, onLogout }: SidebarContentProps) {
 }
 
 export default function SellerLayout({ children }: { children: React.ReactNode }) {
+  const { t } = useI18n()
   const pathname = usePathname()
   const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = React.useState(false)
@@ -228,11 +234,17 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
             </button>
             {/* Page title derived from path */}
             <h1 className="text-brand-gray-900 font-semibold capitalize text-sm md:text-base">
-              {NAV_ITEMS.find(n => pathname.startsWith(n.href))?.label ?? "Seller Portal"}
+              {(() => {
+                const currentNav = NAV_ITEMS.find(n => pathname.startsWith(n.href))
+                return currentNav ? t(`seller.${currentNav.key}`, currentNav.label) : t("seller.portalTitle", "Seller Portal")
+              })()}
             </h1>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            {/* Language Switcher */}
+            <LanguageSwitcher variant="light" />
+
             {/* Notifications */}
             <NotificationBell />
 
@@ -241,7 +253,9 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xs font-bold">
                 S
               </div>
-              <span className="hidden sm:block text-sm font-medium text-brand-gray-700">Seller</span>
+              <span className="hidden sm:block text-sm font-medium text-brand-gray-700">
+                {t("customer.roleSeller", "Seller")}
+              </span>
               <ChevronDown className="w-3.5 h-3.5 text-brand-gray-400" />
             </div>
           </div>

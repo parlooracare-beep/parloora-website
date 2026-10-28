@@ -1,5 +1,7 @@
 import * as React from "react"
+import Link from "next/link"
 import { Cookie, ShieldCheck, Eye, ExternalLink } from "lucide-react"
+import { contactInfo } from "@/config/contact"
 
 export default function CookiePolicy() {
   return (
@@ -67,10 +69,14 @@ export default function CookiePolicy() {
             <div className="bg-primary/5 p-8 rounded-[2rem] border border-primary/10">
               <h3 className="text-xl font-bold text-primary mb-2">Questions?</h3>
               <p className="text-brand-gray-600">
-                If you have any questions about our use of cookies or other technologies, please email us at{" "}
-                <a href="mailto:privacy@parloora.com" className="text-primary font-bold hover:underline">
-                  privacy@parloora.com
-                </a>
+                If you have any questions about our use of cookies or other technologies, please contact our support team via our{" "}
+                <Link href="/contact" className="text-primary font-bold hover:underline">
+                  Contact Us
+                </Link>{" "}
+                page or reach Customer Care & WhatsApp directly at{" "}
+                <a href={contactInfo.whatsappUrl} target="_blank" rel="noopener noreferrer" className="text-primary font-bold hover:underline">
+                  {contactInfo.customerCare}
+                </a>.
               </p>
             </div>
           </div>

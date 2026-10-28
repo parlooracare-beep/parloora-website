@@ -213,8 +213,8 @@ export default function ParlourDetailPage({ params }: { params: Promise<{ id: st
   const businessCategoryLabel = React.useMemo(() => {
     if (!parlour?.type) return "Beauty Parlour"
     const lower = parlour.type.toLowerCase().trim()
-    if (lower === "man" || lower === "men" || lower.includes("men's") || lower.includes("mens")) return "Men's Salon"
-    if (lower === "woman" || lower === "women" || lower.includes("women's") || lower.includes("womens")) return "Women's Salon"
+    if (lower.includes("woman") || lower.includes("women")) return "Women's Salon"
+    if (lower.includes("man") || lower.includes("men")) return "Men's Salon"
     if (lower.includes("spa")) return "Spa & Wellness"
     if (lower.includes("makeup")) return "Makeup Studio"
     if (lower.includes("unisex")) return "Unisex Salon"

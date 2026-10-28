@@ -2,15 +2,15 @@
 
 import * as React from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { ParlooraLogo } from "@/components/shared/Logo"
 import { useRouter, useSearchParams } from "next/navigation"
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Sparkles, Mail, Lock, Eye, EyeOff, Loader2, ArrowLeft, ShieldCheck, ShoppingBag, Calendar } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { createClient } from "@/lib/supabase/client"
 import { signInAction } from "@/lib/actions/auth"
+import { useI18n } from "@/lib/store/useI18n"
+import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher"
 
 export default function LoginPage() {
   return (
@@ -22,6 +22,7 @@ export default function LoginPage() {
 
 function LoginForm() {
   const router = useRouter()
+  const { t } = useI18n()
   const searchParams = useSearchParams()
   const redirectTarget = searchParams.get("redirectedFrom") || searchParams.get("redirect")
 
@@ -42,7 +43,7 @@ function LoginForm() {
       const result = await signInAction({ email, password })
 
       if (!result.success) {
-        setError(result.error || "An unexpected error occurred")
+        setError(result.error || t("auth.loginError"))
         setLoading(false)
         return
       }
@@ -61,12 +62,10 @@ function LoginForm() {
       router.refresh()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      setError(err.message || "Failed to connect to the server")
+      setError(err.message || t("common.somethingWentWrong"))
       setLoading(false)
     }
   }
-
-
 
   return (
     <div className="min-h-screen flex">
@@ -84,14 +83,14 @@ function LoginForm() {
             <ParlooraLogo size="xl" href="/" />
           </div>
           <h2 className="text-4xl font-bold text-brand-gray-900 mb-4 leading-tight">
-            Welcome Back, Beautiful!
+            {t("auth.welcomeBack")}
           </h2>
           <p className="text-brand-gray-500 text-lg leading-relaxed">
-            Log in to access your bookings, manage your appointments, and discover new parlours near you.
+            {t("auth.welcomeBackSub")}
           </p>
           <div className="mt-12 grid grid-cols-3 gap-6 text-center border-t border-brand-gray-200 pt-8">
             <div>
-              <p className="text-2xl font-bold text-primary">Verified</p>
+              <p className="text-2xl font-bold text-primary">{t("common.verified")}</p>
               <p className="text-brand-gray-400 text-xs mt-1">Top Parlours</p>
             </div>
             <div>
@@ -108,16 +107,17 @@ function LoginForm() {
 
       {/* Right Panel — Form */}
       <div className="flex-1 flex flex-col items-center justify-center p-8 relative">
-        {/* Back Button */}
-        <div className="absolute top-6 left-6 lg:top-8 lg:left-8 z-10">
+        {/* Top Controls: Back Button & Language Switcher */}
+        <div className="absolute top-6 left-6 right-6 lg:top-8 lg:left-8 lg:right-8 z-10 flex items-center justify-between">
           <Button asChild variant="ghost" className="h-auto p-1.5 pr-4 rounded-full border border-brand-gray-200 bg-white hover:bg-brand-gray-50 transition-all group shadow-sm">
             <Link href="/">
               <div className="w-8 h-8 rounded-full bg-brand-gray-50 group-hover:bg-white flex items-center justify-center transition-colors">
                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
               </div>
-              <span className="text-sm font-semibold text-brand-gray-500 group-hover:text-brand-gray-900 transition-colors">Back</span>
+              <span className="text-sm font-semibold text-brand-gray-500 group-hover:text-brand-gray-900 transition-colors">{t("common.back")}</span>
             </Link>
           </Button>
+          <LanguageSwitcher />
         </div>
 
         {/* Mobile Logo */}
@@ -149,19 +149,17 @@ function LoginForm() {
                 </div>
               </div>
             )}
-            <h1 className="text-3xl font-bold text-brand-gray-900 mb-2">Sign in to your account</h1>
+            <h1 className="text-3xl font-bold text-brand-gray-900 mb-2">{t("auth.signInTitle")}</h1>
             <p className="text-brand-gray-500">
-              Don&apos;t have an account?{" "}
+              {t("auth.dontHaveAccount")}{" "}
               <Link 
                 href={redirectTarget ? `/signup?redirectedFrom=${encodeURIComponent(redirectTarget)}` : "/signup"} 
                 className="text-primary font-medium hover:underline"
               >
-                Sign up for free
+                {t("auth.signUpFree")}
               </Link>
             </p>
           </div>
-
-
 
           {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-5">
@@ -172,13 +170,13 @@ function LoginForm() {
             )}
 
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-brand-gray-700">Email address</label>
+              <label htmlFor="email" className="text-sm font-medium text-brand-gray-700">{t("auth.emailLabel")}</label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-gray-400" />
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder={t("auth.emailPlaceholder")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 h-12 border-brand-gray-200 focus:border-primary focus:ring-primary rounded-xl transition-all duration-200 hover:border-brand-gray-300 shadow-sm"
@@ -189,9 +187,9 @@ function LoginForm() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label htmlFor="password" className="text-sm font-medium text-brand-gray-700">Password</label>
+                <label htmlFor="password" className="text-sm font-medium text-brand-gray-700">{t("auth.passwordLabel")}</label>
                 <Link href="/forgot-password" className="text-xs text-primary hover:underline">
-                  Forgot password?
+                  {t("auth.forgotPassword")}
                 </Link>
               </div>
               <div className="relative">
@@ -199,7 +197,7 @@ function LoginForm() {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
+                  placeholder={t("auth.passwordPlaceholder")}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10 pr-10 h-12 border-brand-gray-200 focus:border-primary focus:ring-primary rounded-xl transition-all duration-200 hover:border-brand-gray-300 shadow-sm"
@@ -221,17 +219,17 @@ function LoginForm() {
               disabled={loading}
             >
               {loading ? (
-                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Setting up session...</>
+                <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t("auth.settingUpSession")}</>
               ) : (
-                "Sign in"
+                t("auth.signIn")
               )}
             </Button>
           </form>
 
           <p className="text-center text-xs text-brand-gray-400 mt-8">
-            By continuing, you agree to Parloora&apos;s{" "}
-            <Link href="/terms" className="text-primary hover:underline">Terms</Link> and{" "}
-            <Link href="/privacy" className="text-primary hover:underline">Privacy Policy</Link>.
+            {t("auth.termsAgree")}{" "}
+            <Link href="/terms" className="text-primary hover:underline">{t("auth.termsLink")}</Link> {t("common.and")}{" "}
+            <Link href="/privacy" className="text-primary hover:underline">{t("auth.privacyLink")}</Link>.
           </p>
         </div>
       </div>

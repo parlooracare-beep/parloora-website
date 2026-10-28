@@ -22,8 +22,10 @@ import { createClient } from "@/lib/supabase/client"
 import { getUserProfile } from "@/lib/actions/profile"
 import { ProfileCompletionRing } from "@/components/shared/ProfileCompletionRing"
 import { ProfileCompletionBanner } from "@/components/shared/ProfileCompletionBanner"
+import { useI18n } from "@/lib/store/useI18n"
 
 export default function CustomerDashboard() {
+  const { t, formatNumber } = useI18n()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [bookings, setBookings] = React.useState<any[]>([])
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -153,18 +155,18 @@ export default function CustomerDashboard() {
             
             <div className="flex-1 min-w-0">
               <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-brand-gray-900 mb-0.5 truncate">
-                Hello, {user.user_metadata?.display_name || "Beauty Lover"}! ✨
+                {t("home.glowUpSeason", "Hello")}, {user.user_metadata?.display_name || "Beauty Lover"}! ✨
               </h1>
               <p className="text-brand-gray-500 font-medium text-xs sm:text-sm truncate">{user.email}</p>
               <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2 sm:mt-3">
                 <Badge variant="outline" className="bg-brand-gray-50 text-brand-gray-600 border-brand-gray-100 px-2 py-0.5 rounded-lg text-[10px] sm:text-xs">
-                  <Calendar className="w-3 h-3 mr-1 text-primary" /> {bookings.length} Bookings
+                  <Calendar className="w-3 h-3 mr-1 text-primary" /> {formatNumber(bookings.length)} {t("common.bookings", "Bookings")}
                 </Badge>
                 <Badge variant="outline" className="bg-brand-gray-50 text-brand-gray-600 border-brand-gray-100 px-2 py-0.5 rounded-lg text-[10px] sm:text-xs">
-                  <ShoppingBag className="w-3 h-3 mr-1 text-primary" /> {orders.length} Orders
+                  <ShoppingBag className="w-3 h-3 mr-1 text-primary" /> {formatNumber(orders.length)} {t("customer.orders", "Orders")}
                 </Badge>
                 <Badge variant="outline" className="bg-brand-gray-50 text-brand-gray-600 border-brand-gray-100 px-2 py-0.5 rounded-lg text-[10px] sm:text-xs">
-                  <Star className="w-3 h-3 mr-1 text-amber-500 fill-amber-500" /> Member
+                  <Star className="w-3 h-3 mr-1 text-amber-500 fill-amber-500" /> {t("nav.goldMember", "Member")}
                 </Badge>
               </div>
             </div>
@@ -174,17 +176,17 @@ export default function CustomerDashboard() {
               <div className="flex items-center gap-2.5 bg-brand-gray-50 border border-brand-gray-100 rounded-2xl p-2 sm:p-3">
                 <ProfileCompletionRing percentage={profileCompletion} size={40} strokeWidth={4} />
                 <div className="text-left">
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-brand-gray-400">Profile</p>
-                  <p className="text-xs font-black text-brand-gray-800">{profileCompletion}%</p>
+                  <p className="text-[9px] font-bold uppercase tracking-widest text-brand-gray-400">{t("common.profile", "Profile")}</p>
+                  <p className="text-xs font-black text-brand-gray-800">{formatNumber(profileCompletion)}%</p>
                 </div>
               </div>
 
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" className="rounded-xl border-[#4B1D5F]/20 text-[#4B1D5F] hover:bg-[#4B1D5F]/5 text-xs h-9 font-semibold" asChild>
-                  <Link href="/profile"><Settings className="w-3.5 h-3.5 mr-1" />Settings</Link>
+                  <Link href="/profile"><Settings className="w-3.5 h-3.5 mr-1" />{t("common.settings", "Settings")}</Link>
                 </Button>
                 <Button variant="default" size="sm" className="rounded-xl text-xs h-9 font-bold shadow-md shadow-[#4B1D5F]/20" asChild>
-                  <Link href="/profile">Edit Profile</Link>
+                  <Link href="/profile">{t("nav.editProfile", "Edit Profile")}</Link>
                 </Button>
               </div>
             </div>
@@ -200,7 +202,7 @@ export default function CustomerDashboard() {
             <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-1">
               <Calendar className="w-4 h-4" />
             </div>
-            <span className="text-[10px] font-bold text-brand-charcoal">Bookings</span>
+            <span className="text-[10px] font-bold text-brand-charcoal">{t("common.bookings", "Bookings")}</span>
           </Link>
           <Link
             href="/wishlist"
@@ -209,7 +211,7 @@ export default function CustomerDashboard() {
             <div className="w-9 h-9 rounded-xl bg-rose-50 flex items-center justify-center text-rose-500 mb-1">
               <Heart className="w-4 h-4" />
             </div>
-            <span className="text-[10px] font-bold text-brand-charcoal">Favorites</span>
+            <span className="text-[10px] font-bold text-brand-charcoal">{t("nav.favorites", "Favorites")}</span>
           </Link>
           <Link
             href="/notifications"
@@ -218,7 +220,7 @@ export default function CustomerDashboard() {
             <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 mb-1">
               <MessageSquare className="w-4 h-4" />
             </div>
-            <span className="text-[10px] font-bold text-brand-charcoal">Alerts</span>
+            <span className="text-[10px] font-bold text-brand-charcoal">{t("nav.notifications", "Alerts")}</span>
           </Link>
           <Link
             href="/profile"
@@ -227,11 +229,9 @@ export default function CustomerDashboard() {
             <div className="w-9 h-9 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 mb-1">
               <User className="w-4 h-4" />
             </div>
-            <span className="text-[10px] font-bold text-brand-charcoal">Profile</span>
+            <span className="text-[10px] font-bold text-brand-charcoal">{t("common.profile", "Profile")}</span>
           </Link>
         </div>
-
-
 
         {/* Tabs */}
         <div className="flex gap-2 mb-8 bg-white p-1.5 rounded-2xl shadow-sm border border-brand-gray-100 w-full md:w-fit">
@@ -244,7 +244,7 @@ export default function CustomerDashboard() {
                 : "text-brand-gray-500 hover:bg-brand-gray-50"
             )}
           >
-            <Calendar className="w-4 h-4" /> My Bookings
+            <Calendar className="w-4 h-4" /> {t("common.bookings", "My Bookings")}
           </button>
           <button
             onClick={() => setActiveTab("orders")}
@@ -255,7 +255,7 @@ export default function CustomerDashboard() {
                 : "text-brand-gray-500 hover:bg-brand-gray-50"
             )}
           >
-            <Package className="w-4 h-4" /> My Orders
+            <Package className="w-4 h-4" /> {t("customer.orders", "My Orders")}
           </button>
         </div>
 

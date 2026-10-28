@@ -36,7 +36,7 @@ export default function SellerPricingPage() {
               price: "Custom", 
               features: ["Multi-location support", "Dedicated manager", "API access", "White-label options"],
               btn: "Contact Us",
-              link: "mailto:sales@parloora.com"
+              link: "/contact"
             }
           ].map((plan, i) => (
             <div key={i} className={cn(

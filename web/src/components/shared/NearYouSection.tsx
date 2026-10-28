@@ -6,6 +6,7 @@ import Image from "next/image"
 import { MapPin, Star, Navigation, Loader2, ChevronRight } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { formatParlourName } from "@/lib/utils"
+import { useI18n } from "@/lib/store/useI18n"
 
 const NEAR_YOU_IMAGES = [
   "1560066984-138dadb4c035",
@@ -19,6 +20,7 @@ const NEAR_YOU_IMAGES = [
 ]
 
 export function NearYouSection({ initialParlours }: { initialParlours?: any[] }) {
+  const { t } = useI18n()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [parlours, setParlours] = React.useState<any[]>(initialParlours && initialParlours.length > 0 ? initialParlours : [])
   const [city, setCity] = React.useState<string | null>(null)
@@ -112,7 +114,7 @@ export function NearYouSection({ initialParlours }: { initialParlours?: any[] })
               <Navigation className="w-4 h-4 text-emerald-600 animate-pulse" />
             </div>
             <h2 className="text-xl md:text-2xl font-bold text-brand-gray-900">
-              Finding parlours near you...
+              {t("home.findingNearYou", "Finding parlours near you...")}
             </h2>
           </div>
           <div className="flex items-center justify-center py-12">
@@ -134,17 +136,23 @@ export function NearYouSection({ initialParlours }: { initialParlours?: any[] })
               <MapPin className="w-4 h-4 text-emerald-600" />
             </div>
             <div>
-              <h2 className="text-xl md:text-2xl font-bold text-brand-gray-900 leading-tight">Near You</h2>
+              <h2 className="text-xl md:text-2xl font-bold text-brand-gray-900 leading-tight">
+                {t("home.nearYou", "Near You")}
+              </h2>
               {city && (
                 <p className="text-xs text-brand-gray-500 flex items-center gap-1 mt-0.5">
-                  <Navigation className="w-3 h-3" /> Showing results in <span className="font-semibold text-emerald-600">{city}</span>
+                  <Navigation className="w-3 h-3" /> {t("home.showingResultsIn", { city })}
                 </p>
               )}
               {!city && !denied && (
-                <p className="text-xs text-brand-gray-400 mt-0.5">Top-rated parlours near your area</p>
+                <p className="text-xs text-brand-gray-400 mt-0.5">
+                  {t("home.nearYouSub", "Top-rated parlours near your area")}
+                </p>
               )}
               {denied && (
-                <p className="text-xs text-brand-gray-400 mt-0.5">Enable location for personalized results</p>
+                <p className="text-xs text-brand-gray-400 mt-0.5">
+                  {t("home.enableLocation", "Enable location for personalized results")}
+                </p>
               )}
             </div>
           </div>
@@ -152,7 +160,7 @@ export function NearYouSection({ initialParlours }: { initialParlours?: any[] })
             href="/parlours"
             className="text-xs font-semibold text-primary hover:text-primary/80 flex items-center gap-0.5 transition-colors"
           >
-            View All <ChevronRight className="w-3.5 h-3.5" />
+            {t("common.viewAll", "View All")} <ChevronRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
@@ -188,9 +196,9 @@ export function NearYouSection({ initialParlours }: { initialParlours?: any[] })
                   </div>
                   <p className="text-[10px] text-brand-gray-500 line-clamp-1">{parlour.address || parlour.city}</p>
                   <div className="flex items-center justify-between mt-1 pt-1 border-t border-brand-gray-100/60">
-                    <span className="text-[9px] md:text-[10px] text-brand-gray-400 truncate max-w-[100px]">{parlour.type || "Beauty Salon"}</span>
+                    <span className="text-[9px] md:text-[10px] text-brand-gray-400 truncate max-w-[100px]">{parlour.type || t("common.beautySalon", "Beauty Salon")}</span>
                     <span className="text-[10px] font-bold bg-primary text-white px-2 py-0.5 rounded-md group-hover:bg-primary/90 transition-colors shadow-xs">
-                      Book
+                      {t("common.bookNow", "Book")}
                     </span>
                   </div>
                 </div>

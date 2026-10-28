@@ -136,24 +136,46 @@ export async function sendBookingConfirmation(
     amount?: number | null
     customer_name?: string | null
     staff_name?: string | null
+    locale?: "en" | "bn"
   }
 ) {
-  const subject = `✅ Booking Confirmed — ${booking.service_name || "Your Service"} at ${booking.parlour_name || "Parloora"}`
-  const html = layout(`
-    <div class="pill">Booking Confirmed</div>
-    <h1>You're all set, ${booking.customer_name || "there"}! 🎉</h1>
-    <p>Your appointment has been booked successfully. Here are your details:</p>
-    <div class="detail-box">
-      <div class="detail-row"><span class="detail-label">Service</span><span class="detail-value">${booking.service_name || "—"}</span></div>
-      <div class="detail-row"><span class="detail-label">Parlour</span><span class="detail-value">${booking.parlour_name || "—"}</span></div>
-      <div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">${booking.date || "—"}</span></div>
-      <div class="detail-row"><span class="detail-label">Time</span><span class="detail-value">${booking.time || "—"}</span></div>
-      ${booking.staff_name ? `<div class="detail-row"><span class="detail-label">Specialist</span><span class="detail-value">${booking.staff_name}</span></div>` : ""}
-      <div class="detail-row"><span class="detail-label">Total</span><span class="detail-value">৳${Number(booking.amount || 0).toLocaleString()}</span></div>
-    </div>
-    <a class="cta" href="${SITE_URL}/bookings">View My Bookings</a>
-    <p style="font-size:13px;color:#999;">Please arrive 5–10 minutes early. Need to reschedule? Contact the parlour directly or visit your bookings dashboard.</p>
-  `, `Booking confirmed for ${booking.service_name} on ${booking.date}`)
+  const isBn = booking.locale === "bn"
+  const subject = isBn
+    ? `✅ বুকিং নিশ্চিত হয়েছে — ${booking.service_name || "আপনার সেবা"} (${booking.parlour_name || "পার্লোরা"})`
+    : `✅ Booking Confirmed — ${booking.service_name || "Your Service"} at ${booking.parlour_name || "Parloora"}`
+
+  const html = layout(
+    isBn ? `
+      <div class="pill">বুকিং নিশ্চিত</div>
+      <h1>সবকিছু প্রস্তুত, ${booking.customer_name || "সম্মানিত গ্রাহক"}! 🎉</h1>
+      <p>আপনার অ্যাপয়েন্টমেন্ট সফলভাবে বুক করা হয়েছে। বুকিংয়ের বিস্তারিত নিচে দেওয়া হলো:</p>
+      <div class="detail-box">
+        <div class="detail-row"><span class="detail-label">সেবা</span><span class="detail-value">${booking.service_name || "—"}</span></div>
+        <div class="detail-row"><span class="detail-label">পার্লার</span><span class="detail-value">${booking.parlour_name || "—"}</span></div>
+        <div class="detail-row"><span class="detail-label">তারিখ</span><span class="detail-value">${booking.date || "—"}</span></div>
+        <div class="detail-row"><span class="detail-label">সময়</span><span class="detail-value">${booking.time || "—"}</span></div>
+        ${booking.staff_name ? `<div class="detail-row"><span class="detail-label">স্পেশালিস্ট</span><span class="detail-value">${booking.staff_name}</span></div>` : ""}
+        <div class="detail-row"><span class="detail-label">মোট প্রদেয়</span><span class="detail-value">৳${Number(booking.amount || 0).toLocaleString()}</span></div>
+      </div>
+      <a class="cta" href="${SITE_URL}/bookings">আমার বুকিং দেখুন</a>
+      <p style="font-size:13px;color:#999;">অনুগ্রহ করে ৫–১০ মিনিট পূর্বে পৌঁছাবেন। পরিবর্তন করতে চাইলে সরাসরি পার্লারে যোগাযোগ করুন বা আপনার ড্যাশবোর্ড দেখুন।</p>
+    ` : `
+      <div class="pill">Booking Confirmed</div>
+      <h1>You're all set, ${booking.customer_name || "there"}! 🎉</h1>
+      <p>Your appointment has been booked successfully. Here are your details:</p>
+      <div class="detail-box">
+        <div class="detail-row"><span class="detail-label">Service</span><span class="detail-value">${booking.service_name || "—"}</span></div>
+        <div class="detail-row"><span class="detail-label">Parlour</span><span class="detail-value">${booking.parlour_name || "—"}</span></div>
+        <div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">${booking.date || "—"}</span></div>
+        <div class="detail-row"><span class="detail-label">Time</span><span class="detail-value">${booking.time || "—"}</span></div>
+        ${booking.staff_name ? `<div class="detail-row"><span class="detail-label">Specialist</span><span class="detail-value">${booking.staff_name}</span></div>` : ""}
+        <div class="detail-row"><span class="detail-label">Total</span><span class="detail-value">৳${Number(booking.amount || 0).toLocaleString()}</span></div>
+      </div>
+      <a class="cta" href="${SITE_URL}/bookings">View My Bookings</a>
+      <p style="font-size:13px;color:#999;">Please arrive 5–10 minutes early. Need to reschedule? Contact the parlour directly or visit your bookings dashboard.</p>
+    `,
+    isBn ? `বুকিং নিশ্চিত হয়েছে: ${booking.service_name} (${booking.date})` : `Booking confirmed for ${booking.service_name} on ${booking.date}`
+  )
 
   return sendEmail({ to, subject, html })
 }
@@ -167,31 +189,52 @@ export async function sendBookingStatusUpdate(
     date?: string | null
     time?: string | null
     customer_name?: string | null
+    locale?: "en" | "bn"
   },
   status: string
 ) {
+  const isBn = booking.locale === "bn"
   const isConfirmed = status === "confirmed"
   const isCancelled = status === "cancelled"
   const emoji  = isConfirmed ? "✅" : isCancelled ? "❌" : "ℹ️"
-  const label  = isConfirmed ? "Booking Confirmed" : isCancelled ? "Booking Cancelled" : `Booking ${status}`
+  const labelEn = isConfirmed ? "Booking Confirmed" : isCancelled ? "Booking Cancelled" : `Booking ${status}`
+  const labelBn = isConfirmed ? "বুকিং নিশ্চিত হয়েছে" : isCancelled ? "বুকিং বাতিল হয়েছে" : `বুকিং ${status}`
+  const label = isBn ? labelBn : labelEn
   const color  = isConfirmed ? "#16a34a" : isCancelled ? "#dc2626" : BRAND_PURPLE
-  const subject = `${emoji} ${label} — ${booking.service_name || "Your Service"}`
+  const subject = `${emoji} ${label} — ${booking.service_name || "Parloora"}`
 
-  const html = layout(`
-    <div class="pill" style="background:${color}15;color:${color};">${label}</div>
-    <h1 style="color:${color};">${isConfirmed ? "Great news!" : isCancelled ? "Booking Cancelled" : label}</h1>
-    <p>Hi ${booking.customer_name || "there"}, your booking status has been updated to <strong>${status}</strong>.</p>
-    <div class="detail-box">
-      <div class="detail-row"><span class="detail-label">Service</span><span class="detail-value">${booking.service_name || "—"}</span></div>
-      <div class="detail-row"><span class="detail-label">Parlour</span><span class="detail-value">${booking.parlour_name || "—"}</span></div>
-      <div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">${booking.date || "—"}</span></div>
-      <div class="detail-row"><span class="detail-label">Time</span><span class="detail-value">${booking.time || "—"}</span></div>
-    </div>
-    ${isCancelled
-      ? `<p>We're sorry your appointment was cancelled. You can book another slot anytime.</p>`
-      : `<p>We look forward to seeing you soon!</p>`}
-    <a class="cta" href="${SITE_URL}/bookings">View My Bookings</a>
-  `, `Your booking for ${booking.service_name} has been ${status}`)
+  const html = layout(
+    isBn ? `
+      <div class="pill" style="background:${color}15;color:${color};">${label}</div>
+      <h1 style="color:${color};">${isConfirmed ? "সুসংবাদ!" : isCancelled ? "বুকিং বাতিল হয়েছে" : label}</h1>
+      <p>প্রিয় ${booking.customer_name || "গ্রাহক"}, আপনার বুকিং স্ট্যাটাস পরিবর্তন হয়েছে: <strong>${status}</strong>।</p>
+      <div class="detail-box">
+        <div class="detail-row"><span class="detail-label">সেবা</span><span class="detail-value">${booking.service_name || "—"}</span></div>
+        <div class="detail-row"><span class="detail-label">পার্লার</span><span class="detail-value">${booking.parlour_name || "—"}</span></div>
+        <div class="detail-row"><span class="detail-label">তারিখ</span><span class="detail-value">${booking.date || "—"}</span></div>
+        <div class="detail-row"><span class="detail-label">সময়</span><span class="detail-value">${booking.time || "—"}</span></div>
+      </div>
+      ${isCancelled
+        ? `<p>বুকিং বাতিল হওয়ায় আমরা আন্তরিকভাবে দুঃখিত। আপনি যেকোনো সময় নতুন স্লট বুক করতে পারেন।</p>`
+        : `<p>আপনার সেবায় আমরা আনন্দিত। সঠিক সময়ে উপস্থিত থাকবেন।</p>`}
+      <a class="cta" href="${SITE_URL}/bookings">আমার বুকিং দেখুন</a>
+    ` : `
+      <div class="pill" style="background:${color}15;color:${color};">${label}</div>
+      <h1 style="color:${color};">${isConfirmed ? "Great news!" : isCancelled ? "Booking Cancelled" : label}</h1>
+      <p>Hi ${booking.customer_name || "there"}, your booking status has been updated to <strong>${status}</strong>.</p>
+      <div class="detail-box">
+        <div class="detail-row"><span class="detail-label">Service</span><span class="detail-value">${booking.service_name || "—"}</span></div>
+        <div class="detail-row"><span class="detail-label">Parlour</span><span class="detail-value">${booking.parlour_name || "—"}</span></div>
+        <div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">${booking.date || "—"}</span></div>
+        <div class="detail-row"><span class="detail-label">Time</span><span class="detail-value">${booking.time || "—"}</span></div>
+      </div>
+      ${isCancelled
+        ? `<p>We're sorry your appointment was cancelled. You can book another slot anytime.</p>`
+        : `<p>We look forward to seeing you soon!</p>`}
+      <a class="cta" href="${SITE_URL}/bookings">View My Bookings</a>
+    `,
+    isBn ? `আপনার বুকিং স্ট্যাটাস: ${booking.service_name} (${status})` : `Your booking for ${booking.service_name} has been ${status}`
+  )
 
   return sendEmail({ to, subject, html })
 }
@@ -206,23 +249,44 @@ export async function sendBookingReminder(
     time?: string | null
     customer_name?: string | null
     staff_name?: string | null
+    locale?: "en" | "bn"
   }
 ) {
-  const subject = `⏰ Reminder: ${booking.service_name} in ~1 hour at ${booking.parlour_name}`
-  const html = layout(`
-    <div class="pill">Appointment Reminder</div>
-    <h1>Your appointment is coming up! ⏰</h1>
-    <p>Hi ${booking.customer_name || "there"}, just a friendly reminder that you have an upcoming appointment:</p>
-    <div class="detail-box">
-      <div class="detail-row"><span class="detail-label">Service</span><span class="detail-value">${booking.service_name || "—"}</span></div>
-      <div class="detail-row"><span class="detail-label">Parlour</span><span class="detail-value">${booking.parlour_name || "—"}</span></div>
-      <div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">${booking.date || "—"}</span></div>
-      <div class="detail-row"><span class="detail-label">Time</span><span class="detail-value">${booking.time || "—"}</span></div>
-      ${booking.staff_name ? `<div class="detail-row"><span class="detail-label">Specialist</span><span class="detail-value">${booking.staff_name}</span></div>` : ""}
-    </div>
-    <p>Please arrive 5–10 minutes early. See you soon! 💅</p>
-    <a class="cta" href="${SITE_URL}/bookings">View Booking Details</a>
-  `, `Reminder: ${booking.service_name} at ${booking.time} today`)
+  const isBn = booking.locale === "bn"
+  const subject = isBn
+    ? `⏰ স্মারক: ${booking.service_name} প্রায় ১ ঘণ্টার মধ্যে (${booking.parlour_name})`
+    : `⏰ Reminder: ${booking.service_name} in ~1 hour at ${booking.parlour_name}`
+
+  const html = layout(
+    isBn ? `
+      <div class="pill">অ্যাপয়েন্টমেন্ট স্মারক</div>
+      <h1>আপনার অ্যাপয়েন্টমেন্ট আসছে! ⏰</h1>
+      <p>প্রিয় ${booking.customer_name || "গ্রাহক"}, আপনাকে মনে করিয়ে দিচ্ছি যে শীঘ্রই আপনার বুকিং শুরু হবে:</p>
+      <div class="detail-box">
+        <div class="detail-row"><span class="detail-label">সেবা</span><span class="detail-value">${booking.service_name || "—"}</span></div>
+        <div class="detail-row"><span class="detail-label">পার্লার</span><span class="detail-value">${booking.parlour_name || "—"}</span></div>
+        <div class="detail-row"><span class="detail-label">তারিখ</span><span class="detail-value">${booking.date || "—"}</span></div>
+        <div class="detail-row"><span class="detail-label">সময়</span><span class="detail-value">${booking.time || "—"}</span></div>
+        ${booking.staff_name ? `<div class="detail-row"><span class="detail-label">স্পেশালিস্ট</span><span class="detail-value">${booking.staff_name}</span></div>` : ""}
+      </div>
+      <p style="font-size:14px;color:#666;">অনুগ্রহ করে ৫–১০ মিনিট আগে পার্লারে উপস্থিত থাকুন। সুন্দর অভিজ্ঞতার শুভকামনা রইল!</p>
+      <a class="cta" href="${SITE_URL}/bookings">আমার বুকিং দেখুন</a>
+    ` : `
+      <div class="pill">Appointment Reminder</div>
+      <h1>Your appointment is coming up! ⏰</h1>
+      <p>Hi ${booking.customer_name || "there"}, just a friendly reminder that you have an upcoming appointment:</p>
+      <div class="detail-box">
+        <div class="detail-row"><span class="detail-label">Service</span><span class="detail-value">${booking.service_name || "—"}</span></div>
+        <div class="detail-row"><span class="detail-label">Parlour</span><span class="detail-value">${booking.parlour_name || "—"}</span></div>
+        <div class="detail-row"><span class="detail-label">Date</span><span class="detail-value">${booking.date || "—"}</span></div>
+        <div class="detail-row"><span class="detail-label">Time</span><span class="detail-value">${booking.time || "—"}</span></div>
+        ${booking.staff_name ? `<div class="detail-row"><span class="detail-label">Specialist</span><span class="detail-value">${booking.staff_name}</span></div>` : ""}
+      </div>
+      <p style="font-size:14px;color:#666;">Please arrive 5–10 minutes early so your specialist is ready for you. See you soon!</p>
+      <a class="cta" href="${SITE_URL}/bookings">View My Bookings</a>
+    `,
+    isBn ? `অ্যাপয়েন্টমেন্ট স্মারক: ${booking.service_name} সময় ${booking.time}` : `Appointment reminder: ${booking.service_name} at ${booking.time}`
+  )
 
   return sendEmail({ to, subject, html })
 }

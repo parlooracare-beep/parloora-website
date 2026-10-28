@@ -32,27 +32,28 @@ import {
 import { User as UserIcon, Settings as SettingsIcon, LogOut as LogOutIcon } from "lucide-react"
 import { NotificationBell } from "@/components/shared/NotificationBell"
 import { AdminMobileNav } from "@/components/admin/AdminMobileNav"
-
+import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher"
+import { useI18n } from "@/lib/store/useI18n"
 
 const NAV_ITEMS = [
-  { label: "Overview", href: "/admin/dashboard", icon: LayoutDashboard },
-  { label: "Users", href: "/admin/users", icon: Users },
-  { label: "Sellers", href: "/admin/sellers", icon: ShieldCheck },
-  { label: "Parlours", href: "/admin/parlours", icon: Store },
-  { label: "Services", href: "/admin/services", icon: Scissors },
-  { label: "Products", href: "/admin/products", icon: Package },
-  { label: "Bookings", href: "/admin/bookings", icon: Calendar },
-  { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
-  { label: "Transactions", href: "/admin/transactions", icon: Receipt },
-  { label: "Payout Requests", href: "/admin/payouts", icon: Wallet },
-  { label: "Promo Codes", href: "/admin/promo-codes", icon: Ticket },
-  { label: "Blog CMS", href: "/admin/blog", icon: BookOpen },
-  { label: "Media Library", href: "/admin/media", icon: ImageIcon },
-  { label: "Page Builder", href: "/admin/page-builder", icon: LayoutTemplate },
-  { label: "District SEO (64)", href: "/admin/locations", icon: MapPin },
-  { label: "Audit Logs", href: "/admin/activity-logs", icon: Terminal },
-  { label: "Reports", href: "/admin/reports", icon: AlertTriangle },
-  { label: "Settings", href: "/admin/settings", icon: Settings },
+  { key: "overview", label: "Overview", href: "/admin/dashboard", icon: LayoutDashboard },
+  { key: "users", label: "Users", href: "/admin/users", icon: Users },
+  { key: "sellers", label: "Sellers", href: "/admin/sellers", icon: ShieldCheck },
+  { key: "parlours", label: "Parlours", href: "/admin/parlours", icon: Store },
+  { key: "services", label: "Services", href: "/admin/services", icon: Scissors },
+  { key: "products", label: "Products", href: "/admin/products", icon: Package },
+  { key: "bookings", label: "Bookings", href: "/admin/bookings", icon: Calendar },
+  { key: "orders", label: "Orders", href: "/admin/orders", icon: ShoppingBag },
+  { key: "transactions", label: "Transactions", href: "/admin/transactions", icon: Receipt },
+  { key: "payoutRequests", label: "Payout Requests", href: "/admin/payouts", icon: Wallet },
+  { key: "promoCodes", label: "Promo Codes", href: "/admin/promo-codes", icon: Ticket },
+  { key: "blogCms", label: "Blog CMS", href: "/admin/blog", icon: BookOpen },
+  { key: "mediaLibrary", label: "Media Library", href: "/admin/media", icon: ImageIcon },
+  { key: "pageBuilder", label: "Page Builder", href: "/admin/page-builder", icon: LayoutTemplate },
+  { key: "districtSeo", label: "District SEO (64)", href: "/admin/locations", icon: MapPin },
+  { key: "auditLogs", label: "Audit Logs", href: "/admin/activity-logs", icon: Terminal },
+  { key: "reports", label: "Reports", href: "/admin/reports", icon: AlertTriangle },
+  { key: "settings", label: "Settings", href: "/admin/settings", icon: Settings },
 ]
 
 interface AdminSidebarContentProps {
@@ -62,6 +63,8 @@ interface AdminSidebarContentProps {
 }
 
 function AdminSidebarContent({ pathname, onClose, onLogout }: AdminSidebarContentProps) {
+  const { t } = useI18n()
+
   return (
     <div className="flex flex-col h-full">
       {/* Logo */}
@@ -70,15 +73,16 @@ function AdminSidebarContent({ pathname, onClose, onLogout }: AdminSidebarConten
           size="md"
           variant="dark"
           href="/admin/dashboard"
-          subtext="Super Admin"
+          subtext={t("admin.adminControl", "Super Admin")}
           subtextClassName="text-red-500 font-bold tracking-wider uppercase"
         />
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
-        {NAV_ITEMS.map(({ label, href, icon: Icon }) => {
+        {NAV_ITEMS.map(({ key, label, href, icon: Icon }) => {
           const active = pathname === href || pathname.startsWith(href + "/")
+          const translatedLabel = t(`admin.${key}`, label)
           return (
             <Link
               key={href}
@@ -92,7 +96,7 @@ function AdminSidebarContent({ pathname, onClose, onLogout }: AdminSidebarConten
               )}
             >
               <Icon className="w-4.5 h-4.5 shrink-0" strokeWidth={active ? 2.5 : 2} />
-              {label}
+              {translatedLabel}
               {active && <span className="ml-auto w-1.5 h-1.5 bg-primary rounded-full shadow-[0_0_8px_rgba(75,30,109,0.5)]" />}
             </Link>
           )
@@ -103,10 +107,10 @@ function AdminSidebarContent({ pathname, onClose, onLogout }: AdminSidebarConten
       <div className="px-3 py-4 border-t border-brand-gray-100">
         <button
           onClick={onLogout}
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-brand-gray-500 hover:bg-red-50 hover:text-red-600 transition-all w-full"
+          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-brand-gray-500 hover:bg-red-50 hover:text-red-600 transition-all w-full cursor-pointer"
         >
           <LogOut className="w-4 h-4" />
-          System Logout
+          {t("common.logout", "System Logout")}
         </button>
       </div>
     </div>
@@ -116,6 +120,7 @@ function AdminSidebarContent({ pathname, onClose, onLogout }: AdminSidebarConten
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
+  const { t } = useI18n()
   const [sidebarOpen, setSidebarOpen] = React.useState(false)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = React.useState<any>(null)
@@ -253,11 +258,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Menu className="w-5 h-5" />
             </button>
             <h1 className="text-brand-gray-900 font-semibold capitalize text-sm md:text-base">
-              {NAV_ITEMS.find(n => pathname.startsWith(n.href))?.label ?? "Admin Control"}
+              {(() => {
+                const currentNav = NAV_ITEMS.find(n => pathname.startsWith(n.href))
+                return currentNav ? t(`admin.${currentNav.key}`, currentNav.label) : t("admin.adminControl", "Admin Control")
+              })()}
             </h1>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            {/* Language Switcher */}
+            <LanguageSwitcher variant="light" />
+
             {/* Notifications */}
             <NotificationBell />
 
@@ -277,21 +288,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 p-2 border-none shadow-2xl bg-white rounded-2xl">
                 <DropdownMenuLabel className="px-2 py-2 text-xs font-bold text-brand-gray-400 uppercase tracking-widest">
-                  Account Management
+                  {t("common.settings", "Account Management")}
                 </DropdownMenuLabel>
                 <DropdownMenuItem 
                   onClick={() => router.push("/admin/profile")}
                   className="flex items-center gap-2 rounded-xl px-2 py-2.5 focus:bg-brand-gray-50 cursor-pointer"
                 >
                   <UserIcon className="w-4 h-4 text-brand-gray-500" />
-                  <span className="text-sm font-medium text-brand-gray-700">My Profile</span>
+                  <span className="text-sm font-medium text-brand-gray-700">{t("common.profile", "My Profile")}</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={() => router.push("/admin/settings")}
                   className="flex items-center gap-2 rounded-xl px-2 py-2.5 focus:bg-brand-gray-50 cursor-pointer"
                 >
                   <SettingsIcon className="w-4 h-4 text-brand-gray-500" />
-                  <span className="text-sm font-medium text-brand-gray-700">Settings</span>
+                  <span className="text-sm font-medium text-brand-gray-700">{t("common.settings", "Settings")}</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="my-1 bg-brand-gray-100" />
                 <DropdownMenuItem 
@@ -299,7 +310,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   className="flex items-center gap-2 rounded-xl px-2 py-2.5 focus:bg-red-50 text-red-600 focus:text-red-700 cursor-pointer"
                 >
                   <LogOutIcon className="w-4 h-4" />
-                  <span className="text-sm font-bold">Logout System</span>
+                  <span className="text-sm font-bold">{t("common.logout", "Logout System")}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

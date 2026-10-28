@@ -4,12 +4,21 @@ import * as React from "react"
 import { useRouter } from "next/navigation"
 import { Search, MapPin, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useI18n } from "@/lib/store/useI18n"
 
 const BANGLADESH_CITIES = [
-  "All Cities", "Dhaka", "Chittagong", "Sylhet", "Rajshahi", "Khulna", "Moulvibazar", "Barisal"
+  { en: "All Cities", bn: "সকল শহর" },
+  { en: "Dhaka", bn: "ঢাকা" },
+  { en: "Chittagong", bn: "চট্টগ্রাম" },
+  { en: "Sylhet", bn: "সিলেট" },
+  { en: "Rajshahi", bn: "রাজশাহী" },
+  { en: "Khulna", bn: "খুলনা" },
+  { en: "Moulvibazar", bn: "মৌলভীবাজার" },
+  { en: "Barisal", bn: "বরিশাল" }
 ]
 
 export function HeroSearch() {
+  const { t, locale } = useI18n()
   const [query, setQuery] = React.useState("")
   const [city, setCity] = React.useState("All Cities")
   const router = useRouter()
@@ -35,7 +44,7 @@ export function HeroSearch() {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Service, parlour, haircut, facial..."
+          placeholder={t("common.searchPlaceholder")}
           className="bg-transparent text-white placeholder:text-white/70 outline-none w-full text-xs sm:text-sm font-medium"
         />
       </div>
@@ -49,7 +58,9 @@ export function HeroSearch() {
           className="bg-transparent text-white outline-none w-full text-xs sm:text-sm font-medium cursor-pointer [&>option]:text-brand-gray-900 [&>option]:bg-white"
         >
           {BANGLADESH_CITIES.map((c) => (
-            <option key={c} value={c}>{c}</option>
+            <option key={c.en} value={c.en}>
+              {locale === "bn" ? c.bn : c.en}
+            </option>
           ))}
         </select>
       </div>
@@ -62,7 +73,7 @@ export function HeroSearch() {
         className="rounded-xl px-7 h-11 font-black shrink-0 text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#E2A9A9]/35 hover:scale-[1.02] active:scale-[0.98] transition-all"
       >
         <Search className="w-4 h-4" />
-        <span>Find Services</span>
+        <span>{t("common.search")}</span>
       </Button>
     </form>
   )

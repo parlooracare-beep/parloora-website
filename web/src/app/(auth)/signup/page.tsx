@@ -2,17 +2,17 @@
 
 import * as React from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { ParlooraLogo } from "@/components/shared/Logo"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Sparkles, Mail, Lock, Eye, EyeOff, User, Phone, Loader2, Store, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import { createClient } from "@/lib/supabase/client"
 import { signUpAction } from "@/lib/actions/auth"
 import { BANGLADESH_DISTRICTS } from "@/lib/constants"
+import { useI18n } from "@/lib/store/useI18n"
+import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher"
 
 export default function SignupPage() {
   return (
@@ -23,8 +23,7 @@ export default function SignupPage() {
 }
 
 function SignupForm() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const router = useRouter()
+  const { t } = useI18n()
   const searchParams = useSearchParams()
   const redirectTarget = searchParams.get("redirectedFrom") || searchParams.get("redirect")
   const initialRole = searchParams.get("role") === "seller" ? "Seller" : "Customer"
@@ -172,16 +171,17 @@ function SignupForm() {
 
       {/* Right Panel — Form */}
       <div className="flex-1 flex flex-col items-center justify-center p-8 overflow-y-auto relative">
-        {/* Back Button */}
-        <div className="absolute top-6 left-6 lg:top-8 lg:left-8 z-10">
+        {/* Top Controls: Back Button & Language Switcher */}
+        <div className="absolute top-6 left-6 right-6 lg:top-8 lg:left-8 lg:right-8 z-10 flex items-center justify-between">
           <Button asChild variant="ghost" className="h-auto p-1.5 pr-4 rounded-full border border-brand-gray-200 bg-white hover:bg-brand-gray-50 transition-all group shadow-sm">
             <Link href="/">
               <div className="w-8 h-8 rounded-full bg-brand-gray-50 group-hover:bg-white flex items-center justify-center transition-colors">
                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
               </div>
-              <span className="text-sm font-semibold text-brand-gray-500 group-hover:text-brand-gray-900 transition-colors">Back</span>
+              <span className="text-sm font-semibold text-brand-gray-500 group-hover:text-brand-gray-900 transition-colors">{t("common.back")}</span>
             </Link>
           </Button>
+          <LanguageSwitcher />
         </div>
 
         {/* Mobile Logo */}
@@ -191,35 +191,17 @@ function SignupForm() {
 
         <div className="w-full max-w-md py-8">
           <div className="mb-8">
-            {redirectTarget?.includes("/checkout") && (
-              <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-2xl flex items-center gap-3 text-primary">
-                <div>
-                  <p className="font-bold text-sm text-brand-gray-900">Create an account to complete your order</p>
-                  <p className="text-xs text-brand-gray-600">Quick and easy registration. Your cart is preserved!</p>
-                </div>
-              </div>
-            )}
-            {redirectTarget?.includes("/parlours") && (
-              <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-2xl flex items-center gap-3 text-primary">
-                <div>
-                  <p className="font-bold text-sm text-brand-gray-900">Create an account to book your appointment</p>
-                  <p className="text-xs text-brand-gray-600">You will return directly to the parlour booking screen.</p>
-                </div>
-              </div>
-            )}
-            <h1 className="text-3xl font-bold text-brand-gray-900 mb-2">Create your account</h1>
+            <h1 className="text-3xl font-bold text-brand-gray-900 mb-2">{t("auth.createAccount")}</h1>
             <p className="text-brand-gray-500">
-              Already have an account?{" "}
+              {t("auth.alreadyHaveAccount")}{" "}
               <Link 
                 href={redirectTarget ? `/login?redirectedFrom=${encodeURIComponent(redirectTarget)}` : "/login"} 
                 className="text-primary font-medium hover:underline"
               >
-                Sign in
+                {t("auth.signIn")}
               </Link>
             </p>
           </div>
-
-
 
           {/* Role Selection */}
           <div className="flex p-1 bg-brand-gray-100 rounded-2xl mb-8">
@@ -234,7 +216,7 @@ function SignupForm() {
               )}
             >
               <User className="w-4 h-4" />
-              I&apos;m a Customer
+              {t("auth.roleCustomer")}
             </button>
             <button
               type="button"
@@ -247,7 +229,7 @@ function SignupForm() {
               )}
             >
               <Store className="w-4 h-4" />
-              I&apos;m a Parlour
+              {t("auth.roleSeller")}
             </button>
           </div>
 

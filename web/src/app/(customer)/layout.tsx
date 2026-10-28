@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { Navbar } from "@/components/shared/Navbar"
 import { Footer } from "@/components/shared/Footer"
 import { MobileNav } from "@/components/shared/MobileNav"
+import { WhatsAppButton } from "@/components/shared/WhatsAppButton"
 import { createClient } from "@/lib/supabase/client"
 
 export default function CustomerLayout({
@@ -66,6 +67,7 @@ export default function CustomerLayout({
         {children}
       </main>
       <Footer />
+      <WhatsAppButton />
       <MobileNav />
     </div>
   )

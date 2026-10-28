@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Shield, Lock, Eye, FileText, Globe, Scale } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 
@@ -62,10 +63,10 @@ export default function PrivacyPage() {
 
               <div className="mt-16 p-8 bg-primary/5 rounded-3xl border border-primary/10 text-center">
                 <h3 className="text-xl font-bold text-brand-gray-900 mb-2">Questions about your privacy?</h3>
-                <p className="text-brand-gray-600 mb-6 text-sm">Our data protection officer is ready to help you with any concerns.</p>
-                <button className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:opacity-90 transition-all">
-                  Contact Privacy Team
-                </button>
+                <p className="text-brand-gray-600 mb-6 text-sm">Our support team is ready to help you with any concerns.</p>
+                <Link href="/contact" className="inline-block bg-primary text-white px-8 py-3 rounded-xl font-bold hover:opacity-90 transition-all">
+                  Contact Support Team
+                </Link>
               </div>
             </CardContent>
           </Card>

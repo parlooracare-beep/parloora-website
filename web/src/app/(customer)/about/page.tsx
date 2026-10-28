@@ -19,6 +19,7 @@ import {
   Store,
   MapPin,
   Mail,
+  Phone,
   CheckCircle2,
   ChevronRight,
   Briefcase,
@@ -28,6 +29,7 @@ import {
   Smile,
   BadgeCheck,
 } from "lucide-react"
+import { contactInfo } from "@/config/contact"
 
 function InstagramIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
@@ -147,7 +149,7 @@ const FAQ_ITEMS: FaqItem[] = [
     id: "how-contact",
     question: "How can I contact Parloora?",
     answer:
-      "Customers and interested providers can contact Parloora at parlooracare@gmail.com. The official Instagram handle is @parloora.",
+      `Customers and interested providers can contact Parloora Customer Care and WhatsApp Support at ${contactInfo.customerCare}. Our office is located in ${contactInfo.office}. You can also connect with us on Facebook (${contactInfo.social.facebook}), Instagram (${contactInfo.social.instagram}), and YouTube (${contactInfo.social.youtube}).`,
   },
 ]
 
@@ -161,8 +163,17 @@ export default function AboutPage() {
         name: "Parloora",
         url: siteUrl,
         logo: `${siteUrl}/logo.png`,
-        email: "parlooracare@gmail.com",
-        sameAs: ["https://instagram.com/parloora"],
+        telephone: contactInfo.customerCareInternational,
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: "Dhaka",
+          addressCountry: "BD",
+        },
+        sameAs: [
+          contactInfo.social.facebook,
+          contactInfo.social.instagram,
+          contactInfo.social.youtube,
+        ],
         founder: {
           "@type": "Person",
           name: "Amdadur Rahman",
@@ -1061,30 +1072,59 @@ export default function AboutPage() {
 
                   <div className="pb-4 border-b border-[#FAF9F6]">
                     <p className="text-xs uppercase font-bold text-[#5A189A] tracking-wider mb-1">
-                      Support Email
+                      Customer Care & WhatsApp
                     </p>
                     <a
-                      href="mailto:parlooracare@gmail.com"
+                      href={contactInfo.customerCareTel}
                       className="text-base font-bold text-[#5A189A] hover:underline flex items-center gap-1.5 transition-colors"
                     >
-                      <Mail className="w-4 h-4" />
-                      parlooracare@gmail.com
+                      <Phone className="w-4 h-4" />
+                      {contactInfo.customerCare}
                     </a>
+                  </div>
+
+                  <div className="pb-4 border-b border-[#FAF9F6]">
+                    <p className="text-xs uppercase font-bold text-[#5A189A] tracking-wider mb-1">
+                      Office Location
+                    </p>
+                    <p className="text-base font-bold text-[#2B2B2B] flex items-center gap-1.5">
+                      <MapPin className="w-4 h-4 text-[#5A189A]" />
+                      {contactInfo.office}
+                    </p>
                   </div>
 
                   <div>
                     <p className="text-xs uppercase font-bold text-[#5A189A] tracking-wider mb-1">
-                      Instagram Profile
+                      Official Channels
                     </p>
-                    <a
-                      href="https://instagram.com/parloora"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-base font-bold text-[#5A189A] hover:underline flex items-center gap-1.5 transition-colors"
-                    >
-                      <InstagramIcon className="w-4 h-4" />
-                      @parloora
-                    </a>
+                    <div className="flex items-center gap-3 pt-1">
+                      <a
+                        href={contactInfo.social.facebook}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-bold text-[#5A189A] hover:underline"
+                      >
+                        Facebook
+                      </a>
+                      <span className="text-brand-gray-300">&middot;</span>
+                      <a
+                        href={contactInfo.social.instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-bold text-[#5A189A] hover:underline"
+                      >
+                        Instagram
+                      </a>
+                      <span className="text-brand-gray-300">&middot;</span>
+                      <a
+                        href={contactInfo.social.youtube}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-bold text-[#5A189A] hover:underline"
+                      >
+                        YouTube
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
