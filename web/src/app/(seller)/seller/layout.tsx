@@ -60,15 +60,15 @@ function SidebarContent({ pathname, onClose, onLogout }: SidebarContentProps) {
               href={href}
               onClick={onClose}
               className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all",
                 active
-                  ? "bg-white/15 text-white shadow-inner"
-                  : "text-white/60 hover:bg-white/10 hover:text-white"
+                  ? "bg-white/15 text-white shadow-inner border border-white/10"
+                  : "text-white/70 hover:bg-white/10 hover:text-white"
               )}
             >
               <Icon className="w-4.5 h-4.5 shrink-0" strokeWidth={active ? 2.5 : 2} />
               {label}
-              {active && <span className="ml-auto w-1.5 h-1.5 bg-rose-400 rounded-full" />}
+              {active && <span className="ml-auto w-2 h-2 bg-[#E2A9A9] rounded-full shadow-[0_0_10px_#E2A9A9]" />}
             </Link>
           )
         })}
@@ -190,7 +190,7 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
   return (
     <div className="min-h-screen bg-brand-gray-50 flex">
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 shrink-0 bg-gradient-to-b from-[#2D0072] to-[#4A148C] flex-col fixed inset-y-0 left-0 z-30">
+      <aside className="hidden md:flex w-64 shrink-0 bg-gradient-to-b from-[#1C0825] via-[#4B1D5F] to-[#250831] border-r border-white/10 flex-col fixed inset-y-0 left-0 z-30">
         <SidebarContent
           pathname={pathname}
           onClose={() => setSidebarOpen(false)}
@@ -205,7 +205,7 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)}
           />
-          <aside className="absolute inset-y-0 left-0 w-64 bg-gradient-to-b from-[#2D0072] to-[#4A148C] flex flex-col shadow-2xl">
+          <aside className="absolute inset-y-0 left-0 w-64 bg-gradient-to-b from-[#1C0825] via-[#4B1D5F] to-[#250831] border-r border-white/10 flex flex-col shadow-2xl">
             <SidebarContent
               pathname={pathname}
               onClose={() => setSidebarOpen(false)}

@@ -274,7 +274,7 @@ export default function CustomerDashboard() {
                   <Calendar className="w-12 h-12 text-brand-gray-200 mx-auto mb-4" />
                   <h3 className="text-lg font-bold text-brand-gray-900">No appointments yet</h3>
                   <p className="text-brand-gray-500 mb-6">Discover premium parlours and book your next session.</p>
-                  <Button asChild className="bg-primary text-white rounded-xl">
+                  <Button variant="rosegold" size="default" asChild className="rounded-xl px-7 font-black shadow-lg shadow-[#E2A9A9]/30">
                     <Link href="/parlours">Browse Parlours</Link>
                   </Button>
                 </Card>

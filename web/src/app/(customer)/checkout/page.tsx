@@ -663,11 +663,12 @@ export default function CheckoutPage() {
                       <Button 
                         form="checkout-form"
                         type="submit"
+                        variant="rosegold"
                         disabled={isSubmitting}
-                        className="w-full h-16 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-black text-xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
+                        className="w-full h-15 rounded-2xl font-black text-base sm:text-lg shadow-xl shadow-[#E2A9A9]/35 hover:scale-[1.01] active:scale-[0.98] transition-all"
                       >
                         {isSubmitting ? (
-                          <><Loader2 className="w-6 h-6 mr-3 animate-spin" /> Processing...</>
+                          <><Loader2 className="w-5 h-5 mr-3 animate-spin" /> Processing Order...</>
                         ) : formData.paymentMethod === "Cash on Delivery" ? (
                           <>Confirm Order (Cash on Delivery) <ArrowRight className="w-5 h-5 ml-2" /></>
                         ) : (
