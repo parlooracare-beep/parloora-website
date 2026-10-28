@@ -42,8 +42,8 @@ export default function PartnerResourcesPage() {
              <h2 className="text-3xl font-bold mb-4 leading-tight">Need personalized support?</h2>
              <p className="text-brand-gray-400">Our Partner Success team is here to help you optimize your business.</p>
            </div>
-           <Button className="bg-white text-brand-gray-900 rounded-2xl px-10 h-14 font-black hover:bg-white/90 relative z-10">
-             Contact Support
+           <Button asChild className="bg-white text-brand-gray-900 rounded-2xl px-10 h-14 font-black hover:bg-white/90 relative z-10">
+             <Link href="/contact">Contact Support</Link>
            </Button>
         </div>
       </div>
