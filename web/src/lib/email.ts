@@ -114,8 +114,10 @@ function layout(body: string, previewText = ""): string {
       ${body}
     </div>
     <div class="footer">
-      &copy; ${new Date().getFullYear()} Parloora &mdash; Beauty-Tech Marketplace<br/>
+      &copy; ${new Date().getFullYear()} Parloora &mdash; Book Your Self Care Services In Seconds<br/>
+      Customer Care &amp; WhatsApp: 01884599271 &middot; Dhaka, Bangladesh<br/>
       <a href="${SITE_URL}">parloora.com</a> &middot;
+      <a href="${SITE_URL}/contact">Contact Us</a> &middot;
       <a href="${SITE_URL}/privacy">Privacy</a> &middot;
       <a href="${SITE_URL}/terms">Terms</a>
     </div>

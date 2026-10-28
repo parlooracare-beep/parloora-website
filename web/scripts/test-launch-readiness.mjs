@@ -172,4 +172,189 @@ test("Double booking detection prevents concurrent conflicting reservations", ()
   assert.equal(hasSlotConflict(existing, { parlour_id: "p2", date: "2026-10-30", time: "10:00 AM" }), false)
 })
 
+// ─── 6. Inventory Stock Validation & Overselling Prevention ───────────────────
+function validateAndCalculateOrder(items, catalogProducts, shippingFee = 60) {
+  if (!items || items.length === 0) {
+    return { success: false, error: "Empty cart" }
+  }
+  const prodMap = new Map(catalogProducts.map(p => [p.id, p]))
+  let subtotal = 0
+  const verifiedItems = []
+
+  for (const item of items) {
+    const prod = prodMap.get(item.id)
+    if (!prod || !prod.is_active) {
+      return { success: false, error: `Product unavailable: ${item.id}` }
+    }
+    const qty = Number(item.quantity) || 1
+    if (qty <= 0) {
+      return { success: false, error: `Invalid quantity for ${prod.name}` }
+    }
+    if ((prod.stock || 0) < qty) {
+      return { success: false, error: `Insufficient stock for ${prod.name}. Available: ${prod.stock}, Requested: ${qty}` }
+    }
+    // Calculate using genuine database price, disregarding any client-manipulated price
+    const verifiedPrice = Number(prod.price)
+    subtotal += verifiedPrice * qty
+    verifiedItems.push({ id: prod.id, name: prod.name, price: verifiedPrice, quantity: qty })
+  }
+
+  const total = subtotal + shippingFee
+  return { success: true, subtotal, total, items: verifiedItems }
+}
+
+test("Inventory stock validation calculates server-side totals and prevents overselling", () => {
+  const catalog = [
+    { id: "prod-1", name: "Organic Argan Hair Oil", price: 1200, stock: 5, is_active: true },
+    { id: "prod-2", name: "Rose Water Hydrating Toner", price: 650, stock: 2, is_active: true },
+    { id: "prod-3", name: "Vitamin C Serum", price: 950, stock: 0, is_active: false }, // out of stock / inactive
+  ]
+
+  // Valid order within stock bounds
+  const res1 = validateAndCalculateOrder(
+    [{ id: "prod-1", quantity: 2, price: 1 }], // Client claims price is 1 BDT
+    catalog
+  )
+  assert.equal(res1.success, true)
+  assert.equal(res1.subtotal, 2400) // Revalidated database price: 1200 * 2 = 2400 BDT
+  assert.equal(res1.total, 2460) // 2400 + 60 shipping = 2460 BDT
+
+  // Overselling attempt: requesting 5 when only 2 available
+  const res2 = validateAndCalculateOrder(
+    [{ id: "prod-2", quantity: 5 }],
+    catalog
+  )
+  assert.equal(res2.success, false)
+  assert.match(res2.error, /Insufficient stock/)
+
+  // Inactive / zero-stock product attempt
+  const res3 = validateAndCalculateOrder(
+    [{ id: "prod-3", quantity: 1 }],
+    catalog
+  )
+  assert.equal(res3.success, false)
+  assert.match(res3.error, /Product unavailable/)
+})
+
+// ─── 7. Review Eligibility & Duplicate Prevention ────────────────────────────
+function validateReviewSubmission(userId, parlourId, rating, comment, completedBookings, existingReviews) {
+  const roundedRating = Math.round(Number(rating))
+  if (isNaN(roundedRating) || roundedRating < 1 || roundedRating > 5) {
+    return { success: false, error: "Rating must be between 1 and 5 stars" }
+  }
+
+  // Check 1: User must have completed appointment at parlour
+  const hasCompleted = completedBookings.some(
+    b => b.customer_id === userId && b.parlour_id === parlourId && b.status === "completed"
+  )
+  if (!hasCompleted) {
+    return { success: false, error: "Only verified customers with completed appointments can review" }
+  }
+
+  // Check 2: Prevent duplicate reviews for same parlour
+  const hasAlreadyReviewed = existingReviews.some(
+    r => r.customer_id === userId && r.parlour_id === parlourId
+  )
+  if (hasAlreadyReviewed) {
+    return { success: false, error: "Duplicate review: Customer already reviewed this parlour" }
+  }
+
+  return { success: true, rating: roundedRating }
+}
+
+test("Review integrity enforces verified booking and prevents duplicate reviews", () => {
+  const completed = [
+    { customer_id: "user-1", parlour_id: "parlour-a", status: "completed" },
+    { customer_id: "user-2", parlour_id: "parlour-a", status: "confirmed" }, // not completed
+  ]
+  const existingReviews = [
+    { id: "rev-1", customer_id: "user-1", parlour_id: "parlour-a", rating: 5 },
+  ]
+
+  // User with completed booking submits first review -> allowed
+  assert.deepEqual(
+    validateReviewSubmission("user-1", "parlour-b", 5, "Great service!", [{ customer_id: "user-1", parlour_id: "parlour-b", status: "completed" }], []),
+    { success: true, rating: 5 }
+  )
+
+  // Uncompleted customer attempt -> rejected
+  const resUncompleted = validateReviewSubmission("user-2", "parlour-a", 5, "Nice", completed, existingReviews)
+  assert.equal(resUncompleted.success, false)
+  assert.match(resUncompleted.error, /Only verified customers/)
+
+  // Duplicate review attempt -> rejected
+  const resDuplicate = validateReviewSubmission("user-1", "parlour-a", 4, "Updated", completed, existingReviews)
+  assert.equal(resDuplicate.success, false)
+  assert.match(resDuplicate.error, /Duplicate review/)
+
+  // Invalid rating (< 1 or > 5) -> rejected
+  const resBadRating = validateReviewSubmission("user-1", "parlour-b", 6, "Super", [{ customer_id: "user-1", parlour_id: "parlour-b", status: "completed" }], [])
+  assert.equal(resBadRating.success, false)
+  assert.match(resBadRating.error, /between 1 and 5/)
+})
+
+// ─── 8. Admin Entity Table Whitelisting ───────────────────────────────────────
+const ALLOWED_ADMIN_ENTITIES = new Set([
+  "parlours",
+  "services",
+  "products",
+  "promo_codes",
+  "blog_posts",
+  "service_categories",
+  "theme_settings",
+  "orders",
+  "bookings",
+  "reviews",
+  "users",
+  "footer_settings",
+  "homepage_content",
+])
+
+function isPermittedAdminTable(table) {
+  return ALLOWED_ADMIN_ENTITIES.has(table)
+}
+
+test("Admin entity whitelist permits authorized tables and blocks arbitrary tables", () => {
+  // Allowed core entities
+  assert.equal(isPermittedAdminTable("parlours"), true)
+  assert.equal(isPermittedAdminTable("services"), true)
+  assert.equal(isPermittedAdminTable("products"), true)
+  assert.equal(isPermittedAdminTable("orders"), true)
+
+  // Blocked unauthorized or sensitive tables
+  assert.equal(isPermittedAdminTable("auth.users"), false)
+  assert.equal(isPermittedAdminTable("pg_catalog"), false)
+  assert.equal(isPermittedAdminTable("arbitrary_table"), false)
+  assert.equal(isPermittedAdminTable(""), false)
+})
+
+// ─── 9. Booking Reminder Time Parsing Fix (No NaN values) ──────────────────────
+function parseBookingReminderTime(timeStr) {
+  if (!timeStr) return null
+  const ampm = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i)
+  if (ampm) {
+    let hours = parseInt(ampm[1], 10)
+    const minutes = parseInt(ampm[2], 10)
+    const period = ampm[3].toUpperCase()
+    if (period === "AM" && hours === 12) hours = 0
+    if (period === "PM" && hours !== 12) hours += 12
+    return { hours, minutes }
+  }
+  const h24 = timeStr.match(/^(\d{1,2}):(\d{2})$/)
+  if (h24) {
+    return { hours: parseInt(h24[1], 10), minutes: parseInt(h24[2], 10) }
+  }
+  return null
+}
+
+test("Booking Reminder Time parsing accurately extracts hours/minutes for 12h AM/PM without NaN", () => {
+  assert.deepEqual(parseBookingReminderTime("10:00 AM"), { hours: 10, minutes: 0 })
+  assert.deepEqual(parseBookingReminderTime("02:30 PM"), { hours: 14, minutes: 30 })
+  assert.deepEqual(parseBookingReminderTime("12:00 PM"), { hours: 12, minutes: 0 })
+  assert.deepEqual(parseBookingReminderTime("12:00 AM"), { hours: 0, minutes: 0 })
+  assert.deepEqual(parseBookingReminderTime("15:45"), { hours: 15, minutes: 45 })
+  assert.equal(parseBookingReminderTime("invalid"), null)
+})
+
 console.log("All launch readiness automated tests executed.")
+

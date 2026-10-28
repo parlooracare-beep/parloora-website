@@ -20,6 +20,7 @@ import {
   updateFooterSettings
 } from "@/lib/actions/site"
 import { ThemeCustomizer } from "@/components/admin/ThemeCustomizer"
+import { contactInfo } from "@/config/contact"
 
 export default function AdminSettingsPage() {
   const [isSaving, setIsSaving] = React.useState(false)
@@ -38,7 +39,15 @@ export default function AdminSettingsPage() {
         getFooterSettings()
       ])
       setContent(contentData)
-      setFooter(footerData)
+      setFooter(footerData || {
+        about_text: "Your premium destination for beauty and wellness services. Book appointments with top parlours in your area instantly.",
+        address: contactInfo.office,
+        phone: contactInfo.customerCare,
+        email: "",
+        facebook_url: contactInfo.social.facebook,
+        instagram_url: contactInfo.social.instagram,
+        youtube_url: contactInfo.social.youtube,
+      })
       setLoading(false)
     }
     load()
@@ -360,8 +369,8 @@ export default function AdminSettingsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label className="text-xs font-bold text-brand-gray-500 uppercase">Support Email</Label>
-                <Input defaultValue="support@parloora.com" className="h-10 rounded-lg" />
+                <Label className="text-xs font-bold text-brand-gray-500 uppercase">Customer Care Hotline</Label>
+                <Input defaultValue={contactInfo.customerCare} className="h-10 rounded-lg" />
               </div>
               <div className="space-y-2">
                 <Label className="text-xs font-bold text-brand-gray-500 uppercase">Notification Level</Label>

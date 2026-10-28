@@ -201,9 +201,29 @@ export async function updateParlourStatus(parlourId: string, status: string) {
   return { success: true, data }
 }
 
+const ALLOWED_ADMIN_ENTITIES = new Set([
+  "parlours",
+  "services",
+  "products",
+  "promo_codes",
+  "blog_posts",
+  "service_categories",
+  "theme_settings",
+  "orders",
+  "bookings",
+  "reviews",
+  "users",
+  "footer_settings",
+  "homepage_content",
+])
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function updateAdminEntity(table: string, id: string, payload: any) {
   await requireAdmin()
+  if (!ALLOWED_ADMIN_ENTITIES.has(table)) {
+    return { success: false, error: `Invalid operation: table "${table}" is not permitted for entity updates.` }
+  }
+
   const supabase = await createClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await supabase.from(table as any).update(payload).eq("id", id).select().single()
@@ -224,6 +244,10 @@ export async function updateAdminEntity(table: string, id: string, payload: any)
 
 export async function deleteAdminEntity(table: string, id: string) {
   await requireAdmin()
+  if (!ALLOWED_ADMIN_ENTITIES.has(table)) {
+    return { success: false, error: `Invalid operation: table "${table}" is not permitted for entity deletion.` }
+  }
+
   const supabase = await createClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await supabase.from(table as any).delete().eq("id", id)

@@ -36,6 +36,41 @@ export async function submitReview(data: {
     return { success: false, error: "Authentication required" }
   }
 
+  // 1. Validate rating bounds
+  const rating = Math.round(Number(data.rating))
+  if (isNaN(rating) || rating < 1 || rating > 5) {
+    return { success: false, error: "Rating must be between 1 and 5 stars." }
+  }
+
+  // 2. Verified Customer Check: Ensure customer has completed an appointment at this parlour
+  const { hasCompletedBooking } = await import("./bookings")
+  const isEligible = await hasCompletedBooking(data.parlourId)
+  const userRole = (user.app_metadata?.role ?? user.user_metadata?.role ?? "").toLowerCase()
+
+  if (!isEligible && userRole !== "admin") {
+    return {
+      success: false,
+      error: "Only customers who have completed an appointment at this parlour can leave a verified review.",
+    }
+  }
+
+  // 3. Duplicate prevention: Customers can submit only one review per parlour
+  const { data: existingReview } = await supabase
+    .from("reviews")
+    .select("id")
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    .eq("parlour_id", data.parlourId)
+    .eq("customer_id", user.id)
+    .maybeSingle()
+
+  if (existingReview && userRole !== "admin") {
+    return {
+      success: false,
+      error: "You have already submitted a review for this parlour. Thank you for your feedback!",
+    }
+  }
+
   const { error } = await supabase
     .from("reviews")
     .insert([
@@ -43,10 +78,10 @@ export async function submitReview(data: {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         parlour_id: data.parlourId,
-        rating: data.rating,
-        comment: data.comment,
+        rating,
+        comment: data.comment ? data.comment.trim() : "",
         customer_id: user.id,
-        customer_name: data.customerName,
+        customer_name: data.customerName || user.user_metadata?.display_name || "Valued Customer",
       },
     ])
 
@@ -55,8 +90,7 @@ export async function submitReview(data: {
     return { success: false, error: error.message }
   }
 
-  // Update parlour average rating (simplified)
-  // In a real app, this would be a trigger or a more complex calculation
+  // 4. Update parlour average rating accurately
   const { data: allReviews } = await supabase
     .from("reviews")
     .select("rating")

@@ -153,6 +153,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: "/shop", priority: 0.9, changeFrequency: "daily" },
     { path: "/blog", priority: 0.7, changeFrequency: "weekly" },
     { path: "/about", priority: 0.5, changeFrequency: "monthly" },
+    { path: "/contact", priority: 0.8, changeFrequency: "monthly" },
     { path: "/privacy", priority: 0.4, changeFrequency: "monthly" },
     { path: "/terms", priority: 0.4, changeFrequency: "monthly" },
     { path: "/cookies", priority: 0.4, changeFrequency: "monthly" },

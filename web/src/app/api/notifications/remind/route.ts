@@ -49,8 +49,25 @@ export async function GET(request: Request) {
     for (const booking of bookings) {
       if (!booking.time || !booking.customer_id) continue
 
-      // Parse booking time (format is usually "HH:MM:SS" or "HH:MM")
-      const [hours, minutes] = booking.time.split(":").map(Number)
+      // Parse booking time supporting both 12h AM/PM ("10:00 AM", "02:30 PM") and 24h ("14:30")
+      let hours = 0
+      let minutes = 0
+      const ampm = booking.time.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i)
+      if (ampm) {
+        hours = parseInt(ampm[1], 10)
+        minutes = parseInt(ampm[2], 10)
+        const period = ampm[3].toUpperCase()
+        if (period === "AM" && hours === 12) hours = 0
+        if (period === "PM" && hours !== 12) hours += 12
+      } else {
+        const h24 = booking.time.match(/^(\d{1,2}):(\d{2})$/)
+        if (h24) {
+          hours = parseInt(h24[1], 10)
+          minutes = parseInt(h24[2], 10)
+        } else {
+          continue // Skip invalid time format
+        }
+      }
       
       const bookingDateTime = new Date()
       bookingDateTime.setHours(hours, minutes, 0, 0)

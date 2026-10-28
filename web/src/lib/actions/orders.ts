@@ -9,7 +9,7 @@ import { requireSeller, requireUser } from "@/lib/auth-guard"
 
 type OrderInsert = Database["public"]["Tables"]["orders"]["Insert"]
 
-export async function createOrder(orderData: OrderInsert) {
+export async function createOrder(orderData: OrderInsert & { promo_code?: string }) {
   // Enforce customer authentication: must be logged in to place an order
   const { user } = await requireUser()
   const authClient = await createClient()
@@ -22,9 +22,116 @@ export async function createOrder(orderData: OrderInsert) {
   // Use service role client if configured to bypass RLS, otherwise fallback to server client
   const supabase = hasServiceRoleKey() ? createAdminClient() : authClient
 
+  // 1. Validate items array
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rawItems = Array.isArray(orderData.items) ? (orderData.items as any[]) : []
+  if (!rawItems || rawItems.length === 0) {
+    return { success: false, error: "Cannot create an order with an empty cart." }
+  }
+
+  // 2. Query products from database to revalidate authentic prices and stock
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const productIds = rawItems.map((item: any) => item.id).filter(Boolean)
+  if (productIds.length !== rawItems.length) {
+    return { success: false, error: "One or more items in cart have invalid product identifiers." }
+  }
+
+  const { data: dbProducts, error: prodErr } = await supabase
+    .from("products")
+    .select("id, name, price, stock, is_active, seller_id, image_url")
+    .in("id", productIds)
+
+  if (prodErr || !dbProducts) {
+    console.error("Failed to verify cart products from database:", prodErr)
+    return { success: false, error: "Failed to verify cart products. Please try again." }
+  }
+
+  const productMap = new Map(dbProducts.map((p) => [p.id, p]))
+
+  // 3. Verify stock availability and build verified item snapshot
+  let calculatedSubtotal = 0
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const verifiedItems: any[] = []
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  for (const item of rawItems as any[]) {
+    const dbProd = productMap.get(item.id)
+    if (!dbProd) {
+      return { success: false, error: `Product "${item.name || item.id}" was not found or is no longer sold.` }
+    }
+    if (!dbProd.is_active) {
+      return { success: false, error: `Product "${dbProd.name}" is currently unavailable.` }
+    }
+    const requestedQty = Number(item.quantity) || 1
+    if (requestedQty <= 0) {
+      return { success: false, error: `Invalid quantity for product "${dbProd.name}".` }
+    }
+    const currentStock = Number(dbProd.stock) || 0
+    if (currentStock < requestedQty) {
+      return {
+        success: false,
+        error: `Insufficient stock for "${dbProd.name}". Available: ${currentStock}, Requested: ${requestedQty}.`,
+      }
+    }
+
+    const verifiedPrice = Number(dbProd.price) || 0
+    calculatedSubtotal += verifiedPrice * requestedQty
+
+    verifiedItems.push({
+      id: dbProd.id,
+      name: dbProd.name,
+      price: verifiedPrice,
+      quantity: requestedQty,
+      seller_id: dbProd.seller_id,
+      image_url: dbProd.image_url,
+    })
+  }
+
+  // 4. Server-side promo code validation
+  let discountAmount = 0
+  if (orderData.promo_code) {
+    const { validatePromoCode } = await import("./promo")
+    const promoRes = await validatePromoCode(orderData.promo_code, "products", calculatedSubtotal)
+    if (promoRes.success && promoRes.discountAmount) {
+      discountAmount = promoRes.discountAmount
+    }
+  }
+
+  // 5. Calculate verified total on the server (Standard Bangladesh shipping: ৳60)
+  const shippingFee = 60
+  const calculatedTotal = Math.max(0, calculatedSubtotal - discountAmount + shippingFee)
+
+  // 6. Atomically decrement stock in database for purchased items
+  for (const vItem of verifiedItems) {
+    const dbProd = productMap.get(vItem.id)!
+    const newStock = Math.max(0, (dbProd.stock || 0) - vItem.quantity)
+    const { error: stockErr } = await supabase
+      .from("products")
+      .update({ stock: newStock })
+      .eq("id", vItem.id)
+
+    if (stockErr) {
+      console.error(`Failed to decrement stock for product ${vItem.id}:`, stockErr)
+    }
+  }
+
+  // 7. Insert the verified order record
+  const verifiedOrderRecord = {
+    customer_id: finalCustomerId,
+    customer_name: orderData.customer_name || user.user_metadata?.display_name || "Valued Customer",
+    phone: orderData.phone || user.user_metadata?.phone || "",
+    address: orderData.address || "",
+    total_amount: calculatedTotal,
+    status: orderData.status || "Pending",
+    payment_method: orderData.payment_method || "Cash on Delivery",
+    items: verifiedItems,
+    items_count: verifiedItems.reduce((acc, it) => acc + it.quantity, 0),
+    delivery_method: orderData.delivery_method || "Standard Shipping",
+  }
+
   const { data, error } = await supabase
     .from("orders")
-    .insert([{ ...orderData, customer_id: finalCustomerId }])
+    .insert([verifiedOrderRecord])
     .select()
     .single()
 
@@ -33,8 +140,39 @@ export async function createOrder(orderData: OrderInsert) {
     return { success: false, error: error.message }
   }
 
+  // 8. Notifications to customer and vendors
+  if (data) {
+    // Clear abandoned cart tracking for this customer
+    try {
+      const { clearCartActivity } = await import("./cart-recovery")
+      await clearCartActivity()
+    } catch {
+      // Non-blocking
+    }
+
+    await createNotification({
+      user_id: finalCustomerId,
+      title: "Order Placed Successfully",
+      message: `Your order #${data.id.slice(0, 8)} for ৳${calculatedTotal} has been placed.`,
+      type: "order",
+      link: "/dashboard",
+    })
+
+    const vendorIds = new Set(verifiedItems.map((it) => it.seller_id).filter(Boolean))
+    for (const vId of vendorIds) {
+      await createNotification({
+        user_id: vId,
+        title: "New Product Order Received",
+        message: `You received a new product order #${data.id.slice(0, 8)}.`,
+        type: "order",
+        link: "/seller/orders",
+      })
+    }
+  }
+
   revalidatePath("/dashboard")
   revalidatePath("/seller/orders")
+  revalidatePath("/shop")
   
   return { success: true, data }
 }
