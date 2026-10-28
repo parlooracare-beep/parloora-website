@@ -16,6 +16,8 @@ export default function robots(): MetadataRoute.Robots {
           "/parlours/",
           "/shop",
           "/shop/",
+          "/locations",
+          "/locations/",
           "/about",
           "/privacy",
           "/terms",

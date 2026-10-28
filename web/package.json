@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --test scripts/test-launch-readiness.mjs"
+    "test": "node --test scripts/test-launch-readiness.mjs && node --experimental-strip-types --test scripts/test-seo-districts.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",

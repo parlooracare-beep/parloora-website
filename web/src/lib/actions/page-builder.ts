@@ -18,6 +18,7 @@ const DEFAULT_SECTIONS: PageSection[] = [
   { id: "categories", name: "Service Categories", visible: true },
   { id: "steps", name: "How It Works Steps", visible: true },
   { id: "shop", name: "Shop Highlights", visible: true },
+  { id: "locations", name: "Explore by Location (SEO)", visible: true },
   { id: "cta", name: "CTA Banner", visible: true }
 ]
 

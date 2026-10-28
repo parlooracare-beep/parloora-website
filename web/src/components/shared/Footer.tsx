@@ -98,8 +98,8 @@ export function Footer() {
               {[
                 { name: "About Us", href: "/about" },
                 { name: "Find a Parlour", href: "/parlours" },
+                { name: "Bangladesh Locations", href: "/locations" },
                 { name: "All Services", href: "/parlours" },
-                { name: "Special Offers", href: "/parlours" },
                 { name: "Beauty Blog", href: "/blog" }
               ].map(item => (
                 <li key={item.name}>
@@ -165,7 +165,40 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="pt-8 md:pt-10 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
+        {/* Popular Locations SEO Crawl Strip */}
+        <div className="pt-8 pb-6 border-t border-white/10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#E2A9A9]">
+              Popular Locations in Bangladesh:
+            </span>
+            <Link href="/locations" className="text-xs font-bold text-white/70 hover:text-white underline">
+              View All 64 Districts &rarr;
+            </Link>
+          </div>
+          <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-white/60 font-medium">
+            {[
+              { name: "Moulvibazar", href: "/locations/moulvibazar" },
+              { name: "Sylhet", href: "/locations/sylhet" },
+              { name: "Dhaka", href: "/locations/dhaka" },
+              { name: "Chattogram", href: "/locations/chattogram" },
+              { name: "Cox's Bazar", href: "/locations/coxs-bazar" },
+              { name: "Cumilla", href: "/locations/cumilla" },
+              { name: "Gazipur", href: "/locations/gazipur" },
+              { name: "Rajshahi", href: "/locations/rajshahi" },
+              { name: "Bogura", href: "/locations/bogura" },
+              { name: "Khulna", href: "/locations/khulna" },
+              { name: "Rangpur", href: "/locations/rangpur" },
+              { name: "Mymensingh", href: "/locations/mymensingh" },
+              { name: "Barishal", href: "/locations/barishal" },
+            ].map((loc) => (
+              <Link key={loc.href} href={loc.href} className="hover:text-white transition-colors">
+                {loc.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
           <p className="text-xs text-brand-gray-500 font-bold uppercase tracking-widest text-center md:text-left">
             &copy; {currentYear} Parloora Platform. Engineered for Beauty.
           </p>

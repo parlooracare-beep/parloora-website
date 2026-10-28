@@ -1,0 +1,1026 @@
+/**
+ * Parloora Centralized Bangladesh Locations & SEO Dataset
+ * Source of Truth: Government of Bangladesh Administrative Directory (8 Divisions, 64 Districts)
+ * https://bangladesh.gov.bd/views/district-list/District-List/
+ */
+
+export interface Division {
+  id: string
+  name: string
+  bnName: string
+  slug: string
+  headquarters: string
+  districtCount: number
+  description: string
+}
+
+export interface District {
+  id: string
+  name: string
+  bnName: string
+  slug: string
+  divisionId: string
+  divisionName: string
+  divisionSlug: string
+  popularAreas: string[]
+  aliases: string[]
+  metaDescription: string
+}
+
+export interface ServiceCategorySEO {
+  id: string
+  slug: string
+  name: string
+  bnName: string
+  metaTitleSuffix: string
+  description: string
+  keywords: string[]
+  iconName: string
+}
+
+// ─── 8 ADMINISTRATIVE DIVISIONS ──────────────────────────────────────────────
+
+export const BANGLADESH_DIVISIONS: Division[] = [
+  {
+    id: "dhaka",
+    name: "Dhaka",
+    bnName: "ঢাকা",
+    slug: "dhaka-division",
+    headquarters: "Dhaka",
+    districtCount: 13,
+    description: "The capital division of Bangladesh, featuring the highest concentration of premium beauty parlours, luxury salons, and professional aesthetic clinics.",
+  },
+  {
+    id: "chattogram",
+    name: "Chattogram",
+    bnName: "চট্টগ্রাম",
+    slug: "chattogram-division",
+    headquarters: "Chattogram",
+    districtCount: 11,
+    description: "The commercial and coastal hub of southeastern Bangladesh, home to renowned bridal makeup artists, hair care studios, and luxury wellness spas.",
+  },
+  {
+    id: "rajshahi",
+    name: "Rajshahi",
+    bnName: "রাজশাহী",
+    slug: "rajshahi-division",
+    headquarters: "Rajshahi",
+    districtCount: 8,
+    description: "The historic northern educational and silk division, offering established family beauty parlours, bridal studios, and modern men's grooming lounges.",
+  },
+  {
+    id: "khulna",
+    name: "Khulna",
+    bnName: "খুলনা",
+    slug: "khulna-division",
+    headquarters: "Khulna",
+    districtCount: 10,
+    description: "The southwestern economic center, home to growing beauty tech salons, personalized bridal care artists, and modern self-care parlours.",
+  },
+  {
+    id: "sylhet",
+    name: "Sylhet",
+    bnName: "সিলেট",
+    slug: "sylhet-division",
+    headquarters: "Sylhet",
+    districtCount: 4,
+    description: "The scenic northeastern division, renowned for expatriate-standard luxury bridal styling, beauty parlours, and premium spa retreats across Moulvibazar and Sylhet.",
+  },
+  {
+    id: "rangpur",
+    name: "Rangpur",
+    bnName: "রংপুর",
+    slug: "rangpur-division",
+    headquarters: "Rangpur",
+    districtCount: 8,
+    description: "The northern agricultural heartland, with rapidly growing modern salon networks, bridal beauty houses, and affordable grooming centers.",
+  },
+  {
+    id: "mymensingh",
+    name: "Mymensingh",
+    bnName: "ময়মনসিংহ",
+    slug: "mymensingh-division",
+    headquarters: "Mymensingh",
+    districtCount: 4,
+    description: "Centrally located divisional center with traditional herbal beauty treatments, modern women's parlours, and expert styling centers.",
+  },
+  {
+    id: "barishal",
+    name: "Barishal",
+    bnName: "বরিশাল",
+    slug: "barishal-division",
+    headquarters: "Barishal",
+    districtCount: 6,
+    description: "The riverine southern division, providing trusted local beauty care, bridal makeovers, and personalized self-care services.",
+  },
+]
+
+// ─── ALL 64 DISTRICTS OF BANGLADESH ──────────────────────────────────────────
+
+export const BANGLADESH_DISTRICTS_DATA: District[] = [
+  // ── Dhaka Division (13) ──
+  {
+    id: "dhaka",
+    name: "Dhaka",
+    bnName: "ঢাকা",
+    slug: "dhaka",
+    divisionId: "dhaka",
+    divisionName: "Dhaka",
+    divisionSlug: "dhaka-division",
+    popularAreas: ["Gulshan", "Banani", "Dhanmondi", "Uttara", "Mirpur", "Mohakhali", "Bashundhara", "Baily Road"],
+    aliases: ["Dhaka", "Dacca", "ঢাকা"],
+    metaDescription: "Find verified beauty parlours, salons, and makeup artists in Dhaka. Compare prices, read client reviews, and book self-care appointments instantly on Parloora.",
+  },
+  {
+    id: "faridpur",
+    name: "Faridpur",
+    bnName: "ফরিদপুর",
+    slug: "faridpur",
+    divisionId: "dhaka",
+    divisionName: "Dhaka",
+    divisionSlug: "dhaka-division",
+    popularAreas: ["Faridpur Sadar", "Boalmari", "Bhanga", "Nagarkanda"],
+    aliases: ["Faridpur", "ফরিদপুর"],
+    metaDescription: "Explore top beauty parlours, bridal specialists, and grooming salons in Faridpur with genuine pricing and verified services on Parloora.",
+  },
+  {
+    id: "gazipur",
+    name: "Gazipur",
+    bnName: "গাজীপুর",
+    slug: "gazipur",
+    divisionId: "dhaka",
+    divisionName: "Dhaka",
+    divisionSlug: "dhaka-division",
+    popularAreas: ["Gazipur Sadar", "Tongi", "Konabari", "Kaliakair", "Kapasia"],
+    aliases: ["Gazipur", "গাজীপুর"],
+    metaDescription: "Book self-care appointments at verified beauty parlours and hair salons in Gazipur and Tongi on Parloora.",
+  },
+  {
+    id: "gopalganj",
+    name: "Gopalganj",
+    bnName: "গোপালগঞ্জ",
+    slug: "gopalganj",
+    divisionId: "dhaka",
+    divisionName: "Dhaka",
+    divisionSlug: "dhaka-division",
+    popularAreas: ["Gopalganj Sadar", "Kashiani", "Kotalipara", "Tungipara"],
+    aliases: ["Gopalganj", "গোপালগঞ্জ"],
+    metaDescription: "Discover reputable beauty parlours, men's grooming lounges, and bridal artists in Gopalganj on Parloora.",
+  },
+  {
+    id: "kishoreganj",
+    name: "Kishoreganj",
+    bnName: "কিশোরগঞ্জ",
+    slug: "kishoreganj",
+    divisionId: "dhaka",
+    divisionName: "Dhaka",
+    divisionSlug: "dhaka-division",
+    popularAreas: ["Kishoreganj Sadar", "Bhairab", "Bajitpur", "Katiadi"],
+    aliases: ["Kishoreganj", "কিশোরগঞ্জ"],
+    metaDescription: "Find trusted beauty parlours, hair stylists, and makeover experts across Kishoreganj and Bhairab with Parloora.",
+  },
+  {
+    id: "madaripur",
+    name: "Madaripur",
+    bnName: "মাদারীপুর",
+    slug: "madaripur",
+    divisionId: "dhaka",
+    divisionName: "Dhaka",
+    divisionSlug: "dhaka-division",
+    popularAreas: ["Madaripur Sadar", "Shibchar", "Kalkini", "Rajoir"],
+    aliases: ["Madaripur", "মাদারীপুর"],
+    metaDescription: "Browse verified beauty parlours and grooming centers in Madaripur. Compare service rates and book online with Parloora.",
+  },
+  {
+    id: "manikganj",
+    name: "Manikganj",
+    bnName: "মানিকগঞ্জ",
+    slug: "manikganj",
+    divisionId: "dhaka",
+    divisionName: "Dhaka",
+    divisionSlug: "dhaka-division",
+    popularAreas: ["Manikganj Sadar", "Singair", "Saturia", "Shivalaya"],
+    aliases: ["Manikganj", "মানিকগঞ্জ"],
+    metaDescription: "Discover authentic beauty parlours and bridal salons in Manikganj with verified pricing and reviews on Parloora.",
+  },
+  {
+    id: "munshiganj",
+    name: "Munshiganj",
+    bnName: "মুন্সীগঞ্জ",
+    slug: "munshiganj",
+    divisionId: "dhaka",
+    divisionName: "Dhaka",
+    divisionSlug: "dhaka-division",
+    popularAreas: ["Munshiganj Sadar", "Sreenagar", "Sirajdikhan", "Lohajang"],
+    aliases: ["Munshiganj", "মুন্সীগঞ্জ"],
+    metaDescription: "Find verified self-care salons, beauty parlours, and makeup artists in Munshiganj on Parloora.",
+  },
+  {
+    id: "narayanganj",
+    name: "Narayanganj",
+    bnName: "নারায়ণগঞ্জ",
+    slug: "narayanganj",
+    divisionId: "dhaka",
+    divisionName: "Dhaka",
+    divisionSlug: "dhaka-division",
+    popularAreas: ["Narayanganj Sadar", "Chashara", "Fatullah", "Siddhirganj", "Sonargaon"],
+    aliases: ["Narayanganj", "নারায়ণগঞ্জ"],
+    metaDescription: "Discover top beauty salons and bridal makeover centers in Narayanganj. Book haircuts, facials, and grooming in seconds on Parloora.",
+  },
+  {
+    id: "narsingdi",
+    name: "Narsingdi",
+    bnName: "নরসিংদী",
+    slug: "narsingdi",
+    divisionId: "dhaka",
+    divisionName: "Dhaka",
+    divisionSlug: "dhaka-division",
+    popularAreas: ["Narsingdi Sadar", "Madhabdi", "Palash", "Shibpur"],
+    aliases: ["Narsingdi", "নরসিংদী"],
+    metaDescription: "Find reliable beauty parlours and bridal styling specialists in Narsingdi with real prices and customer reviews on Parloora.",
+  },
+  {
+    id: "rajbari",
+    name: "Rajbari",
+    bnName: "রাজবাড়ী",
+    slug: "rajbari",
+    divisionId: "dhaka",
+    divisionName: "Dhaka",
+    divisionSlug: "dhaka-division",
+    popularAreas: ["Rajbari Sadar", "Pangsha", "Goalanda", "Baliakandi"],
+    aliases: ["Rajbari", "রাজবাড়ী"],
+    metaDescription: "Explore verified beauty parlours, hair spas, and grooming shops in Rajbari with Parloora.",
+  },
+  {
+    id: "shariatpur",
+    name: "Shariatpur",
+    bnName: "শরীয়তপুর",
+    slug: "shariatpur",
+    divisionId: "dhaka",
+    divisionName: "Dhaka",
+    divisionSlug: "dhaka-division",
+    popularAreas: ["Shariatpur Sadar", "Naria", "Zajira", "Bhedarganj"],
+    aliases: ["Shariatpur", "শরীয়তপুর"],
+    metaDescription: "Find reputable salons and beauty parlours in Shariatpur. Compare services and book verified appointments on Parloora.",
+  },
+  {
+    id: "tangail",
+    name: "Tangail",
+    bnName: "টাঙ্গাইল",
+    slug: "tangail",
+    divisionId: "dhaka",
+    divisionName: "Dhaka",
+    divisionSlug: "dhaka-division",
+    popularAreas: ["Tangail Sadar", "Mirzapur", "Madhupur", "Ghatail", "Sakhipur"],
+    aliases: ["Tangail", "টাঙ্গাইল"],
+    metaDescription: "Book self-care services at verified beauty parlours and hair salons in Tangail easily on Parloora.",
+  },
+
+  // ── Chattogram Division (11) ──
+  {
+    id: "chattogram",
+    name: "Chattogram",
+    bnName: "চট্টগ্রাম",
+    slug: "chattogram",
+    divisionId: "chattogram",
+    divisionName: "Chattogram",
+    divisionSlug: "chattogram-division",
+    popularAreas: ["GEC Circle", "Agrabad", "Nasirabad", "Khulshi", "Panchlaish", "Halishahar", "Chawkbazar"],
+    aliases: ["Chattogram", "Chittagong", "চট্টগ্রাম"],
+    metaDescription: "Find premium beauty parlours, bridal studios, and luxury spas in Chattogram. Compare prices, ratings, and book online with Parloora.",
+  },
+  {
+    id: "coxs-bazar",
+    name: "Cox's Bazar",
+    bnName: "কক্সবাজার",
+    slug: "coxs-bazar",
+    divisionId: "chattogram",
+    divisionName: "Chattogram",
+    divisionSlug: "chattogram-division",
+    popularAreas: ["Cox's Bazar Sadar", "Kolatoli", "Laboni Beach Area", "Ramu", "Teknaf"],
+    aliases: ["Cox's Bazar", "Coxs Bazar", "Coxsbazar", "কক্সবাজার"],
+    metaDescription: "Discover beauty parlours, beach resort wellness spas, and hair salons in Cox's Bazar on Parloora.",
+  },
+  {
+    id: "cumilla",
+    name: "Cumilla",
+    bnName: "কুমিল্লা",
+    slug: "cumilla",
+    divisionId: "chattogram",
+    divisionName: "Chattogram",
+    divisionSlug: "chattogram-division",
+    popularAreas: ["Kandirpar", "Cumilla Sadar", "Laksam", "Debidwar", "Daudkandi"],
+    aliases: ["Cumilla", "Comilla", "কুমিল্লা"],
+    metaDescription: "Find verified beauty parlours, bridal artists, and men's salons in Cumilla (Comilla) on Parloora.",
+  },
+  {
+    id: "feni",
+    name: "Feni",
+    bnName: "ফেনী",
+    slug: "feni",
+    divisionId: "chattogram",
+    divisionName: "Chattogram",
+    divisionSlug: "chattogram-division",
+    popularAreas: ["Feni Sadar", "Daganbhuiyan", "Chhagalnaiya", "Parshuram"],
+    aliases: ["Feni", "ফেনী"],
+    metaDescription: "Explore trusted beauty salons, facial centers, and bridal makeup studios in Feni with Parloora.",
+  },
+  {
+    id: "brahmanbaria",
+    name: "Brahmanbaria",
+    bnName: "ব্রাহ্মণবাড়িয়া",
+    slug: "brahmanbaria",
+    divisionId: "chattogram",
+    divisionName: "Chattogram",
+    divisionSlug: "chattogram-division",
+    popularAreas: ["Brahmanbaria Sadar", "Ashuganj", "Kasba", "Nabinagar"],
+    aliases: ["Brahmanbaria", "B.Baria", "ব্রাহ্মণবাড়িয়া"],
+    metaDescription: "Find reputable beauty parlours, hair grooming centers, and bridal artists in Brahmanbaria on Parloora.",
+  },
+  {
+    id: "chandpur",
+    name: "Chandpur",
+    bnName: "চাঁদপুর",
+    slug: "chandpur",
+    divisionId: "chattogram",
+    divisionName: "Chattogram",
+    divisionSlug: "chattogram-division",
+    popularAreas: ["Chandpur Sadar", "Hajiganj", "Matlab", "Faridganj"],
+    aliases: ["Chandpur", "চাঁদপুর"],
+    metaDescription: "Discover authentic beauty parlours and hair salons in Chandpur. Check prices and book online with Parloora.",
+  },
+  {
+    id: "noakhali",
+    name: "Noakhali",
+    bnName: "নোয়াখালী",
+    slug: "noakhali",
+    divisionId: "chattogram",
+    divisionName: "Chattogram",
+    divisionSlug: "chattogram-division",
+    popularAreas: ["Maijdee", "Noakhali Sadar", "Begumganj", "Chowmuhani"],
+    aliases: ["Noakhali", "নোয়াখালী"],
+    metaDescription: "Find top beauty parlours, facial spas, and men's salons in Noakhali and Chowmuhani on Parloora.",
+  },
+  {
+    id: "lakshmipur",
+    name: "Lakshmipur",
+    bnName: "লক্ষ্মীপুর",
+    slug: "lakshmipur",
+    divisionId: "chattogram",
+    divisionName: "Chattogram",
+    divisionSlug: "chattogram-division",
+    popularAreas: ["Lakshmipur Sadar", "Raipur", "Ramganj", "Ramgati"],
+    aliases: ["Lakshmipur", "Laxmipur", "লক্ষ্মীপুর"],
+    metaDescription: "Browse verified beauty parlours and grooming centers in Lakshmipur on Parloora.",
+  },
+  {
+    id: "khagrachhari",
+    name: "Khagrachhari",
+    bnName: "খাগড়াছড়ি",
+    slug: "khagrachhari",
+    divisionId: "chattogram",
+    divisionName: "Chattogram",
+    divisionSlug: "chattogram-division",
+    popularAreas: ["Khagrachhari Sadar", "Dighinala", "Ramgarh", "Matiranga"],
+    aliases: ["Khagrachhari", "Khagrachari", "খাগড়াছড়ি"],
+    metaDescription: "Discover beauty care and grooming services in Khagrachhari Hill District with Parloora.",
+  },
+  {
+    id: "rangamati",
+    name: "Rangamati",
+    bnName: "রাঙ্গামাটি",
+    slug: "rangamati",
+    divisionId: "chattogram",
+    divisionName: "Chattogram",
+    divisionSlug: "chattogram-division",
+    popularAreas: ["Rangamati Sadar", "Kaptai", "Baghaichhari", "Barkal"],
+    aliases: ["Rangamati", "রাঙ্গামাটি"],
+    metaDescription: "Explore verified beauty parlours and grooming salons in Rangamati Hill District on Parloora.",
+  },
+  {
+    id: "bandarban",
+    name: "Bandarban",
+    bnName: "বান্দরবান",
+    slug: "bandarban",
+    divisionId: "chattogram",
+    divisionName: "Chattogram",
+    divisionSlug: "chattogram-division",
+    popularAreas: ["Bandarban Sadar", "Ruma", "Thanchi", "Lama"],
+    aliases: ["Bandarban", "বান্দরবান"],
+    metaDescription: "Find trusted beauty and self-care service providers in Bandarban on Parloora.",
+  },
+
+  // ── Rajshahi Division (8) ──
+  {
+    id: "rajshahi",
+    name: "Rajshahi",
+    bnName: "রাজশাহী",
+    slug: "rajshahi",
+    divisionId: "rajshahi",
+    divisionName: "Rajshahi",
+    divisionSlug: "rajshahi-division",
+    popularAreas: ["Shaheb Bazar", "Rajshahi Sadar", "Motihar", "Boalia", "Upashahar"],
+    aliases: ["Rajshahi", "রাজশাহী"],
+    metaDescription: "Find verified beauty parlours, hair styling salons, and bridal artists in Rajshahi on Parloora. Compare prices and book instantly.",
+  },
+  {
+    id: "bogura",
+    name: "Bogura",
+    bnName: "বগুড়া",
+    slug: "bogura",
+    divisionId: "rajshahi",
+    divisionName: "Rajshahi",
+    divisionSlug: "rajshahi-division",
+    popularAreas: ["Jaleshwaritola", "Bogura Sadar", "Sherpur", "Shibganj", "Gabtali"],
+    aliases: ["Bogura", "Bogra", "বগুড়া"],
+    metaDescription: "Discover top beauty parlours and bridal studios in Bogura (Jaleshwaritola) with genuine reviews on Parloora.",
+  },
+  {
+    id: "pabna",
+    name: "Pabna",
+    bnName: "পাবনা",
+    slug: "pabna",
+    divisionId: "rajshahi",
+    divisionName: "Rajshahi",
+    divisionSlug: "rajshahi-division",
+    popularAreas: ["Pabna Sadar", "Ishwardi", "Santhia", "Bera", "Chatmohar"],
+    aliases: ["Pabna", "পাবনা"],
+    metaDescription: "Find verified beauty parlours and grooming salons in Pabna and Ishwardi on Parloora.",
+  },
+  {
+    id: "sirajganj",
+    name: "Sirajganj",
+    bnName: "সিরাজগঞ্জ",
+    slug: "sirajganj",
+    divisionId: "rajshahi",
+    divisionName: "Rajshahi",
+    divisionSlug: "rajshahi-division",
+    popularAreas: ["Sirajganj Sadar", "Shahjadpur", "Ullapara", "Belkuchi"],
+    aliases: ["Sirajganj", "সিরাজগঞ্জ"],
+    metaDescription: "Explore reputable beauty parlours and self-care studios in Sirajganj on Parloora.",
+  },
+  {
+    id: "naogaon",
+    name: "Naogaon",
+    bnName: "নওগাঁ",
+    slug: "naogaon",
+    divisionId: "rajshahi",
+    divisionName: "Rajshahi",
+    divisionSlug: "rajshahi-division",
+    popularAreas: ["Naogaon Sadar", "Patnitala", "Mohadevpur", "Manda"],
+    aliases: ["Naogaon", "নওগাঁ"],
+    metaDescription: "Discover authentic beauty parlours and hair salons in Naogaon on Parloora.",
+  },
+  {
+    id: "natore",
+    name: "Natore",
+    bnName: "নাটোর",
+    slug: "natore",
+    divisionId: "rajshahi",
+    divisionName: "Rajshahi",
+    divisionSlug: "rajshahi-division",
+    popularAreas: ["Natore Sadar", "Singra", "Baraigram", "Lalpur"],
+    aliases: ["Natore", "নাটোর"],
+    metaDescription: "Find verified beauty salons, facial care, and bridal makeup providers in Natore on Parloora.",
+  },
+  {
+    id: "chapainawabganj",
+    name: "Chapainawabganj",
+    bnName: "চাঁপাইনবাবগঞ্জ",
+    slug: "chapainawabganj",
+    divisionId: "rajshahi",
+    divisionName: "Rajshahi",
+    divisionSlug: "rajshahi-division",
+    popularAreas: ["Nawabganj Sadar", "Shibganj", "Bholahat", "Nachole"],
+    aliases: ["Chapainawabganj", "Nawabganj", "চাঁপাইনবাবগঞ্জ"],
+    metaDescription: "Explore trusted beauty care, bridal stylists, and salons in Chapainawabganj on Parloora.",
+  },
+  {
+    id: "joypurhat",
+    name: "Joypurhat",
+    bnName: "জয়পুরহাট",
+    slug: "joypurhat",
+    divisionId: "rajshahi",
+    divisionName: "Rajshahi",
+    divisionSlug: "rajshahi-division",
+    popularAreas: ["Joypurhat Sadar", "Panchbibi", "Kalai", "Khetlal"],
+    aliases: ["Joypurhat", "জয়পুরহাট"],
+    metaDescription: "Find quality beauty parlours and self-care services in Joypurhat on Parloora.",
+  },
+
+  // ── Khulna Division (10) ──
+  {
+    id: "khulna",
+    name: "Khulna",
+    bnName: "খুলনা",
+    slug: "khulna",
+    divisionId: "khulna",
+    divisionName: "Khulna",
+    divisionSlug: "khulna-division",
+    popularAreas: ["Khulna Sadar", "Sonadanga", "Boyra", "Khalishpur", "Daulatpur"],
+    aliases: ["Khulna", "খুলনা"],
+    metaDescription: "Find top beauty parlours, hair treatment salons, and bridal makeover artists in Khulna on Parloora.",
+  },
+  {
+    id: "jashore",
+    name: "Jashore",
+    bnName: "যশোর",
+    slug: "jashore",
+    divisionId: "khulna",
+    divisionName: "Khulna",
+    divisionSlug: "khulna-division",
+    popularAreas: ["Jashore Sadar", "Benapole", "Jhikargachha", "Keshabpur"],
+    aliases: ["Jashore", "Jessore", "যশোর"],
+    metaDescription: "Discover verified beauty parlours, haircut stylists, and makeup artists in Jashore on Parloora.",
+  },
+  {
+    id: "kushtia",
+    name: "Kushtia",
+    bnName: "কুষ্টিয়া",
+    slug: "kushtia",
+    divisionId: "khulna",
+    divisionName: "Khulna",
+    divisionSlug: "khulna-division",
+    popularAreas: ["Kushtia Sadar", "Kumarkhali", "Bheramara", "Mirpur"],
+    aliases: ["Kushtia", "কুষ্টিয়া"],
+    metaDescription: "Find reputable beauty parlours and bridal studios in Kushtia with authentic prices on Parloora.",
+  },
+  {
+    id: "satkhira",
+    name: "Satkhira",
+    bnName: "সাতক্ষীরা",
+    slug: "satkhira",
+    divisionId: "khulna",
+    divisionName: "Khulna",
+    divisionSlug: "khulna-division",
+    popularAreas: ["Satkhira Sadar", "Kalaroa", "Tala", "Shyamnagar"],
+    aliases: ["Satkhira", "সাতক্ষীরা"],
+    metaDescription: "Explore trusted beauty salons and bridal makeover centers in Satkhira on Parloora.",
+  },
+  {
+    id: "jhenaidah",
+    name: "Jhenaidah",
+    bnName: "ঝিনাইদহ",
+    slug: "jhenaidah",
+    divisionId: "khulna",
+    divisionName: "Khulna",
+    divisionSlug: "khulna-division",
+    popularAreas: ["Jhenaidah Sadar", "Kaliganj", "Kotchandpur", "Shailkupa"],
+    aliases: ["Jhenaidah", "ঝিনাইদহ"],
+    metaDescription: "Find verified beauty care and grooming salons in Jhenaidah on Parloora.",
+  },
+  {
+    id: "chuadanga",
+    name: "Chuadanga",
+    bnName: "চুয়াডাঙ্গা",
+    slug: "chuadanga",
+    divisionId: "khulna",
+    divisionName: "Khulna",
+    divisionSlug: "khulna-division",
+    popularAreas: ["Chuadanga Sadar", "Alamdanga", "Damurhuda", "Jibannagar"],
+    aliases: ["Chuadanga", "চুয়াডাঙ্গা"],
+    metaDescription: "Discover quality beauty parlours and bridal artists in Chuadanga on Parloora.",
+  },
+  {
+    id: "meherpur",
+    name: "Meherpur",
+    bnName: "মেহেরপুর",
+    slug: "meherpur",
+    divisionId: "khulna",
+    divisionName: "Khulna",
+    divisionSlug: "khulna-division",
+    popularAreas: ["Meherpur Sadar", "Mujibnagar", "Gangni"],
+    aliases: ["Meherpur", "মেহেরপুর"],
+    metaDescription: "Browse verified beauty parlours and hair salons in Meherpur with Parloora.",
+  },
+  {
+    id: "magura",
+    name: "Magura",
+    bnName: "মাগুরা",
+    slug: "magura",
+    divisionId: "khulna",
+    divisionName: "Khulna",
+    divisionSlug: "khulna-division",
+    popularAreas: ["Magura Sadar", "Sreepur", "Mohammadpur", "Shalikha"],
+    aliases: ["Magura", "মাগুরা"],
+    metaDescription: "Explore authentic beauty salons, bridal stylists, and spas in Magura on Parloora.",
+  },
+  {
+    id: "narail",
+    name: "Narail",
+    bnName: "নড়াইল",
+    slug: "narail",
+    divisionId: "khulna",
+    divisionName: "Khulna",
+    divisionSlug: "khulna-division",
+    popularAreas: ["Narail Sadar", "Lohagara", "Kalia"],
+    aliases: ["Narail", "নড়াইল"],
+    metaDescription: "Find reputable beauty parlours and grooming services in Narail on Parloora.",
+  },
+  {
+    id: "bagerhat",
+    name: "Bagerhat",
+    bnName: "বাগেরহাট",
+    slug: "bagerhat",
+    divisionId: "khulna",
+    divisionName: "Khulna",
+    divisionSlug: "khulna-division",
+    popularAreas: ["Bagerhat Sadar", "Mongla", "Fakirhat", "Rampal"],
+    aliases: ["Bagerhat", "বাগেরহাট"],
+    metaDescription: "Discover beauty care and self-care providers in historic Bagerhat on Parloora.",
+  },
+
+  // ── Sylhet Division (4) ──
+  {
+    id: "sylhet",
+    name: "Sylhet",
+    bnName: "সিলেট",
+    slug: "sylhet",
+    divisionId: "sylhet",
+    divisionName: "Sylhet",
+    divisionSlug: "sylhet-division",
+    popularAreas: ["Zindabazar", "Amberkhana", "Kumarpara", "Upashahar", "Shibganj", "Lamabazar", "Subidbazar"],
+    aliases: ["Sylhet", "Sylhet ", "সিলেট"],
+    metaDescription: "Discover premier beauty parlours, luxury bridal salons, and spas in Sylhet (Zindabazar, Amberkhana). Compare prices and book instantly with Parloora.",
+  },
+  {
+    id: "moulvibazar",
+    name: "Moulvibazar",
+    bnName: "মৌলভীবাজার",
+    slug: "moulvibazar",
+    divisionId: "sylhet",
+    divisionName: "Sylhet",
+    divisionSlug: "sylhet-division",
+    popularAreas: ["Moulvibazar Sadar", "Sreemangal", "Kulaura", "Kamalganj", "Barlekha", "Juri", "Rajnagar"],
+    aliases: ["Moulvibazar", "Moulvibazar ", "Maulvibazar", "Maulvibazar ", "মৌলভীবাজার"],
+    metaDescription: "Find verified beauty parlours, hair salons, and makeup artists in Moulvibazar & Sreemangal. Explore genuine provider profiles and book online with Parloora.",
+  },
+  {
+    id: "habiganj",
+    name: "Habiganj",
+    bnName: "হবিগঞ্জ",
+    slug: "habiganj",
+    divisionId: "sylhet",
+    divisionName: "Sylhet",
+    divisionSlug: "sylhet-division",
+    popularAreas: ["Habiganj Sadar", "Madhabpur", "Nabiganj", "Bahubal", "Chunarughat"],
+    aliases: ["Habiganj", "হবিগঞ্জ"],
+    metaDescription: "Discover verified beauty parlours, bridal studios, and grooming centers in Habiganj with Parloora.",
+  },
+  {
+    id: "sunamganj",
+    name: "Sunamganj",
+    bnName: "সুনামগঞ্জ",
+    slug: "sunamganj",
+    divisionId: "sylhet",
+    divisionName: "Sylhet",
+    divisionSlug: "sylhet-division",
+    popularAreas: ["Sunamganj Sadar", "Chhatak", "Jagannathpur", "Tahirpur"],
+    aliases: ["Sunamganj", "সুনামগঞ্জ"],
+    metaDescription: "Explore trusted beauty salons and bridal makeup artists in Sunamganj on Parloora.",
+  },
+
+  // ── Rangpur Division (8) ──
+  {
+    id: "rangpur",
+    name: "Rangpur",
+    bnName: "রংপুর",
+    slug: "rangpur",
+    divisionId: "rangpur",
+    divisionName: "Rangpur",
+    divisionSlug: "rangpur-division",
+    popularAreas: ["Jahaj Company Mor", "Rangpur Sadar", "Dhap", "Pairaband", "Badarganj"],
+    aliases: ["Rangpur", "রংপুর"],
+    metaDescription: "Find top beauty parlours, hair stylists, and bridal makeover artists in Rangpur. Compare prices and book on Parloora.",
+  },
+  {
+    id: "dinajpur",
+    name: "Dinajpur",
+    bnName: "দিনাজপুর",
+    slug: "dinajpur",
+    divisionId: "rangpur",
+    divisionName: "Rangpur",
+    divisionSlug: "rangpur-division",
+    popularAreas: ["Dinajpur Sadar", "Phulbari", "Birganj", "Kaharole", "Nawabganj"],
+    aliases: ["Dinajpur", "দিনাজপুর"],
+    metaDescription: "Discover verified beauty parlours and hair salons in Dinajpur with Parloora.",
+  },
+  {
+    id: "gaibandha",
+    name: "Gaibandha",
+    bnName: "গাইবান্ধা",
+    slug: "gaibandha",
+    divisionId: "rangpur",
+    divisionName: "Rangpur",
+    divisionSlug: "rangpur-division",
+    popularAreas: ["Gaibandha Sadar", "Gobindaganj", "Palashbari", "Sundarganj"],
+    aliases: ["Gaibandha", "গাইবান্ধা"],
+    metaDescription: "Explore trusted beauty care, bridal makeup, and grooming services in Gaibandha on Parloora.",
+  },
+  {
+    id: "kurigram",
+    name: "Kurigram",
+    bnName: "কুড়িগ্রাম",
+    slug: "kurigram",
+    divisionId: "rangpur",
+    divisionName: "Rangpur",
+    divisionSlug: "rangpur-division",
+    popularAreas: ["Kurigram Sadar", "Nageshwari", "Bhurungamari", "Ulipur"],
+    aliases: ["Kurigram", "কুড়িগ্রাম"],
+    metaDescription: "Find quality beauty salons and self-care providers in Kurigram with Parloora.",
+  },
+  {
+    id: "lalmonirhat",
+    name: "Lalmonirhat",
+    bnName: "লালমনিরহাট",
+    slug: "lalmonirhat",
+    divisionId: "rangpur",
+    divisionName: "Rangpur",
+    divisionSlug: "rangpur-division",
+    popularAreas: ["Lalmonirhat Sadar", "Patgram", "Hatibandha", "Aditmari"],
+    aliases: ["Lalmonirhat", "লালমনিরহাট"],
+    metaDescription: "Discover verified beauty parlours and hair styling centers in Lalmonirhat on Parloora.",
+  },
+  {
+    id: "nilphamari",
+    name: "Nilphamari",
+    bnName: "নীলফামারী",
+    slug: "nilphamari",
+    divisionId: "rangpur",
+    divisionName: "Rangpur",
+    divisionSlug: "rangpur-division",
+    popularAreas: ["Saidpur", "Nilphamari Sadar", "Domar", "Jaldhaka"],
+    aliases: ["Nilphamari", "Saidpur", "নীলফামারী"],
+    metaDescription: "Find top beauty parlours and bridal styling specialists in Saidpur and Nilphamari on Parloora.",
+  },
+  {
+    id: "panchagarh",
+    name: "Panchagarh",
+    bnName: "পঞ্চগড়",
+    slug: "panchagarh",
+    divisionId: "rangpur",
+    divisionName: "Rangpur",
+    divisionSlug: "rangpur-division",
+    popularAreas: ["Panchagarh Sadar", "Tetulia", "Boda", "Debiganj"],
+    aliases: ["Panchagarh", "পঞ্চগড়"],
+    metaDescription: "Explore verified beauty salons and self-care providers in Panchagarh and Tetulia with Parloora.",
+  },
+  {
+    id: "thakurgaon",
+    name: "Thakurgaon",
+    bnName: "ঠাকুরগাঁও",
+    slug: "thakurgaon",
+    divisionId: "rangpur",
+    divisionName: "Rangpur",
+    divisionSlug: "rangpur-division",
+    popularAreas: ["Thakurgaon Sadar", "Pirganj", "Rani Sankail", "Baliadangi"],
+    aliases: ["Thakurgaon", "ঠাকুরগাঁও"],
+    metaDescription: "Find reputable beauty parlours and grooming centers in Thakurgaon on Parloora.",
+  },
+
+  // ── Mymensingh Division (4) ──
+  {
+    id: "mymensingh",
+    name: "Mymensingh",
+    bnName: "ময়মনসিংহ",
+    slug: "mymensingh",
+    divisionId: "mymensingh",
+    divisionName: "Mymensingh",
+    divisionSlug: "mymensingh-division",
+    popularAreas: ["Town Hall Area", "Mymensingh Sadar", "Trishal", "Muktagachha", "Bhaluka", "Gafargaon"],
+    aliases: ["Mymensingh", "ময়মনসিংহ"],
+    metaDescription: "Find verified beauty parlours, bridal studios, and hair salons in Mymensingh. Check prices and book online with Parloora.",
+  },
+  {
+    id: "jamalpur",
+    name: "Jamalpur",
+    bnName: "জামালপুর",
+    slug: "jamalpur",
+    divisionId: "mymensingh",
+    divisionName: "Mymensingh",
+    divisionSlug: "mymensingh-division",
+    popularAreas: ["Jamalpur Sadar", "Sarishabari", "Melandaha", "Dewanganj"],
+    aliases: ["Jamalpur", "জামালপুর"],
+    metaDescription: "Discover authentic beauty parlours and bridal artists in Jamalpur with Parloora.",
+  },
+  {
+    id: "netrokona",
+    name: "Netrokona",
+    bnName: "নেত্রকোণা",
+    slug: "netrokona",
+    divisionId: "mymensingh",
+    divisionName: "Mymensingh",
+    divisionSlug: "mymensingh-division",
+    popularAreas: ["Netrokona Sadar", "Kendua", "Mohanganj", "Durgapur"],
+    aliases: ["Netrokona", "নেত্রকোণা"],
+    metaDescription: "Explore trusted beauty salons, facial spas, and grooming shops in Netrokona on Parloora.",
+  },
+  {
+    id: "sherpur",
+    name: "Sherpur",
+    bnName: "শেরপুর",
+    slug: "sherpur",
+    divisionId: "mymensingh",
+    divisionName: "Mymensingh",
+    divisionSlug: "mymensingh-division",
+    popularAreas: ["Sherpur Sadar", "Nalitabari", "Nakla", "Jhenaigati"],
+    aliases: ["Sherpur", "শেরপুর"],
+    metaDescription: "Find quality beauty parlours and self-care services in Sherpur on Parloora.",
+  },
+
+  // ── Barishal Division (6) ──
+  {
+    id: "barishal",
+    name: "Barishal",
+    bnName: "বরিশাল",
+    slug: "barishal",
+    divisionId: "barishal",
+    divisionName: "Barishal",
+    divisionSlug: "barishal-division",
+    popularAreas: ["Sadartola", "Barishal Sadar", "Natullabad", "Rupatali", "Gournadi", "Bakerganj"],
+    aliases: ["Barishal", "Barisal", "বরিশাল"],
+    metaDescription: "Find premier beauty parlours, hair styling salons, and bridal makeover artists in Barishal on Parloora.",
+  },
+  {
+    id: "patuakhali",
+    name: "Patuakhali",
+    bnName: "পটুয়াখালী",
+    slug: "patuakhali",
+    divisionId: "barishal",
+    divisionName: "Barishal",
+    divisionSlug: "barishal-division",
+    popularAreas: ["Patuakhali Sadar", "Kuakata", "Galachipa", "Bauphal"],
+    aliases: ["Patuakhali", "Kuakata", "পটুয়াখালী"],
+    metaDescription: "Discover beauty parlours, resort spas, and hair salons in Patuakhali and Kuakata with Parloora.",
+  },
+  {
+    id: "bhola",
+    name: "Bhola",
+    bnName: "ভোলা",
+    slug: "bhola",
+    divisionId: "barishal",
+    divisionName: "Barishal",
+    divisionSlug: "barishal-division",
+    popularAreas: ["Bhola Sadar", "Char Fasson", "Borhanuddin", "Lalmohan"],
+    aliases: ["Bhola", "ভোলা"],
+    metaDescription: "Explore verified beauty parlours and self-care providers in Bhola Island on Parloora.",
+  },
+  {
+    id: "pirojpur",
+    name: "Pirojpur",
+    bnName: "পিরোজপুর",
+    slug: "pirojpur",
+    divisionId: "barishal",
+    divisionName: "Barishal",
+    divisionSlug: "barishal-division",
+    popularAreas: ["Pirojpur Sadar", "Mathbaria", "Bhandaria", "Nazirpur"],
+    aliases: ["Pirojpur", "পিরোজপুর"],
+    metaDescription: "Find trusted beauty care and grooming salons in Pirojpur on Parloora.",
+  },
+  {
+    id: "barguna",
+    name: "Barguna",
+    bnName: "বরগুনা",
+    slug: "barguna",
+    divisionId: "barishal",
+    divisionName: "Barishal",
+    divisionSlug: "barishal-division",
+    popularAreas: ["Barguna Sadar", "Amtali", "Patharghata", "Betagi"],
+    aliases: ["Barguna", "বরগুনা"],
+    metaDescription: "Discover authentic beauty parlours and bridal artists in Barguna with Parloora.",
+  },
+  {
+    id: "jhalokati",
+    name: "Jhalokati",
+    bnName: "ঝালকাঠি",
+    slug: "jhalokati",
+    divisionId: "barishal",
+    divisionName: "Barishal",
+    divisionSlug: "barishal-division",
+    popularAreas: ["Jhalokati Sadar", "Rajapur", "Nalchity", "Kathalia"],
+    aliases: ["Jhalokati", "Jhalakati", "ঝালকাঠি"],
+    metaDescription: "Find verified beauty parlours and hair salons in Jhalokati on Parloora.",
+  },
+]
+
+// ─── SERVICE CATEGORIES FOR DISTRICT SEO ──────────────────────────────────────
+
+export const SERVICE_CATEGORIES_SEO: ServiceCategorySEO[] = [
+  {
+    id: "beauty-parlours",
+    slug: "beauty-parlours",
+    name: "Beauty Parlours",
+    bnName: "বিউটি পার্লার",
+    metaTitleSuffix: "Beauty Parlours & Self-Care",
+    description: "Full-service beauty parlours offering expert facials, waxing, manicure, pedicure, and personalized beauty care.",
+    keywords: ["beauty parlour", "women beauty salon", "facial treatment", "manicure", "pedicure", "waxing"],
+    iconName: "Sparkles",
+  },
+  {
+    id: "salons",
+    slug: "salons",
+    name: "Hair & Beauty Salons",
+    bnName: "স্যালুন",
+    metaTitleSuffix: "Hair Salons & Styling",
+    description: "Professional hair stylists offering modern haircuts, blow dries, smoothening, rebonding, and coloring treatments.",
+    keywords: ["hair salon", "haircut", "hair rebonding", "hair color", "hair spa", "hair styling"],
+    iconName: "Scissors",
+  },
+  {
+    id: "mens-salons",
+    slug: "mens-salons",
+    name: "Men's Salons & Grooming",
+    bnName: "মেনস স্যালুন",
+    metaTitleSuffix: "Men's Salons & Gents Grooming",
+    description: "Dedicated gents salons offering precision haircuts, beard trimming, styling, facials, and grooming packages.",
+    keywords: ["mens salon", "gents parlour", "beard grooming", "mens haircut", "gents facial"],
+    iconName: "User",
+  },
+  {
+    id: "makeup-artists",
+    slug: "makeup-artists",
+    name: "Bridal & Party Makeup",
+    bnName: "মেকআপ আর্টিস্ট",
+    metaTitleSuffix: "Bridal & Party Makeup Artists",
+    description: "Certified makeup artists and makeover studios for wedding brides, reception glam, engagement, and festive parties.",
+    keywords: ["bridal makeup", "makeup artist", "party makeup", "holud makeup", "bridal makeover"],
+    iconName: "Palette",
+  },
+  {
+    id: "spas",
+    slug: "spas",
+    name: "Spas & Wellness",
+    bnName: "স্পা ও রিলাক্সেশন",
+    metaTitleSuffix: "Spas & Body Massage",
+    description: "Relaxing wellness spas providing deep tissue massage, aromatherapy, body polishes, and steam therapy.",
+    keywords: ["spa near me", "body massage", "aromatherapy", "wellness spa", "body scrub"],
+    iconName: "HeartPulse",
+  },
+  {
+    id: "skincare",
+    slug: "skincare",
+    name: "Skin Care & Facials",
+    bnName: "স্কিন কেয়ার",
+    metaTitleSuffix: "Skin Care & Facial Clinics",
+    description: "Specialized skincare clinics and estheticians for hydra-facials, acne care, brightening, and organic remedies.",
+    keywords: ["skincare salon", "hydra facial", "acne treatment", "skin whitening", "organic facial"],
+    iconName: "Sparkles",
+  },
+]
+
+// ─── HELPER FUNCTIONS ────────────────────────────────────────────────────────
+
+export function getAllDivisions(): Division[] {
+  return BANGLADESH_DIVISIONS
+}
+
+export function getDivisionBySlug(slug: string): Division | undefined {
+  const normalized = slug.toLowerCase().trim()
+  return BANGLADESH_DIVISIONS.find(
+    (d) => d.slug === normalized || d.id === normalized || `${d.id}-division` === normalized
+  )
+}
+
+export function getAllDistricts(): District[] {
+  return BANGLADESH_DISTRICTS_DATA
+}
+
+export function getDistrictBySlug(slug: string): District | undefined {
+  const normalized = slug.toLowerCase().trim().replace(/_/g, "-")
+  return BANGLADESH_DISTRICTS_DATA.find(
+    (d) => d.slug === normalized || d.id === normalized
+  )
+}
+
+export function getDistrictByNameOrAlias(query: string): District | undefined {
+  if (!query) return undefined
+  const cleaned = query.trim().toLowerCase()
+  return BANGLADESH_DISTRICTS_DATA.find((d) => {
+    if (d.name.toLowerCase() === cleaned) return true
+    if (d.bnName === query.trim()) return true
+    if (d.slug === cleaned) return true
+    return d.aliases.some((a) => a.trim().toLowerCase() === cleaned)
+  })
+}
+
+export function getDistrictsByDivision(divisionId: string): District[] {
+  const normalized = divisionId.toLowerCase().replace("-division", "").trim()
+  return BANGLADESH_DISTRICTS_DATA.filter((d) => d.divisionId === normalized)
+}
+
+export function getNearbyDistricts(districtId: string, limit = 4): District[] {
+  const current = getDistrictBySlug(districtId)
+  if (!current) return []
+  return BANGLADESH_DISTRICTS_DATA.filter(
+    (d) => d.divisionId === current.divisionId && d.id !== current.id
+  ).slice(0, limit)
+}
+
+export function getAllServiceCategoriesSEO(): ServiceCategorySEO[] {
+  return SERVICE_CATEGORIES_SEO
+}
+
+export function getServiceCategorySEOBySlug(slug: string): ServiceCategorySEO | undefined {
+  const normalized = slug.toLowerCase().trim()
+  return SERVICE_CATEGORIES_SEO.find((c) => c.slug === normalized || c.id === normalized)
+}

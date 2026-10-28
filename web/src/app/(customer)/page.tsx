@@ -23,6 +23,7 @@ import { HeroSearch } from "@/components/shared/HeroSearch"
 import { NearYouSection } from "@/components/shared/NearYouSection"
 import { getHomepageSections } from "@/lib/actions/page-builder"
 import { MobileHomeHeader } from "@/components/shared/MobileHomeHeader"
+import { LocationsExploreSection } from "@/components/shared/LocationsExploreSection"
 
 const defaultContent = {
   hero_title: "Book Your Self-Care Services in Seconds",
@@ -541,6 +542,8 @@ export default async function HomePage() {
                 </div>
               </section>
             )
+          case "locations":
+            return <LocationsExploreSection key="locations" />
           case "cta":
             return (
               <section key="cta" className="py-16 md:py-24 bg-gradient-to-br from-[#1C0825] via-[#4B1D5F] to-[#2E0F3E] relative overflow-hidden">

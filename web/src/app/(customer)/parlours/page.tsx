@@ -230,6 +230,16 @@ export default function ParloursPage() {
               ✨ AI Search
             </button>
           </div>
+
+          <div className="mt-4">
+            <Link
+              href="/locations"
+              className="inline-flex items-center gap-1.5 text-xs text-white/80 hover:text-[#E2A9A9] transition-colors font-medium underline decoration-white/30 underline-offset-4"
+            >
+              <span>Browse by location: All 64 Districts of Bangladesh</span>
+              <ChevronRight className="w-3.5 h-3.5 text-[#E2A9A9]" />
+            </Link>
+          </div>
         </div>
       </div>
 
