@@ -157,7 +157,6 @@ export function Navbar() {
 
         {/* Mobile Actions */}
         <div className="flex md:hidden items-center gap-2">
-          <LanguageSwitcher />
           <Button 
             variant="ghost" 
             size="icon-sm"

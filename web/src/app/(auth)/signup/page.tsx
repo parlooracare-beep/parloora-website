@@ -194,7 +194,7 @@ function SignupForm() {
               <span className="text-sm font-semibold text-brand-gray-500 group-hover:text-brand-gray-900 transition-colors">{t("common.back")}</span>
             </Link>
           </Button>
-          <LanguageSwitcher />
+          <LanguageSwitcher className="hidden sm:inline-flex" />
         </div>
 
         {/* Mobile Logo */}

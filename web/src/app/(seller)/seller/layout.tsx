@@ -2,230 +2,142 @@
 
 import * as React from "react"
 import Link from "next/link"
-import Image from "next/image"
-import { ParlooraLogo } from "@/components/shared/Logo"
 import { usePathname } from "next/navigation"
-import {
-  LayoutDashboard, Calendar, Scissors, Package, BarChart2,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  Settings, LogOut, Menu, X, Sparkles, Bell, ChevronDown, ShoppingBag, Users, Wallet
+import { 
+  Store, 
+  Calendar, 
+  Users, 
+  Settings, 
+  PlusCircle, 
+  Sparkles,
+  Clock,
+  ExternalLink,
+  ChevronDown,
+  Menu,
+  X,
+  CreditCard,
+  Building2,
+  Package
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
-import { SellerMobileNav } from "@/components/seller/SellerMobileNav"
 import { NotificationBell } from "@/components/shared/NotificationBell"
 import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher"
 import { useI18n } from "@/lib/store/useI18n"
 
 const NAV_ITEMS = [
-  { key: "dashboard", label: "Dashboard", href: "/seller/dashboard", icon: LayoutDashboard },
-  { key: "bookings", label: "Bookings", href: "/seller/bookings", icon: Calendar },
-  { key: "orders", label: "Orders", href: "/seller/orders", icon: Package },
-  { key: "services", label: "Services", href: "/seller/services", icon: Scissors },
-  { key: "staff", label: "Staff", href: "/seller/staff", icon: Users },
-  { key: "products", label: "Products", href: "/seller/products", icon: ShoppingBag },
-  { key: "analytics", label: "Analytics", href: "/seller/analytics", icon: BarChart2 },
-  { key: "payouts", label: "Payouts", href: "/seller/payouts", icon: Wallet },
-  { key: "settings", label: "Settings", href: "/seller/settings", icon: Settings },
+  { label: "Dashboard", href: "/seller/dashboard", icon: Store, key: "dashboard" },
+  { label: "Appointments", href: "/seller/appointments", icon: Calendar, key: "appointments" },
+  { label: "Parlours", href: "/seller/parlours", icon: Building2, key: "parlours" },
+  { label: "Products", href: "/seller/products", icon: Package, key: "products" },
+  { label: "Services", href: "/seller/services", icon: Sparkles, key: "services" },
+  { label: "Opening Hours", href: "/seller/hours", icon: Clock, key: "hours" },
+  { label: "Staff", href: "/seller/staff", icon: Users, key: "staff" },
+  { label: "Earnings", href: "/seller/earnings", icon: CreditCard, key: "earnings" },
+  { label: "Settings", href: "/seller/settings", icon: Settings, key: "settings" },
 ]
 
-interface SidebarContentProps {
-  pathname: string
-  onClose: () => void
-  onLogout: () => void
-}
-
-function SidebarContent({ pathname, onClose, onLogout }: SidebarContentProps) {
-  const { t } = useI18n()
-
-  return (
-    <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div className="px-5 py-6 border-b border-white/10">
-        <ParlooraLogo
-          size="md"
-          variant="light"
-          href="/seller/dashboard"
-          subtext={t("seller.portalTitle", "Seller Portal")}
-          subtextClassName="text-white/60 text-[10px] leading-none mt-0.5"
-        />
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
-        {NAV_ITEMS.map(({ key, label, href, icon: Icon }) => {
-          const active = pathname === href || pathname.startsWith(href + "/")
-          const translatedLabel = t(`seller.${key}`, label)
-          return (
-            <Link
-              key={href}
-              href={href}
-              onClick={onClose}
-              className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all",
-                active
-                  ? "bg-white/15 text-white shadow-inner border border-white/10"
-                  : "text-white/70 hover:bg-white/10 hover:text-white"
-              )}
-            >
-              <Icon className="w-4.5 h-4.5 shrink-0" strokeWidth={active ? 2.5 : 2} />
-              {translatedLabel}
-              {active && <span className="ml-auto w-2 h-2 bg-[#E2A9A9] rounded-full shadow-[0_0_10px_#E2A9A9]" />}
-            </Link>
-          )
-        })}
-      </nav>
-
-      {/* Logout */}
-      <div className="px-3 py-4 border-t border-white/10">
-        <button
-          onClick={onLogout}
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-white/50 hover:bg-white/10 hover:text-white transition-all w-full cursor-pointer"
-        >
-          <LogOut className="w-4 h-4" />
-          {t("seller.signOut", "Sign Out")}
-        </button>
-      </div>
-    </div>
-  )
-}
-
-export default function SellerLayout({ children }: { children: React.ReactNode }) {
-  const { t } = useI18n()
+export default function SellerLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const pathname = usePathname()
-  const router = useRouter()
+  const { t } = useI18n()
   const [sidebarOpen, setSidebarOpen] = React.useState(false)
-  const [parlourStatus, setParlourStatus] = React.useState<string | null>(null)
-  const [loading, setLoading] = React.useState(true)
-
-  React.useEffect(() => {
-    let cancelled = false
-    
-    // Safety timeout: if checking takes longer than 5 seconds, let the workspace load anyway
-    const timeoutId = setTimeout(() => {
-      if (!cancelled) {
-        console.warn("Seller check parlour timed out")
-        setLoading(false)
-      }
-    }, 5000)
-
-    async function checkParlour() {
-      try {
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        
-        if (cancelled) return
-
-        if (!user) {
-          clearTimeout(timeoutId)
-          router.push("/login")
-          return
-        }
-
-        const { data: parlour, error } = await supabase
-          .from("parlours")
-          .select("status")
-          .eq("owner_id", user.id)
-          .single()
-
-        if (cancelled) return
-        clearTimeout(timeoutId)
-
-        if (error || !parlour) {
-          console.error("No parlour found for seller:", error)
-          setLoading(false)
-          return
-        }
-
-        setParlourStatus(parlour.status)
-        setLoading(false)
-
-        // Redirect logic
-        const isAllowedPath = pathname === "/seller/pending" || 
-                              pathname === "/seller/settings" || 
-                              pathname === "/seller/services" || 
-                              pathname.startsWith("/seller/services/")
-
-        if (parlour.status === "pending" && !isAllowedPath) {
-          router.push("/seller/pending")
-        } else if (parlour.status === "active" && pathname === "/seller/pending") {
-          router.push("/seller/dashboard")
-        }
-      } catch (err) {
-        console.error("Error in checkParlour:", err)
-        if (!cancelled) setLoading(false)
-      }
-    }
-
-    checkParlour()
-
-    return () => {
-      cancelled = true
-      clearTimeout(timeoutId)
-    }
-  }, [pathname, router])
-
-  const handleLogout = async () => {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push("/login")
-    router.refresh()
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-brand-gray-50">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-brand-gray-500 font-medium">Loading Workspace...</p>
-        </div>
-      </div>
-    )
-  }
-
-  // If pending, only show the pending page content without the full sidebar/header 
-  // OR show a simplified version. For now, let's just let the pending page render 
-  // its own full-screen UI if the layout allows it.
-  if (parlourStatus === "pending" && pathname === "/seller/pending") {
-    return <div className="min-h-screen bg-brand-gray-50">{children}</div>
-  }
 
   return (
     <div className="min-h-screen bg-brand-gray-50 flex">
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 shrink-0 bg-gradient-to-b from-[#1C0825] via-[#4B1D5F] to-[#250831] border-r border-white/10 flex-col fixed inset-y-0 left-0 z-30">
-        <SidebarContent
-          pathname={pathname}
-          onClose={() => setSidebarOpen(false)}
-          onLogout={handleLogout}
-        />
-      </aside>
-
-      {/* Mobile Sidebar Overlay */}
+      {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
-        <div className="fixed inset-0 z-40 md:hidden">
-          <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setSidebarOpen(false)}
-          />
-          <aside className="absolute inset-y-0 left-0 w-64 bg-gradient-to-b from-[#1C0825] via-[#4B1D5F] to-[#250831] border-r border-white/10 flex flex-col shadow-2xl">
-            <SidebarContent
-              pathname={pathname}
-              onClose={() => setSidebarOpen(false)}
-              onLogout={handleLogout}
-            />
-          </aside>
-        </div>
+        <div 
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
       )}
 
+      {/* Sidebar */}
+      <aside className={cn(
+        "fixed top-0 bottom-0 left-0 z-50 w-64 bg-white border-r border-brand-gray-200 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:z-auto",
+        sidebarOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        {/* Logo */}
+        <div className="h-16 flex items-center justify-between px-6 border-b border-brand-gray-100">
+          <Link href="/seller/dashboard" className="flex items-center gap-2 font-bold text-xl text-primary">
+            <span className="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center font-black shadow-md shadow-primary/20">
+              P
+            </span>
+            <span className="text-brand-gray-900 font-extrabold tracking-tight">Partner Portal</span>
+          </Link>
+          <button 
+            onClick={() => setSidebarOpen(false)}
+            className="md:hidden text-brand-gray-400 hover:text-brand-gray-600"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Action Button */}
+        <div className="p-4">
+          <Link
+            href="/seller/services/new"
+            className="flex items-center justify-center gap-2 w-full py-2.5 px-4 bg-primary text-white rounded-xl font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors"
+          >
+            <PlusCircle className="w-4 h-4" />
+            Add New Service
+          </Link>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon
+            const isActive = pathname.startsWith(item.href)
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setSidebarOpen(false)}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all duration-200 group relative",
+                  isActive
+                    ? "bg-primary text-white shadow-md shadow-primary/20"
+                    : "text-brand-gray-600 hover:text-primary hover:bg-primary/5"
+                )}
+              >
+                <Icon className={cn(
+                  "w-4 h-4 transition-transform duration-200 group-hover:scale-110",
+                  isActive ? "text-white" : "text-brand-gray-400 group-hover:text-primary"
+                )} />
+                <span>{t(`seller.${item.key}`, item.label)}</span>
+              </Link>
+            )
+          })}
+        </nav>
+
+        {/* Live Site Link */}
+        <div className="p-3 border-t border-brand-gray-100">
+          <Link 
+            href="/" 
+            target="_blank"
+            className="flex items-center justify-between p-2 text-xs font-medium text-brand-gray-500 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors group"
+          >
+            <span className="flex items-center gap-2">
+              <ExternalLink className="w-3.5 h-3.5 text-brand-gray-400 group-hover:text-primary" />
+              Customer Site
+            </span>
+            <span className="text-[10px] bg-brand-gray-100 group-hover:bg-primary/10 group-hover:text-primary px-1.5 py-0.5 rounded text-brand-gray-500 font-mono">
+              Live
+            </span>
+          </Link>
+        </div>
+      </aside>
+
       {/* Main Content */}
-      <div className="flex-1 md:ml-64 flex flex-col min-h-screen">
-        {/* Top Bar */}
-        <header className="sticky top-0 z-20 bg-white border-b shadow-sm px-4 md:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Top Navbar */}
+        <header className="h-16 bg-white border-b border-brand-gray-200 px-4 md:px-8 flex items-center justify-between sticky top-0 z-30">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
               className="md:hidden p-2 text-brand-gray-500 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
@@ -243,7 +155,7 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
 
           <div className="flex items-center gap-2.5 sm:gap-3">
             {/* Language Switcher */}
-            <LanguageSwitcher variant="light" />
+            <LanguageSwitcher variant="light" className="hidden sm:inline-flex" />
 
             {/* Notifications */}
             <NotificationBell />
@@ -265,8 +177,6 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
         <main className="flex-1 p-4 md:p-6 lg:p-8 pb-24 md:pb-8">
           {children}
         </main>
-
-        <SellerMobileNav />
       </div>
     </div>
   )

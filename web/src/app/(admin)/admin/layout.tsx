@@ -2,255 +2,208 @@
 
 import * as React from "react"
 import Link from "next/link"
-import NextImage from "next/image"
-import { ParlooraLogo } from "@/components/shared/Logo"
 import { usePathname } from "next/navigation"
 import {
-  LayoutDashboard, Users, Store, Receipt, AlertTriangle,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  Settings, LogOut, Menu, ShieldCheck, Bell, ChevronDown,
-  Scissors, Package, Calendar, ShoppingBag, Loader2,
-  BookOpen, Image as ImageIcon, LayoutTemplate, Terminal, Wallet, Ticket, MapPin
+  LayoutDashboard,
+  Store,
+  Calendar,
+  Users,
+  Settings,
+  LogOut,
+  ExternalLink,
+  ChevronDown,
+  Menu,
+  X,
+  CreditCard,
+  Tag,
+  ShieldCheck,
+  Activity,
+  MapPin,
+  Sparkles,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { createClient } from "@/lib/supabase/client"
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { getAdminMetrics } from "@/lib/actions/admin"
+import { NotificationBell } from "@/components/shared/NotificationBell"
+import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { User as UserIcon, Settings as SettingsIcon, LogOut as LogOutIcon } from "lucide-react"
-import { NotificationBell } from "@/components/shared/NotificationBell"
-import { AdminMobileNav } from "@/components/admin/AdminMobileNav"
-import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher"
 import { useI18n } from "@/lib/store/useI18n"
 
 const NAV_ITEMS = [
-  { key: "overview", label: "Overview", href: "/admin/dashboard", icon: LayoutDashboard },
-  { key: "users", label: "Users", href: "/admin/users", icon: Users },
-  { key: "sellers", label: "Sellers", href: "/admin/sellers", icon: ShieldCheck },
-  { key: "parlours", label: "Parlours", href: "/admin/parlours", icon: Store },
-  { key: "services", label: "Services", href: "/admin/services", icon: Scissors },
-  { key: "products", label: "Products", href: "/admin/products", icon: Package },
-  { key: "bookings", label: "Bookings", href: "/admin/bookings", icon: Calendar },
-  { key: "orders", label: "Orders", href: "/admin/orders", icon: ShoppingBag },
-  { key: "transactions", label: "Transactions", href: "/admin/transactions", icon: Receipt },
-  { key: "payoutRequests", label: "Payout Requests", href: "/admin/payouts", icon: Wallet },
-  { key: "promoCodes", label: "Promo Codes", href: "/admin/promo-codes", icon: Ticket },
-  { key: "blogCms", label: "Blog CMS", href: "/admin/blog", icon: BookOpen },
-  { key: "mediaLibrary", label: "Media Library", href: "/admin/media", icon: ImageIcon },
-  { key: "pageBuilder", label: "Page Builder", href: "/admin/page-builder", icon: LayoutTemplate },
-  { key: "districtSeo", label: "District SEO (64)", href: "/admin/locations", icon: MapPin },
-  { key: "auditLogs", label: "Audit Logs", href: "/admin/activity-logs", icon: Terminal },
-  { key: "reports", label: "Reports", href: "/admin/reports", icon: AlertTriangle },
-  { key: "settings", label: "Settings", href: "/admin/settings", icon: Settings },
+  { label: "Dashboard", href: "/admin", icon: LayoutDashboard, key: "dashboard" },
+  { label: "Parlours", href: "/admin/parlours", icon: Store, key: "parlours" },
+  { label: "Services", href: "/admin/services", icon: Sparkles, key: "services" },
+  { label: "Bookings", href: "/admin/bookings", icon: Calendar, key: "bookings" },
+  { label: "Promo Codes", href: "/admin/promo-codes", icon: Tag, key: "promoCodes" },
+  { label: "Commission & Payouts", href: "/admin/payouts", icon: CreditCard, key: "payouts" },
+  { label: "Locations", href: "/admin/locations", icon: MapPin, key: "locations" },
+  { label: "Activity Logs", href: "/admin/activity-logs", icon: Activity, key: "activityLogs" },
+  { label: "Users & Roles", href: "/admin/users", icon: Users, key: "users" },
+  { label: "Settings", href: "/admin/settings", icon: Settings, key: "settings" },
 ]
-
-interface AdminSidebarContentProps {
-  pathname: string
-  onClose: () => void
-  onLogout: () => void
-}
-
-function AdminSidebarContent({ pathname, onClose, onLogout }: AdminSidebarContentProps) {
-  const { t } = useI18n()
-
-  return (
-    <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div className="px-5 py-6 border-b border-brand-gray-100">
-        <ParlooraLogo
-          size="md"
-          variant="dark"
-          href="/admin/dashboard"
-          subtext={t("admin.adminControl", "Super Admin")}
-          subtextClassName="text-red-500 font-bold tracking-wider uppercase"
-        />
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
-        {NAV_ITEMS.map(({ key, label, href, icon: Icon }) => {
-          const active = pathname === href || pathname.startsWith(href + "/")
-          const translatedLabel = t(`admin.${key}`, label)
-          return (
-            <Link
-              key={href}
-              href={href}
-              onClick={onClose}
-              className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
-                active
-                  ? "bg-primary/10 text-primary shadow-sm"
-                  : "text-brand-gray-500 hover:bg-brand-gray-50 hover:text-brand-gray-900"
-              )}
-            >
-              <Icon className="w-4.5 h-4.5 shrink-0" strokeWidth={active ? 2.5 : 2} />
-              {translatedLabel}
-              {active && <span className="ml-auto w-1.5 h-1.5 bg-primary rounded-full shadow-[0_0_8px_rgba(75,30,109,0.5)]" />}
-            </Link>
-          )
-        })}
-      </nav>
-
-      {/* Logout */}
-      <div className="px-3 py-4 border-t border-brand-gray-100">
-        <button
-          onClick={onLogout}
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-brand-gray-500 hover:bg-red-50 hover:text-red-600 transition-all w-full cursor-pointer"
-        >
-          <LogOut className="w-4 h-4" />
-          {t("common.logout", "System Logout")}
-        </button>
-      </div>
-    </div>
-  )
-}
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const router = useRouter()
   const { t } = useI18n()
   const [sidebarOpen, setSidebarOpen] = React.useState(false)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [user, setUser] = React.useState<any>(null)
-  const [authChecked, setAuthChecked] = React.useState(false)
 
   React.useEffect(() => {
-    let cancelled = false
-
-    // Hard timeout — if auth check takes >5s, redirect to dashboard to avoid infinite spinner
-    const timeoutId = setTimeout(() => {
-      if (!cancelled) {
-        console.warn("Admin auth check timed out — redirecting to dashboard")
-        router.push("/dashboard")
-      }
-    }, 5000)
-
     const supabase = createClient()
-    supabase.auth.getUser()
-      .then(({ data: { user } }) => {
-        if (cancelled) return
-        clearTimeout(timeoutId)
+    supabase.auth.getUser().then(({ data: { user } }) => setUser(user))
+  }, [])
 
-        if (!user) {
-          router.push("/login")
-          return
-        }
-
-        // 1. First check JWT claims (cached role, zero latency)
-        const jwtRole = user.app_metadata?.role || user.user_metadata?.role
-        if (jwtRole?.toLowerCase() === "admin") {
-          if (!cancelled) {
-            setUser(user)
-            setAuthChecked(true)
-          }
-          return
-        }
-        
-        // 2. Fallback: database role check
-        supabase.from("users").select("role").eq("id", user.id).single()
-          .then(
-            ({ data }) => {
-              if (cancelled) return
-              if (data?.role?.toLowerCase() !== "admin") {
-                router.push("/dashboard")
-              } else {
-                setUser(user)
-                setAuthChecked(true)
-              }
-            },
-            () => {
-              if (!cancelled) router.push("/dashboard")
-            }
-          )
-      },
-      () => {
-        if (!cancelled) {
-          clearTimeout(timeoutId)
-          router.push("/login")
-        }
-      })
-
-    return () => {
-      cancelled = true
-      clearTimeout(timeoutId)
-    }
-  }, [router])
-
-  // Show full-screen loader while verifying auth
-  if (!authChecked) {
-    return (
-      <div className="min-h-screen bg-brand-gray-100 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4 text-center max-w-xs">
-          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-            <Loader2 className="w-8 h-8 text-primary animate-spin" />
-          </div>
-          <div>
-            <p className="text-brand-gray-900 font-semibold text-sm">Verifying Access</p>
-            <p className="text-brand-gray-400 text-xs mt-1">Checking your admin credentials...</p>
-          </div>
-          <button
-            onClick={() => router.push("/dashboard")}
-            className="mt-2 text-xs text-brand-gray-400 underline hover:text-brand-gray-700"
-          >
-            Not loading? Return to Dashboard
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  const handleLogout = async () => {
+  const handleSignOut = async () => {
     const supabase = createClient()
     await supabase.auth.signOut()
-    router.push("/login")
-    router.refresh()
+    window.location.href = "/login"
   }
 
   return (
-    <div className="min-h-screen bg-brand-gray-100 flex">
-      {/* Desktop Sidebar (Light Theme for Admin) */}
-      <aside className="hidden md:flex w-64 shrink-0 bg-white border-r border-brand-gray-100 flex-col fixed inset-y-0 left-0 z-30">
-        <AdminSidebarContent
-          pathname={pathname}
-          onClose={() => setSidebarOpen(false)}
-          onLogout={handleLogout}
-        />
-      </aside>
-
-      {/* Mobile Sidebar Overlay */}
+    <div className="min-h-screen bg-brand-gray-50 flex">
+      {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
-        <div className="fixed inset-0 z-40 md:hidden">
-          <div
-            className="absolute inset-0 bg-brand-gray-900/20 backdrop-blur-sm"
-            onClick={() => setSidebarOpen(false)}
-          />
-          <aside className="absolute inset-y-0 left-0 w-64 bg-white flex flex-col shadow-2xl">
-            <AdminSidebarContent
-              pathname={pathname}
-              onClose={() => setSidebarOpen(false)}
-              onLogout={handleLogout}
-            />
-          </aside>
-        </div>
+        <div
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs md:hidden animate-fade-in"
+          onClick={() => setSidebarOpen(false)}
+        />
       )}
 
-      {/* Main Content */}
-      <div className="flex-1 md:ml-64 flex flex-col min-h-screen">
-        {/* Top Bar */}
-        <header className="sticky top-0 z-20 bg-white border-b shadow-sm px-4 md:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+      {/* Sidebar */}
+      <aside
+        className={cn(
+          "fixed top-0 bottom-0 left-0 z-50 w-64 bg-brand-gray-900 text-white flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 md:static md:z-auto",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        {/* Brand header */}
+        <div className="h-16 flex items-center justify-between px-6 border-b border-brand-gray-800">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center shadow-lg shadow-amber-500/20">
+              <ShieldCheck className="w-5 h-5 text-brand-gray-950 font-bold" />
+            </div>
+            <div>
+              <span className="font-bold text-white text-base tracking-tight leading-none block">
+                Parloora
+              </span>
+              <span className="text-[10px] text-amber-400 font-semibold uppercase tracking-wider block mt-0.5">
+                Super Admin
+              </span>
+            </div>
+          </div>
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="md:hidden text-brand-gray-400 hover:text-white p-1"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Quick status bar */}
+        <div className="px-4 py-3 bg-brand-gray-950/50 border-b border-brand-gray-800/60 flex items-center justify-between text-xs">
+          <span className="text-brand-gray-400 flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            System Live
+          </span>
+          <span className="text-[11px] text-amber-400/90 font-mono bg-amber-400/10 px-2 py-0.5 rounded-full border border-amber-400/20">
+            v2.4-prod
+          </span>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+          <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-brand-gray-500 mb-2">
+            Platform Management
+          </p>
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon
+            const isActive =
+              item.href === "/admin"
+                ? pathname === "/admin"
+                : pathname.startsWith(item.href)
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setSidebarOpen(false)}
+                className={cn(
+                  "flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 group relative",
+                  isActive
+                    ? "bg-gradient-to-r from-amber-500 to-amber-600 text-brand-gray-950 font-bold shadow-md shadow-amber-500/20"
+                    : "text-brand-gray-300 hover:text-white hover:bg-brand-gray-800/70"
+                )}
+              >
+                <Icon
+                  className={cn(
+                    "w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110",
+                    isActive ? "text-brand-gray-950" : "text-brand-gray-400 group-hover:text-amber-400"
+                  )}
+                />
+                <span className="flex-1">{t(`admin.${item.key}`, item.label)}</span>
+                {isActive && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-brand-gray-950" />
+                )}
+              </Link>
+            )
+          })}
+        </nav>
+
+        {/* Live site link */}
+        <div className="px-3 py-2 border-t border-brand-gray-800/60">
+          <Link
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between px-3 py-2 text-xs font-medium text-brand-gray-400 hover:text-white hover:bg-brand-gray-800 rounded-lg transition-colors group"
+          >
+            <span className="flex items-center gap-2">
+              <ExternalLink className="w-3.5 h-3.5 text-brand-gray-400 group-hover:text-amber-400" />
+              View Live Website
+            </span>
+            <span className="text-[10px] bg-brand-gray-800 group-hover:bg-brand-gray-700 px-1.5 py-0.5 rounded text-brand-gray-400 font-mono">
+              ↗
+            </span>
+          </Link>
+        </div>
+
+        {/* User / Sign out footer */}
+        <div className="p-3 border-t border-brand-gray-800 bg-brand-gray-950/30">
+          <div className="flex items-center justify-between gap-3 px-2 py-1.5">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-full bg-amber-400 text-brand-gray-950 flex items-center justify-center text-xs font-bold shrink-0">
+                {user?.email?.charAt(0).toUpperCase() || "A"}
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-white truncate leading-none">
+                  Admin User
+                </p>
+                <p className="text-[10px] text-brand-gray-400 truncate mt-1">
+                  {user?.email || "admin@parloora.com"}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleSignOut}
+              title="Sign Out"
+              className="p-1.5 rounded-lg text-brand-gray-400 hover:text-red-400 hover:bg-brand-gray-800 transition-colors shrink-0"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Top Navbar */}
+        <header className="h-16 bg-white border-b border-brand-gray-200/80 px-4 md:px-8 flex items-center justify-between shrink-0 sticky top-0 z-30 shadow-xs">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
               className="md:hidden p-2 text-brand-gray-500 hover:text-brand-gray-900 hover:bg-brand-gray-100 rounded-lg transition-colors"
@@ -267,7 +220,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           <div className="flex items-center gap-2.5 sm:gap-3">
             {/* Language Switcher */}
-            <LanguageSwitcher variant="light" />
+            <LanguageSwitcher variant="light" className="hidden sm:inline-flex" />
 
             {/* Notifications */}
             <NotificationBell />
@@ -286,31 +239,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <ChevronDown className="w-3.5 h-3.5 text-brand-gray-400" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 p-2 border-none shadow-2xl bg-white rounded-2xl">
-                <DropdownMenuLabel className="px-2 py-2 text-xs font-bold text-brand-gray-400 uppercase tracking-widest">
-                  {t("common.settings", "Account Management")}
-                </DropdownMenuLabel>
-                <DropdownMenuItem 
-                  onClick={() => router.push("/admin/profile")}
-                  className="flex items-center gap-2 rounded-xl px-2 py-2.5 focus:bg-brand-gray-50 cursor-pointer"
-                >
-                  <UserIcon className="w-4 h-4 text-brand-gray-500" />
-                  <span className="text-sm font-medium text-brand-gray-700">{t("common.profile", "My Profile")}</span>
+              <DropdownMenuContent align="end" className="w-48 rounded-xl p-1 shadow-xl bg-white border border-brand-gray-100">
+                <DropdownMenuItem asChild className="rounded-lg text-xs font-medium cursor-pointer">
+                  <Link href="/admin/settings">System Settings</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => router.push("/admin/settings")}
-                  className="flex items-center gap-2 rounded-xl px-2 py-2.5 focus:bg-brand-gray-50 cursor-pointer"
-                >
-                  <SettingsIcon className="w-4 h-4 text-brand-gray-500" />
-                  <span className="text-sm font-medium text-brand-gray-700">{t("common.settings", "Settings")}</span>
+                <DropdownMenuItem asChild className="rounded-lg text-xs font-medium cursor-pointer">
+                  <Link href="/admin/activity-logs">Security Logs</Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator className="my-1 bg-brand-gray-100" />
-                <DropdownMenuItem 
-                  onClick={handleLogout}
-                  className="flex items-center gap-2 rounded-xl px-2 py-2.5 focus:bg-red-50 text-red-600 focus:text-red-700 cursor-pointer"
+                <div className="h-px bg-brand-gray-100 my-1" />
+                <DropdownMenuItem
+                  onClick={handleSignOut}
+                  className="rounded-lg text-xs font-medium text-red-600 focus:text-red-700 cursor-pointer"
                 >
-                  <LogOutIcon className="w-4 h-4" />
-                  <span className="text-sm font-bold">{t("common.logout", "Logout System")}</span>
+                  <LogOut className="w-3.5 h-3.5 mr-2" />
+                  Sign Out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -318,14 +260,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 md:p-6 lg:p-8 pb-24 pb-safe md:pb-8">
+        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto pb-24 md:pb-8">
           {children}
         </main>
-
-        {/* Mobile App Navigation */}
-        <AdminMobileNav onOpenMenu={() => setSidebarOpen(true)} />
       </div>
     </div>
   )
 }
-
