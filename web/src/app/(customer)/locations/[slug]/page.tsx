@@ -55,6 +55,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description: `Discover verified beauty parlours, salons, and self-care providers across ${division.name} Division, Bangladesh. Explore districts, compare service prices, and book appointments with Parloora.`,
       alternates: {
         canonical: `${siteUrl}/locations/${division.slug}`,
+        languages: {
+          en: `${siteUrl}/en/locations/${division.slug}`,
+          bn: `${siteUrl}/bn/locations/${division.slug}`,
+          "x-default": `${siteUrl}/locations/${division.slug}`,
+        },
       },
       openGraph: {
         title: `Beauty Parlours in ${division.name} Division | Parloora`,
@@ -105,6 +110,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     keywords,
     alternates: {
       canonical: `${siteUrl}/locations/${district.slug}`,
+      languages: {
+        en: `${siteUrl}/en/locations/${district.slug}`,
+        bn: `${siteUrl}/bn/locations/${district.slug}`,
+        "x-default": `${siteUrl}/locations/${district.slug}`,
+      },
     },
     openGraph: {
       title: article?.ogTitle || seoTitle,

@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Clock, ShieldCheck, Mail, ArrowLeft, ExternalLink, MessageCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { contactInfo } from "@/config/contact"
 
 export default function SellerPendingPage() {
   return (
@@ -69,9 +70,11 @@ export default function SellerPendingPage() {
             <h4 className="font-bold text-lg mb-1">Need help setting up?</h4>
             <p className="text-white/60 text-sm">Our partner support team is available 24/7 to assist you.</p>
           </div>
-          <Button className="bg-white text-brand-gray-900 rounded-xl px-6 font-bold hover:bg-white/90 shrink-0 gap-2 relative z-10">
-            <MessageCircle className="w-4 h-4" />
-            Contact Support
+          <Button asChild className="bg-white text-brand-gray-900 rounded-xl px-6 font-bold hover:bg-white/90 shrink-0 gap-2 relative z-10">
+            <a href={contactInfo.whatsappUrl} target="_blank" rel="noopener noreferrer">
+              <MessageCircle className="w-4 h-4 text-emerald-600" />
+              Contact Support
+            </a>
           </Button>
         </div>
 
